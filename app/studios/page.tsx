@@ -1,4 +1,6 @@
 // app/studios/page.tsx
+import Link from 'next/link';
+
 export default function StudiosPage() {
   return (
     <>
@@ -12,7 +14,7 @@ export default function StudiosPage() {
 
       <section className="section">
         <div className="cards-grid">
-          <div className="card">
+          <Link href="/studios/gorilla-ledger" className="card">
             <p className="card-tag">Fintech · Product</p>
             <h2 className="card-title">Gorilla Ledger™</h2>
             <p className="card-text">
@@ -24,23 +26,23 @@ export default function StudiosPage() {
               Built with Next.js and Supabase under the Savvy Gorilla ecosystem.
               Public release in phases.
             </p>
-          </div>
+          </Link>
 
-          <div className="card">
+          <Link href="/studios/our-matriline" className="card">
             <p className="card-tag">Podcast · Women · Legacy</p>
             <h2 className="card-title">Our Matriline Podcast</h2>
             <p className="card-text">
               A women-led storytelling space documenting the journeys from
               girlhood to womanhood, inter-tribal love, dowry politics, and the
-              sometimes messy beauty of matrilineal lines.
+              everyday politics of family and love.
             </p>
             <p className="card-meta">
               Savvy Gorilla supports branding, digital presence, and technical
               setup.
             </p>
-          </div>
+          </Link>
 
-          <div className="card">
+          <Link href="/studios/war-towards-purpose" className="card">
             <p className="card-tag">Docu-series · Memory</p>
             <h2 className="card-title">War Towards Purpose</h2>
             <p className="card-text">
@@ -52,9 +54,9 @@ export default function StudiosPage() {
               Produced by Savvy Gorilla Studios in collaboration with Motherland
               Entertainment.
             </p>
-          </div>
+          </Link>
 
-          <div className="card">
+          <Link href="/studios/roots-family-tree" className="card">
             <p className="card-tag">Storylab · Family</p>
             <h2 className="card-title">Roots Family Tree</h2>
             <p className="card-text">
@@ -66,9 +68,9 @@ export default function StudiosPage() {
               Early-stage; combining visual design, light tech, and oral
               history.
             </p>
-          </div>
+          </Link>
 
-          <div className="card">
+          <Link href="/studios/unmas-support" className="card">
             <p className="card-tag">Tech &amp; Comms · Partners</p>
             <h2 className="card-title">UNMAS &amp; humanitarian support</h2>
             <p className="card-text">
@@ -80,9 +82,9 @@ export default function StudiosPage() {
               Includes event concepts, reports, social media content, and
               partner-facing materials.
             </p>
-          </div>
+          </Link>
 
-          <div className="card">
+          <Link href="/studios/savvy-rilla-labs" className="card">
             <p className="card-tag">Studio · Experiments</p>
             <h2 className="card-title">Savvy Rilla Podcast &amp; side labs</h2>
             <p className="card-text">
@@ -93,7 +95,7 @@ export default function StudiosPage() {
             <p className="card-meta">
               Used as a lab to test workflows, formats, and brand directions.
             </p>
-          </div>
+          </Link>
         </div>
       </section>
 

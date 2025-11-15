@@ -8,6 +8,31 @@ export const metadata: Metadata = {
   title: 'Savvy Gorilla Technologies',
   description:
     'Savvy Gorilla Technologies builds modern web apps, storytelling products, and strategic communication for organisations and creators in South Sudan and across Africa.',
+  metadataBase: new URL('https://savvyrilla.tech'),
+  openGraph: {
+    title: 'Savvy Gorilla Technologies',
+    description:
+      'African Stories. African Systems. African Solutions. A Juba-based digital studio building web apps, podcasts, and strategic communication.',
+    url: 'https://savvyrilla.tech',
+    siteName: 'Savvy Gorilla Technologies',
+    images: [
+      {
+        url: '/og-savvy.png',
+        width: 1200,
+        height: 630,
+        alt: 'Savvy Gorilla Technologies – African Stories. African Systems. African Solutions.',
+      },
+    ],
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Savvy Gorilla Technologies',
+    description:
+      'African Stories. African Systems. African Solutions. A Juba-based digital studio building web apps, podcasts, and strategic communication.',
+    images: ['/og-savvy.png'],
+  },
 };
 
 function Nav() {
