@@ -1,7 +1,7 @@
 // app/contact/page.tsx
 export default function ContactPage() {
   return (
-    <>
+    <div className="page">
       <p className="page-eyebrow">Contact</p>
       <h1 className="page-title">Tell us what you are trying to build</h1>
       <p className="page-subtitle">
@@ -16,10 +16,7 @@ export default function ContactPage() {
           <p>
             You can reach us by email at:
             <br />
-            <a
-              href="mailto:info@savvyrilla.tech"
-              className="card-link"
-            >
+            <a href="mailto:info@savvyrilla.tech" className="card-link">
               info@savvyrilla.tech
             </a>
           </p>
@@ -82,6 +79,6 @@ export default function ContactPage() {
           </p>
         </form>
       </div>
-    </>
+    </div>
   );
 }

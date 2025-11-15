@@ -1,10 +1,10 @@
-// app/page.tsx  (Home)
+// app/page.tsx
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function HomePage() {
   return (
-    <>
+    <div className="page">
       <section className="hero">
         <div>
           <p className="hero-kicker">Savvy Gorilla Technologies</p>
@@ -70,7 +70,7 @@ export default function HomePage() {
         <div className="cards-grid">
           <div className="card">
             <p className="card-tag">Technology</p>
-            <h3 className="card-title">Web apps & digital tools</h3>
+            <h3 className="card-title">Web apps &amp; digital tools</h3>
             <p className="card-text">
               Design and development of modern, responsive web apps — from
               financial trackers and dashboards to internal tools and
@@ -83,7 +83,7 @@ export default function HomePage() {
           </div>
           <div className="card">
             <p className="card-tag">Storytelling</p>
-            <h3 className="card-title">Podcasts & docu-series</h3>
+            <h3 className="card-title">Podcasts &amp; docu-series</h3>
             <p className="card-text">
               Concepting, branding, and creative direction for audio and visual
               storytelling — including intros, episode artwork, and narrative
@@ -95,7 +95,7 @@ export default function HomePage() {
           </div>
           <div className="card">
             <p className="card-tag">Strategy</p>
-            <h3 className="card-title">Communication & strategy support</h3>
+            <h3 className="card-title">Communication &amp; strategy support</h3>
             <p className="card-text">
               Support to teams that need clear communication, event visibility,
               donor-facing materials, and light-touch strategic planning without
@@ -111,7 +111,7 @@ export default function HomePage() {
 
       <section className="section">
         <div className="section-header">
-          <h2 className="section-title">Selected studios & projects</h2>
+          <h2 className="section-title">Selected studios &amp; projects</h2>
           <p className="section-text">
             Savvy Gorilla hosts several in-house studios and products. Each one
             explores a different side of African life — finance, family,
@@ -147,7 +147,7 @@ export default function HomePage() {
               forgets them.
             </p>
             <p className="card-meta">
-              With Motherland Entertainment & Savvy Gorilla Studios.
+              With Motherland Entertainment &amp; Savvy Gorilla Studios.
             </p>
           </div>
         </div>
@@ -182,6 +182,6 @@ export default function HomePage() {
           Tell us about your project
         </Link>
       </section>
-    </>
+    </div>
   );
 }

@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function StudiosPage() {
   return (
-    <>
+    <div className="page">
       <p className="page-eyebrow">Studios &amp; Projects</p>
       <h1 className="page-title">The ecosystem around Savvy Gorilla</h1>
       <p className="page-subtitle">
@@ -74,9 +74,9 @@ export default function StudiosPage() {
             <p className="card-tag">Tech &amp; Comms · Partners</p>
             <h2 className="card-title">Humanitarian Support</h2>
             <p className="card-text">
-              Strategic communication, visibility, and tech training in
-              support of development and peacebuilding efforts in
-              South Sudan.
+              Strategic communication, visibility, and light tech thinking in
+              support of mine action, protection, and broader humanitarian
+              efforts in South Sudan and beyond.
             </p>
             <p className="card-meta">
               Includes event concepts, reports, social media content, and
@@ -109,6 +109,6 @@ export default function StudiosPage() {
           </p>
         </div>
       </section>
-    </>
+    </div>
   );
 }
