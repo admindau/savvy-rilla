@@ -6,7 +6,7 @@ type StudioSlug =
   | 'our-matriline'
   | 'war-towards-purpose'
   | 'roots-family-tree'
-  | 'unmas-support'
+  | 'humanitarian-support'
   | 'savvy-rilla-labs';
 
 const projects: Record<
@@ -62,11 +62,11 @@ const projects: Record<
       'Roots is still in an exploratory phase, serving as a sandbox for formats, templates, and platforms that may later be refined into a product.',
     ],
   },
-  'unmas-support': {
-    title: 'UNMAS & humanitarian support',
+  'humanitarian-support': {
+    title: 'humanitarian & humanitarian support',
     tag: 'Tech & Comms · Partners',
     intro:
-      'Savvy Gorilla provides strategic communication and light tech thinking in support of mine action and protection efforts, particularly alongside UNMAS in South Sudan.',
+      'Savvy Gorilla provides strategic communication and light tech thinking in support of mine action and protection efforts, particularly alongside humanitarian in South Sudan.',
     body: [
       'This work includes visibility and advocacy materials, social media content, donor-facing reports, and concept notes that capture the scale and nuance of mine action operations.',
       'We focus on making complex, technical work legible to multiple audiences — from affected communities and national authorities to international donors and partner agencies.',
@@ -92,7 +92,7 @@ export function generateStaticParams() {
     'our-matriline',
     'war-towards-purpose',
     'roots-family-tree',
-    'unmas-support',
+    'humanitarian-support',
     'savvy-rilla-labs',
   ];
   return slugs.map((slug) => ({ slug }));

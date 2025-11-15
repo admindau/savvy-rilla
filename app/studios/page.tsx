@@ -70,9 +70,9 @@ export default function StudiosPage() {
             </p>
           </Link>
 
-          <Link href="/studios/unmas-support" className="card">
+          <Link href="/studios/humanitarian-support" className="card">
             <p className="card-tag">Tech &amp; Comms · Partners</p>
-            <h2 className="card-title">UNMAS &amp; humanitarian support</h2>
+            <h2 className="card-title">Humanitarian Support</h2>
             <p className="card-text">
               Strategic communication, visibility, and light tech thinking in
               support of mine action, protection, and peacebuilding efforts in
