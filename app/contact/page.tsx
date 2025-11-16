@@ -1,7 +1,7 @@
 // app/contact/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -9,7 +9,7 @@ export default function ContactPage() {
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus('submitting');
     setError(null);
@@ -34,7 +34,9 @@ export default function ContactPage() {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json().catch(() => null);
+      const data: { ok?: boolean; error?: string } | null = await res
+        .json()
+        .catch(() => null);
 
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || 'Unable to send message right now.');
@@ -42,8 +44,12 @@ export default function ContactPage() {
 
       setStatus('success');
       form.reset();
-    } catch (err: any) {
-      setError(err?.message || 'Something went wrong while sending your message.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Something went wrong while sending your message.');
+      }
       setStatus('error');
     }
   }
