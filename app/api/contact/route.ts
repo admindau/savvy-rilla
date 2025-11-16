@@ -38,9 +38,10 @@ export async function POST(req: Request) {
       });
     }
 
-    const subject = `New contact form submission – ${name}`;
+    // -------- 1) INTERNAL EMAIL TO SAVVY GORILLA --------
+    const internalSubject = `New contact form submission – ${name}`;
 
-    const textLines = [
+    const internalTextLines = [
       `Name: ${name}`,
       `Email: ${email}`,
       organisation ? `Organisation: ${organisation}` : null,
@@ -54,11 +55,58 @@ export async function POST(req: Request) {
       from: `Savvy Gorilla Contact <${CONTACT_FROM}>`,
       to: [CONTACT_TO],
       replyTo: email,
-      subject,
-      text: textLines.join('\n'),
+      subject: internalSubject,
+      text: internalTextLines.join('\n'),
     });
 
-    return NextResponse.json({ ok: true });
+    // -------- 2) CONFIRMATION EMAIL TO THE SENDER --------
+    let confirmationError: unknown = null;
+
+    try {
+      const confirmationSubject = 'We’ve received your message – Savvy Gorilla Technologies';
+
+      const confirmationTextLines = [
+        `Hi ${name},`,
+        '',
+        'Thank you for reaching out to Savvy Gorilla Technologies.',
+        'This is a quick note to confirm that we’ve received your message and will review it.',
+        '',
+        'Here is a copy of what you sent:',
+        '----------------------------------------',
+        `Name: ${name}`,
+        organisation ? `Organisation / project: ${organisation}` : null,
+        type ? `Type of work: ${type}` : null,
+        '',
+        'Message:',
+        message,
+        '----------------------------------------',
+        '',
+        'We usually respond within a few working days, depending on our studio workload.',
+        '',
+        'If anything is urgent or time-sensitive, you can reply directly to this email and let us know.',
+        '',
+        'Savvy Gorilla Technologies',
+        'Juba, South Sudan',
+        'savvyrilla.tech',
+      ].filter(Boolean);
+
+      await resend.emails.send({
+        from: `Savvy Gorilla Contact <${CONTACT_FROM}>`,
+        to: [email],
+        replyTo: CONTACT_TO || CONTACT_FROM,
+        subject: confirmationSubject,
+        text: confirmationTextLines.join('\n'),
+      });
+    } catch (err) {
+      confirmationError = err;
+      console.error('Error sending confirmation email:', err);
+      // We don’t fail the whole request if the confirmation email fails.
+    }
+
+    return NextResponse.json({
+      ok: true,
+      confirmationSent: !confirmationError,
+    });
   } catch (error) {
     console.error('Error in /api/contact:', error);
     return NextResponse.json(
