@@ -34,11 +34,12 @@ function buildConfirmationHtml(params: {
           <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;background:#050505;border-radius:16px;border:1px solid #232323;padding:24px;">
             <tr>
               <td align="left" style="padding-bottom:16px;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <div style="width:32px;height:32px;border-radius:999px;background:radial-gradient(circle at 30% 20%,#ffffff 0,#111111 60%);display:inline-block;"></div>
-                  <div style="display:inline-block;vertical-align:middle;">
-                    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#a3a3a3;">Savvy Gorilla</div>
-                    <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#707070;">Technologies</div>
+                <div style="display:block;">
+                  <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#f5f5f5;font-weight:600;">
+                    SAVVY GORILLA
+                  </div>
+                  <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#a3a3a3;margin-top:2px;">
+                    TECHNOLOGIES
                   </div>
                 </div>
               </td>
@@ -136,7 +137,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Fallback if email service is not configured (still logs on server)
     if (!resend || !CONTACT_TO || !CONTACT_FROM) {
       console.log('Contact form submission (no email configured):', {
         name,
@@ -154,9 +154,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // -------- 1) INTERNAL EMAIL TO SAVVY GORILLA --------
+    // 1) Internal email to you
     const internalSubject = `New contact form submission – ${name}`;
-
     const internalTextLines = [
       `Name: ${name}`,
       `Email: ${email}`,
@@ -175,7 +174,7 @@ export async function POST(req: Request) {
       text: internalTextLines.join('\n'),
     });
 
-    // -------- 2) CONFIRMATION EMAIL TO THE SENDER (HTML + text) --------
+    // 2) Confirmation email (HTML + text) to sender
     let confirmationError: unknown = null;
 
     try {
@@ -223,7 +222,6 @@ export async function POST(req: Request) {
     } catch (err) {
       confirmationError = err;
       console.error('Error sending confirmation email:', err);
-      // Do not fail the whole request if confirmation fails
     }
 
     return NextResponse.json({
