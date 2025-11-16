@@ -15,16 +15,28 @@ interface ContactMessage {
 
 interface PageProps {
   searchParams?: {
-    key?: string;
+    [key: string]: string | string[] | undefined;
   };
 }
 
-export default async function StudioMessagesPage({ searchParams }: PageProps) {
-  const adminKey = process.env.ADMIN_DASHBOARD_KEY;
-  const providedKey = searchParams?.key;
+export default async function StudioMessagesPage({ searchParams = {} }: PageProps) {
+  // 🔐 Read admin key from env
+  const adminKey = process.env.ADMIN_DASHBOARD_KEY ?? null;
 
-  // Simple guard: if ADMIN_DASHBOARD_KEY is set and doesn't match, block.
-  if (adminKey && providedKey !== adminKey) {
+  // 🔑 Normalize ?key= from URL (could be string or string[])
+  const rawKey = searchParams['key'];
+  const providedKey = Array.isArray(rawKey) ? rawKey[0] : rawKey ?? null;
+
+  // 🔍 Log to server logs (Vercel) for debugging
+  console.log('STUDIO MESSAGES AUTH CHECK', {
+    hasAdminKey: !!adminKey,
+    providedKey,
+  });
+
+  const isAuthorized =
+    !adminKey || (providedKey !== null && adminKey !== null && providedKey === adminKey);
+
+  if (!isAuthorized) {
     return (
       <div className="page">
         <p className="page-eyebrow">Studio</p>
