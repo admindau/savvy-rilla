@@ -1,5 +1,55 @@
 // app/contact/page.tsx
+'use client';
+
+import { useState } from 'react';
+
+type Status = 'idle' | 'submitting' | 'success' | 'error';
+
 export default function ContactPage() {
+  const [status, setStatus] = useState<Status>('idle');
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setStatus('submitting');
+    setError(null);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const payload = {
+      name: formData.get('name'),
+      organisation: formData.get('organisation'),
+      email: formData.get('email'),
+      type: formData.get('type'),
+      message: formData.get('message'),
+    };
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'Unable to send message right now.');
+      }
+
+      setStatus('success');
+      form.reset();
+    } catch (err: any) {
+      setError(err?.message || 'Something went wrong while sending your message.');
+      setStatus('error');
+    }
+  }
+
+  const isSubmitting = status === 'submitting';
+
   return (
     <div className="page">
       <p className="page-eyebrow">Contact</p>
@@ -30,19 +80,28 @@ export default function ContactPage() {
           </p>
         </div>
 
-        <form className="contact-form">
+        <form className="contact-form" onSubmit={handleSubmit}>
           <div className="form-row">
             <label htmlFor="name">Name</label>
-            <input id="name" name="name" placeholder="Your full name" />
+            <input
+              id="name"
+              name="name"
+              placeholder="Your full name"
+              required
+              disabled={isSubmitting}
+            />
           </div>
+
           <div className="form-row">
             <label htmlFor="org">Organisation / project</label>
             <input
               id="org"
               name="organisation"
               placeholder="Optional — who you represent"
+              disabled={isSubmitting}
             />
           </div>
+
           <div className="form-row">
             <label htmlFor="email">Email</label>
             <input
@@ -50,11 +109,14 @@ export default function ContactPage() {
               name="email"
               type="email"
               placeholder="you@example.com"
+              required
+              disabled={isSubmitting}
             />
           </div>
+
           <div className="form-row">
             <label htmlFor="type">Type of work</label>
-            <select id="type" name="type">
+            <select id="type" name="type" disabled={isSubmitting}>
               <option value="">Select an option</option>
               <option value="tech">Tech / web app / dashboard</option>
               <option value="media">Podcast / docu-series / media</option>
@@ -62,21 +124,33 @@ export default function ContactPage() {
               <option value="other">Something else</option>
             </select>
           </div>
+
           <div className="form-row">
             <label htmlFor="message">Project or challenge</label>
             <textarea
               id="message"
               name="message"
               placeholder="Share what you are trying to do, your timeline, and anything else that feels important."
+              required
+              disabled={isSubmitting}
             />
           </div>
-          <button type="submit" className="btn btn-primary">
-            Send message (placeholder)
+
+          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+            {isSubmitting ? 'Sending…' : 'Send message'}
           </button>
-          <p className="hero-meta">
-            This form is currently a visual placeholder. When you are ready, we
-            can wire it to an email service or backend endpoint.
-          </p>
+
+          {status === 'success' && (
+            <p className="hero-meta" style={{ color: '#a0ffa0', marginTop: '0.5rem' }}>
+              Thank you — your message has been sent. We&apos;ll get back to you soon.
+            </p>
+          )}
+
+          {status === 'error' && error && (
+            <p className="hero-meta" style={{ color: '#ffb0b0', marginTop: '0.5rem' }}>
+              {error}
+            </p>
+          )}
         </form>
       </div>
     </div>

@@ -74,8 +74,7 @@ export default function StudiosPage() {
             <p className="card-tag">Tech &amp; Comms · Partners</p>
             <h2 className="card-title">Humanitarian Support</h2>
             <p className="card-text">
-              Strategic communication, visibility, and light tech thinking in
-              support of mine action, protection, and broader humanitarian
+              Strategic communication, visibility, and IT training, and broader humanitarian
               efforts in South Sudan and beyond.
             </p>
             <p className="card-meta">
