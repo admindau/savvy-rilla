@@ -1,6 +1,7 @@
 // app/api/contact/route.ts
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { getSupabaseServerClient } from '@/lib/supabase';
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const CONTACT_TO = process.env.CONTACT_INBOX_EMAIL;
@@ -137,8 +138,49 @@ export async function POST(req: Request) {
       );
     }
 
+    // --- 1) Try to log into Supabase (non-fatal if it fails) ---
+    let dbLogged = false;
+    let dbError: unknown = null;
+
+    try {
+      const supabase = getSupabaseServerClient();
+
+      if (supabase) {
+        const userAgent = req.headers.get('user-agent') ?? null;
+        const forwardedFor = req.headers.get('x-forwarded-for');
+        const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : null;
+        const sourcePath = req.headers.get('x-pathname') ?? null;
+
+        const { error } = await supabase.from('contact_messages').insert({
+          name,
+          email,
+          organisation,
+          type,
+          message,
+          user_agent: userAgent,
+          ip,
+          source_path: sourcePath,
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        dbLogged = true;
+      } else {
+        console.warn(
+          'Supabase client not available, skipping contact_messages insert.',
+        );
+      }
+    } catch (err) {
+      dbError = err;
+      console.error('Error logging contact message to Supabase:', err);
+      // We do NOT fail the request because of DB issues.
+    }
+
+    // --- 2) Email notifications (same as before) ---
     if (!resend || !CONTACT_TO || !CONTACT_FROM) {
-      console.log('Contact form submission (no email configured):', {
+      console.log('Contact form submission (email not fully configured):', {
         name,
         email,
         organisation,
@@ -149,12 +191,13 @@ export async function POST(req: Request) {
       return NextResponse.json({
         ok: true,
         fallback: true,
+        dbLogged,
         message:
-          'Message received in server logs, but email service is not fully configured.',
+          'Message received, but email service is not fully configured on the server.',
       });
     }
 
-    // 1) Internal email to you
+    // 2a) Internal email to Savvy Gorilla
     const internalSubject = `New contact form submission – ${name}`;
     const internalTextLines = [
       `Name: ${name}`,
@@ -174,7 +217,7 @@ export async function POST(req: Request) {
       text: internalTextLines.join('\n'),
     });
 
-    // 2) Confirmation email (HTML + text) to sender
+    // 2b) Confirmation email to the sender
     let confirmationError: unknown = null;
 
     try {
@@ -222,10 +265,13 @@ export async function POST(req: Request) {
     } catch (err) {
       confirmationError = err;
       console.error('Error sending confirmation email:', err);
+      // Do not fail entire request if confirmation fails.
     }
 
     return NextResponse.json({
       ok: true,
+      dbLogged,
+      dbError: dbError ? 'db_error' : null,
       confirmationSent: !confirmationError,
     });
   } catch (error) {
