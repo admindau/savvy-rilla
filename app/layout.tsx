@@ -5,22 +5,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Savvy Gorilla Technologies',
+  title: 'Savvy Rilla Technologies',
   description:
-    'Savvy Gorilla Technologies builds modern web apps, storytelling products, and strategic communication for organisations and creators in South Sudan and across Africa.',
+    'Savvy Rilla Technologies builds modern web apps, storytelling products, and strategic communication for organisations and creators in South Sudan and across Africa.',
   metadataBase: new URL('https://savvyrilla.tech'),
   openGraph: {
-    title: 'Savvy Gorilla Technologies',
+    title: 'Savvy Rilla Technologies',
     description:
       'African Stories. African Systems. African Solutions. A Juba-based digital studio building web apps, podcasts, and strategic communication.',
     url: 'https://savvyrilla.tech',
-    siteName: 'Savvy Gorilla Technologies',
+    siteName: 'Savvy Rilla Technologies',
     images: [
       {
         url: '/og-savvy.png',
         width: 1200,
         height: 630,
-        alt: 'Savvy Gorilla Technologies – African Stories. African Systems. African Solutions.',
+        alt: 'Savvy Rilla Technologies – African Stories. African Systems. African Solutions.',
       },
     ],
     type: 'website',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Savvy Gorilla Technologies',
+    title: 'Savvy Rilla Technologies',
     description:
       'African Stories. African Systems. African Solutions. A Juba-based digital studio building web apps, podcasts, and strategic communication.',
     images: ['/og-savvy.png'],
@@ -43,13 +43,13 @@ function Nav() {
           <span className="brand-mark">
             <Image
               src="/logo-white.png"
-              alt="Savvy Gorilla Technologies logo"
+              alt="Savvy Rilla Technologies logo"
               width={40}
               height={40}
             />
           </span>
           <span className="brand-text">
-            <span className="brand-title">Savvy Gorilla</span>
+            <span className="brand-title">Savvy Rilla</span>
             <span className="brand-subtitle">Technologies</span>
           </span>
         </Link>
@@ -58,8 +58,7 @@ function Nav() {
           <Link href="/studios">Studios &amp; Projects</Link>
           <Link href="/about">About</Link>
           <Link href="/contact" className="nav-cta">
-            Contact
-          </Link>
+            Contact</Link>
         </nav>
       </div>
     </header>
@@ -71,7 +70,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="container footer-content">
         <div>
-          <p className="footer-title">Savvy Gorilla Technologies</p>
+          <p className="footer-title">Savvy Rilla Technologies</p>
           <p className="footer-text">
             Building African tech, stories, and strategy — from Juba to the world.
           </p>
@@ -81,7 +80,7 @@ function Footer() {
             Based in Juba, South Sudan. Working with partners across Africa and beyond.
           </p>
           <p className="footer-text footer-copy">
-            © {new Date().getFullYear()} Savvy Gorilla Technologies. All rights reserved.
+            © {new Date().getFullYear()} Savvy Rilla Technologies. All rights reserved.
           </p>
         </div>
       </div>
