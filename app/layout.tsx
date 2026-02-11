@@ -56,7 +56,8 @@ function Nav() {
           </span>
         </Link>
 
-        <nav className="nav-links" aria-label="Primary navigation">
+        {/* Desktop nav (unchanged on desktop) */}
+        <nav className="nav-links nav-links--desktop" aria-label="Primary navigation">
           <Link href="/platforms">Platforms</Link>
           <Link href="/enterprise">Enterprise</Link>
           <Link href="/infrastructure">Infrastructure</Link>
@@ -67,6 +68,42 @@ function Nav() {
             Request consultation
           </Link>
         </nav>
+
+        {/* Mobile nav (real hamburger, prevents overflow) */}
+        <details className="nav-menu" aria-label="Mobile navigation">
+          <summary className="nav-menu-btn" aria-label="Open menu">
+            <span className="nav-menu-icon" aria-hidden="true">
+              <span />
+            </span>
+          </summary>
+
+          <div className="nav-menu-panel" role="menu">
+            <Link href="/platforms" role="menuitem" className="nav-menu-link">
+              Platforms
+            </Link>
+            <Link href="/enterprise" role="menuitem" className="nav-menu-link">
+              Enterprise
+            </Link>
+            <Link href="/infrastructure" role="menuitem" className="nav-menu-link">
+              Infrastructure
+            </Link>
+            <Link href="/industries" role="menuitem" className="nav-menu-link">
+              Industries
+            </Link>
+            <Link href="/insights" role="menuitem" className="nav-menu-link">
+              Insights
+            </Link>
+            <Link href="/company" role="menuitem" className="nav-menu-link">
+              Company
+            </Link>
+            <Link href="/status" role="menuitem" className="nav-menu-link">
+              Status
+            </Link>
+            <Link href="/contact" role="menuitem" className="nav-menu-link nav-menu-link--cta">
+              Request consultation
+            </Link>
+          </div>
+        </details>
       </div>
     </header>
   );
@@ -93,25 +130,24 @@ function Footer() {
               governments, and organisations — engineered for real-world African constraints.
             </p>
 
-            <div className="footer-badges">
+            <div className="footer-badges" aria-label="Capabilities">
               <span className="footer-badge">Security-first</span>
               <span className="footer-badge">API-first</span>
               <span className="footer-badge">Operational support</span>
             </div>
 
-            {/* Infra credibility blocks */}
-            <div className="footer-infra">
+            <div className="footer-infra" aria-label="Infrastructure credibility blocks">
               <div className="infra-block">
                 <div className="infra-title">Compliance &amp; Security</div>
                 <div className="infra-text">
-                  Policy-first data • Access control • Audit-ready foundations
+                  Policy-first data design • Access control • Audit-ready foundations
                 </div>
               </div>
 
               <div className="infra-block">
                 <div className="infra-title">Operational Coverage</div>
                 <div className="infra-text">
-                  East Africa focus • Multi-region deployments • Remote support
+                  East Africa focus • Multi-region cloud deployments • Remote support
                 </div>
               </div>
 
@@ -137,27 +173,47 @@ function Footer() {
             </div>
           </div>
 
-          <div className="footer-links">
+          <div className="footer-links" aria-label="Footer navigation">
             <div className="footer-col">
               <div className="footer-col-title">Company</div>
-              <Link className="footer-link" href="/company">About</Link>
-              <Link className="footer-link" href="/insights">Insights</Link>
-              <Link className="footer-link" href="/contact">Contact</Link>
-              <Link className="footer-link" href="/status">Status</Link>
+              <Link className="footer-link" href="/company">
+                About
+              </Link>
+              <Link className="footer-link" href="/insights">
+                Insights
+              </Link>
+              <Link className="footer-link" href="/contact">
+                Contact
+              </Link>
+              <Link className="footer-link" href="/status">
+                Status
+              </Link>
             </div>
 
             <div className="footer-col">
               <div className="footer-col-title">Services</div>
-              <Link className="footer-link" href="/enterprise">Enterprise Engineering</Link>
-              <Link className="footer-link" href="/infrastructure">Infrastructure</Link>
-              <Link className="footer-link" href="/industries">Industries</Link>
+              <Link className="footer-link" href="/enterprise">
+                Enterprise Engineering
+              </Link>
+              <Link className="footer-link" href="/infrastructure">
+                Infrastructure
+              </Link>
+              <Link className="footer-link" href="/industries">
+                Industries
+              </Link>
             </div>
 
             <div className="footer-col">
               <div className="footer-col-title">Platforms</div>
-              <Link className="footer-link" href="/platforms">Platforms</Link>
-              <Link className="footer-link" href="/platforms/gorilla-ledger">Gorilla Ledger™</Link>
-              <Link className="footer-link" href="/platforms/fx-intelligence">FX Intelligence</Link>
+              <Link className="footer-link" href="/platforms">
+                Platforms
+              </Link>
+              <Link className="footer-link" href="/platforms/gorilla-ledger">
+                Gorilla Ledger™
+              </Link>
+              <Link className="footer-link" href="/platforms/fx-intelligence">
+                FX Intelligence
+              </Link>
             </div>
           </div>
         </div>
@@ -184,7 +240,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        {/* Performance polish: auto-reduce motion on low-end devices */}
+        {/* Low-end device motion reduction */}
         <Script
           id="low-power-detect"
           strategy="beforeInteractive"
@@ -197,8 +253,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     var saveData = !!(conn && conn.saveData);
     var mem = nav.deviceMemory || 0;
     var cores = nav.hardwareConcurrency || 0;
-
-    // conservative thresholds
     var lowPower = saveData || (mem && mem <= 4) || (cores && cores <= 4);
     if (lowPower) document.documentElement.classList.add('low-power');
   } catch (e) {}
@@ -213,7 +267,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <div className="site">
           <Nav />
-          {/* Let pages control their own containers for full-bleed sections */}
           <main className="site-main">{children}</main>
           <Footer />
         </div>

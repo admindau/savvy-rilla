@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
 
 type ParallaxProps = {
   children: React.ReactNode;
   className?: string;
 
-  /** Max rotation strength (deg-ish). Will be clamped internally. */
+  /** Max rotation strength. Clamped internally. */
   strength?: number;
 };
 
@@ -14,54 +14,86 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
-export default function Parallax({ children, className = "", strength = 10 }: ParallaxProps) {
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+export default function Parallax({ children, className = '', strength = 10 }: ParallaxProps) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const root = ref.current;
+    if (!root) return;
 
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    const inner = root.querySelector<HTMLElement>('.parallax-inner');
+    if (!inner) return;
 
-    const maxDeg = clamp(strength, 4, 10); // ✅ clamp so it never feels toy-like
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lowPower = document.documentElement.classList.contains('low-power');
+    if (prefersReduced || lowPower) return;
+
+    const maxDeg = clamp(strength, 4, 10);
+
+    // “heavier” depth translation is tied to strength, but clamped
+    const maxTranslate = clamp(6 + maxDeg * 0.9, 8, 16);
+
     let raf = 0;
 
+    // target + current (for smoothing)
+    let tRx = 0;
+    let tRy = 0;
+    let cRx = 0;
+    let cRy = 0;
+
+    // Layer nodes
+    const layers = Array.from(root.querySelectorAll<HTMLElement>('[data-depth]'));
+
+    const setNeutral = () => {
+      tRx = 0;
+      tRy = 0;
+    };
+
     const onMove = (ev: PointerEvent) => {
-      const rect = el.getBoundingClientRect();
+      const rect = root.getBoundingClientRect();
       const nx = (ev.clientX - rect.left) / rect.width; // 0..1
       const ny = (ev.clientY - rect.top) / rect.height; // 0..1
 
-      // convert to -1..1
-      const px = (nx - 0.5) * 2;
-      const py = (ny - 0.5) * 2;
+      const px = (nx - 0.5) * 2; // -1..1
+      const py = (ny - 0.5) * 2; // -1..1
 
-      const rx = clamp(py * -maxDeg, -maxDeg, maxDeg);
-      const ry = clamp(px * maxDeg, -maxDeg, maxDeg);
-
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        el.style.setProperty("--rx", `${rx.toFixed(2)}deg`);
-        el.style.setProperty("--ry", `${ry.toFixed(2)}deg`);
-        el.style.setProperty("--px", `${px.toFixed(3)}`); // depth translate driver
-        el.style.setProperty("--py", `${py.toFixed(3)}`);
-      });
+      tRx = clamp(py * -maxDeg, -maxDeg, maxDeg);
+      tRy = clamp(px * maxDeg, -maxDeg, maxDeg);
     };
 
-    const onLeave = () => {
-      el.style.setProperty("--rx", `0deg`);
-      el.style.setProperty("--ry", `0deg`);
-      el.style.setProperty("--px", `0`);
-      el.style.setProperty("--py", `0`);
+    const tick = () => {
+      // smoothing
+      cRx = lerp(cRx, tRx, 0.12);
+      cRy = lerp(cRy, tRy, 0.12);
+
+      inner.style.setProperty('--rx', `${cRx.toFixed(2)}deg`);
+      inner.style.setProperty('--ry', `${cRy.toFixed(2)}deg`);
+
+      // translate layers at different rates (“depth”)
+      // depth: 0.2..1 (we clamp)
+      for (const node of layers) {
+        const d = clamp(Number(node.dataset.depth ?? '0.6'), 0.15, 1);
+        const tx = (cRy / maxDeg) * (maxTranslate * d);
+        const ty = (cRx / maxDeg) * (maxTranslate * d);
+        node.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
+      }
+
+      raf = requestAnimationFrame(tick);
     };
 
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerleave", onLeave);
+    root.addEventListener('pointermove', onMove);
+    root.addEventListener('pointerleave', setNeutral);
+
+    raf = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(raf);
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerleave", onLeave);
+      root.removeEventListener('pointermove', onMove);
+      root.removeEventListener('pointerleave', setNeutral);
     };
   }, [strength]);
 
