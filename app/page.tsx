@@ -5,182 +5,351 @@ import Image from 'next/image';
 export default function HomePage() {
   return (
     <div className="page">
-      <section className="hero">
-        <div>
-          <p className="hero-kicker">Savvy Gorilla Technologies</p>
-          <h1 className="hero-main-title">
-            <span className="block">African Stories.</span>
-            <span className="block">African Systems.</span>
-            <span className="block">African Solutions.</span>
-          </h1>
-          <p className="hero-text">
-            We are a Juba-based digital studio building modern web apps,
-            podcasts, and strategic communication for organisations, creators,
-            and movements across South Sudan and the continent.
-          </p>
-          <div className="hero-actions">
-            <Link href="/contact" className="btn btn-primary">
-              Start a project
-            </Link>
-            <Link href="/studios" className="btn btn-ghost">
-              Explore our work
-            </Link>
-          </div>
-          <p className="hero-meta">
-            From core banking dashboards to women-led podcasts and docu-series,
-            we help African ideas find a modern home — in code, on camera, and
-            on record.
-          </p>
+      {/* HERO */}
+      <section className="hero hero--matrix">
+        {/* Optional background image layer (add file to /public if you want) */}
+        <div className="hero-bg" aria-hidden="true">
+          {/* If you add a background image like /hero-grid.png or /hero-map.png, uncomment:
+          <Image
+            src="/hero-map.png"
+            alt=""
+            fill
+            className="hero-bg-img"
+            priority
+          />
+          */}
         </div>
 
-        <div className="hero-card">
-          <div className="hero-card-inner">
-            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '0.6rem' }}>
-              <Image
-                src="/logo-black.png"
-                alt="Savvy Gorilla Technologies logo"
-                width={40}
-                height={40}
-              />
-              <div>
-                <p className="hero-card-title">Juba-bred. Africa-focused.</p>
-                <p className="hero-card-text">
-                  Savvy Gorilla sits at the intersection of technology,
-                  storytelling, and strategy — helping teams design tools and
-                  narratives that actually work in African contexts.
+        <div className="container hero-grid">
+          <div className="hero-left">
+            <p className="hero-kicker">Savvy Rilla Technologies</p>
+
+            <h1 className="hero-main-title hero-main-title--provider">
+              Powering Secure Digital Infrastructure Across Africa.
+            </h1>
+
+            <p className="hero-text">
+              We design, build, and operate enterprise-grade technology platforms for financial
+              institutions, governments, and organisations — engineered for performance, security,
+              and real-world African constraints.
+            </p>
+
+            <div className="hero-actions">
+              <Link href="/platforms" className="btn btn-primary">
+                Explore platforms
+              </Link>
+              <Link href="/contact" className="btn btn-ghost">
+                Request consultation
+              </Link>
+            </div>
+
+            <div className="hero-strip">
+              <span className="hero-strip-item">Secure by architecture</span>
+              <span className="hero-strip-dot" aria-hidden="true" />
+              <span className="hero-strip-item">API-first systems</span>
+              <span className="hero-strip-dot" aria-hidden="true" />
+              <span className="hero-strip-item">Performance optimized</span>
+              <span className="hero-strip-dot" aria-hidden="true" />
+              <span className="hero-strip-item">Multi-region ready</span>
+            </div>
+          </div>
+
+          {/* HERO RIGHT: Command panel + image */}
+          <div className="hero-right">
+            <div className="hero-panel">
+              <div className="hero-panel-head">
+                <div className="hero-panel-brand">
+                  <Image
+                    src="/logo-white.png"
+                    alt="Savvy Rilla Technologies logo"
+                    width={34}
+                    height={34}
+                  />
+                  <div>
+                    <p className="hero-panel-title">Operational Overview</p>
+                    <p className="hero-panel-subtitle">Live systems snapshot</p>
+                  </div>
+                </div>
+                <div className="hero-panel-badge">ACTIVE</div>
+              </div>
+
+              <div className="hero-metrics">
+                <div className="metric">
+                  <p className="metric-label">Active platforms</p>
+                  <p className="metric-value">3</p>
+                </div>
+                <div className="metric">
+                  <p className="metric-label">Systems deployed</p>
+                  <p className="metric-value">12+</p>
+                </div>
+                <div className="metric">
+                  <p className="metric-label">Avg response time</p>
+                  <p className="metric-value">&lt;200ms</p>
+                </div>
+                <div className="metric">
+                  <p className="metric-label">Uptime target</p>
+                  <p className="metric-value">99.9%</p>
+                </div>
+              </div>
+
+              <div className="hero-panel-foot">
+                <p className="hero-panel-note">
+                  Engineering resilient systems for institutions in emerging markets.
                 </p>
               </div>
             </div>
-            <p className="hero-tagline">
-              Tech studio · Creative lab · Strategy partner
-            </p>
+
+            <div className="hero-image-card">
+              {/* Add a real image like /infra.jpg or /dashboard.png to /public */}
+              <div className="hero-image-placeholder" aria-hidden="true">
+                <p className="hero-image-placeholder-text">
+                  Add a product dashboard image here (e.g. /dashboard.png)
+                </p>
+              </div>
+
+              {/* Uncomment when you add an image file:
+              <Image
+                src="/dashboard.png"
+                alt="Platform dashboard preview"
+                width={900}
+                height={620}
+                className="hero-image"
+                priority
+              />
+              */}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="section-header">
-          <h2 className="section-title">What we do</h2>
-          <p className="section-text">
-            We help organisations and creators move from rough ideas and
-            scattered tools to clear systems, visual identities, and products
-            they can be proud to show donors, clients, and audiences.
-          </p>
-        </div>
-        <div className="cards-grid">
-          <div className="card">
-            <p className="card-tag">Technology</p>
-            <h3 className="card-title">Web apps &amp; digital tools</h3>
-            <p className="card-text">
-              Design and development of modern, responsive web apps — from
-              financial trackers and dashboards to internal tools and
-              documentation hubs.
-            </p>
-            <p className="card-meta">
-              Stack: Next.js, TypeScript, Supabase, Vercel, and clean, future
-              friendly design.
+      {/* PLATFORMS */}
+      <section className="section section--dense">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Technology Platforms</h2>
+            <p className="section-text">
+              We build and operate platforms designed for security, clarity, and scale — from financial
+              infrastructure to market intelligence systems.
             </p>
           </div>
-          <div className="card">
-            <p className="card-tag">Storytelling</p>
-            <h3 className="card-title">Podcasts &amp; docu-series</h3>
-            <p className="card-text">
-              Concepting, branding, and creative direction for audio and visual
-              storytelling — including intros, episode artwork, and narrative
-              structure.
-            </p>
-            <p className="card-meta">
-              From Our Matriline Podcast to War Towards Purpose.
-            </p>
-          </div>
-          <div className="card">
-            <p className="card-tag">Strategy</p>
-            <h3 className="card-title">Communication &amp; strategy support</h3>
-            <p className="card-text">
-              Support to teams that need clear communication, event visibility,
-              donor-facing materials, and light-touch strategic planning without
-              the buzzwords.
-            </p>
-            <p className="card-meta">
-              Especially for humanitarian, development, and public sector actors
-              working in complex contexts.
-            </p>
+
+          <div className="cards-grid cards-grid--platforms">
+            <div className="card card--platform">
+              <p className="card-tag">Platform · Finance</p>
+              <h3 className="card-title">Gorilla Ledger™</h3>
+              <p className="card-text">
+                Enterprise-grade financial tracking infrastructure engineered for secure transaction
+                management, structured reporting, and scalable analytics.
+              </p>
+              <p className="card-meta">Deployment: Cloud • Roadmap: Multi-tenant • Security: RLS-ready</p>
+              <div className="card-actions">
+                <Link href="/platforms/gorilla-ledger" className="btn btn-ghost btn-sm">
+                  View platform
+                </Link>
+              </div>
+            </div>
+
+            <div className="card card--platform">
+              <p className="card-tag">Platform · Market Intelligence</p>
+              <h3 className="card-title">FX Intelligence Engine</h3>
+              <p className="card-text">
+                Multi-currency monitoring and analytics delivering clean visualisation, trend insights,
+                and reporting workflows for institutions and analysts.
+              </p>
+              <p className="card-meta">Deployment: Cloud • Data: Time-series • UX: Command-center dashboards</p>
+              <div className="card-actions">
+                <Link href="/platforms/fx-intelligence" className="btn btn-ghost btn-sm">
+                  View platform
+                </Link>
+              </div>
+            </div>
+
+            <div className="card card--platform">
+              <p className="card-tag">Platform · Systems</p>
+              <h3 className="card-title">Custom Enterprise Systems</h3>
+              <p className="card-text">
+                Purpose-built platforms tailored to institutional needs — reporting dashboards, internal
+                tools, secure data hubs, and operational systems.
+              </p>
+              <p className="card-meta">Model: Build + Operate • Security: Access control • Support: SLA options</p>
+              <div className="card-actions">
+                <Link href="/enterprise" className="btn btn-ghost btn-sm">
+                  Explore enterprise
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* ENTERPRISE ENGINEERING */}
       <section className="section">
-        <div className="section-header">
-          <h2 className="section-title">Selected studios &amp; projects</h2>
-          <p className="section-text">
-            Savvy Gorilla hosts several in-house studios and products. Each one
-            explores a different side of African life — finance, family,
-            freedom, football, and faith.
-          </p>
-        </div>
-        <div className="cards-grid">
-          <div className="card">
-            <p className="card-tag">Fintech · Product</p>
-            <h3 className="card-title">Gorilla Ledger™</h3>
-            <p className="card-text">
-              A modern personal finance tracker for Africans who want clarity on
-              income, expenses, and goals — without wrestling with spreadsheets.
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Enterprise Engineering</h2>
+            <p className="section-text">
+              Beyond building apps — we architect digital foundations: APIs, databases, secure access
+              layers, dashboards, and operational tooling that teams can rely on long-term.
             </p>
-            <p className="card-meta">Currently in active development.</p>
           </div>
-          <div className="card">
-            <p className="card-tag">Podcast · Storytelling</p>
-            <h3 className="card-title">Our Matriline Podcast</h3>
-            <p className="card-text">
-              A women-led podcast documenting girlhood-to-womanhood journeys,
-              inter-tribal relationships, and the everyday politics of family
-              and love.
-            </p>
-            <p className="card-meta">Hosted and produced in collaboration.</p>
+
+          <div className="cards-grid">
+            <div className="card">
+              <p className="card-tag">Architecture</p>
+              <h3 className="card-title">Systems design &amp; blueprints</h3>
+              <p className="card-text">
+                Discovery, systems mapping, architecture decisions, and delivery plans that reduce
+                risk before development starts.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Engineering</p>
+              <h3 className="card-title">Backend, data &amp; dashboards</h3>
+              <p className="card-text">
+                Secure APIs, database modeling, analytics layers, and high-performance user interfaces
+                designed for clarity and scale.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Security</p>
+              <h3 className="card-title">Access control &amp; hardening</h3>
+              <p className="card-text">
+                Authentication flows, role-based access, policy-first data design, and production hardening.
+              </p>
+            </div>
           </div>
-          <div className="card">
-            <p className="card-tag">Docu-series · Legacy</p>
-            <h3 className="card-title">War Towards Purpose</h3>
-            <p className="card-text">
-              A docu-series archiving the lives of those who fought, built, and
-              carried nations — soldiers, spouses, and children — before history
-              forgets them.
-            </p>
-            <p className="card-meta">
-              With Motherland Entertainment &amp; Savvy Gorilla Studios.
-            </p>
+
+          <div style={{ marginTop: '1rem' }}>
+            <Link href="/enterprise" className="btn btn-primary">
+              Explore enterprise engineering
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="section-header">
-          <h2 className="section-title">Who we work with</h2>
-          <p className="section-text">
-            We collaborate with banks, humanitarian agencies, NGOs, creatives,
-            and entrepreneurs who want African-made solutions — not copy-paste
-            imports that ignore local realities.
-          </p>
+      {/* INDUSTRIES */}
+      <section className="section section--subtle">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Industries</h2>
+            <p className="section-text">
+              We serve institutions and teams that need secure systems, credible reporting, and infrastructure
+              that works in complex environments.
+            </p>
+          </div>
+
+          <div className="cards-grid">
+            <div className="card card--industry">
+              <p className="card-tag">Finance</p>
+              <h3 className="card-title">Financial institutions</h3>
+              <p className="card-text">Ledgers, reporting engines, FX monitoring, data dashboards, secure access.</p>
+            </div>
+            <div className="card card--industry">
+              <p className="card-tag">Public sector</p>
+              <h3 className="card-title">Government &amp; agencies</h3>
+              <p className="card-text">Digital reporting systems, internal tooling, structured data platforms.</p>
+            </div>
+            <div className="card card--industry">
+              <p className="card-tag">Development</p>
+              <h3 className="card-title">NGOs &amp; partners</h3>
+              <p className="card-text">Operational dashboards, secure data systems, M&amp;E tooling, visibility workflows.</p>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '1rem' }}>
+            <Link href="/industries" className="btn btn-ghost">
+              View industries
+            </Link>
+          </div>
         </div>
-        <p className="section-text">
-          Whether you are prototyping a new app, documenting a campaign, or
-          standing up a podcast from scratch, we come in as a thinking partner —
-          not just a vendor.
-        </p>
       </section>
 
+      {/* INFRASTRUCTURE */}
       <section className="section">
-        <div className="section-header">
-          <h2 className="section-title">Ready when you are</h2>
-          <p className="section-text">
-            Have a project, an idea, or even just a problem you are trying to
-            name? Share a few lines and we will help you shape it into something
-            buildable.
-          </p>
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Infrastructure &amp; Managed Services</h2>
+            <p className="section-text">
+              Technology provision does not end at deployment. We provide operational support that keeps
+              systems secure, monitored, and continuously improved.
+            </p>
+          </div>
+
+          <div className="cards-grid">
+            <div className="card">
+              <p className="card-tag">Operations</p>
+              <h3 className="card-title">Hosting, monitoring &amp; uptime</h3>
+              <p className="card-text">
+                Deployment models, performance monitoring, and reliability practices aligned with institutional needs.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Delivery</p>
+              <h3 className="card-title">CI/CD &amp; release management</h3>
+              <p className="card-text">
+                Automated delivery pipelines, controlled releases, and version lifecycle management.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Support</p>
+              <h3 className="card-title">SLA-based support options</h3>
+              <p className="card-text">
+                Tiered support for incident response, upgrades, and long-term technical advisory.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '1rem' }}>
+            <Link href="/infrastructure" className="btn btn-primary">
+              Explore infrastructure &amp; support
+            </Link>
+          </div>
         </div>
-        <Link href="/contact" className="btn btn-primary">
-          Tell us about your project
-        </Link>
+      </section>
+
+      {/* STACK */}
+      <section className="section section--dense">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Technology Architecture</h2>
+            <p className="section-text">
+              We build with modern, reliable infrastructure — and design security into the data layer from day one.
+            </p>
+          </div>
+
+          <div className="cards-grid">
+            <div className="card">
+              <p className="card-tag">Frontend</p>
+              <h3 className="card-title">Next.js · TypeScript</h3>
+              <p className="card-text">High-performance interfaces, dashboards, and user journeys.</p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Backend</p>
+              <h3 className="card-title">Node.js · API-first</h3>
+              <p className="card-text">Clean system boundaries, scalable endpoints, structured service layers.</p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Data</p>
+              <h3 className="card-title">PostgreSQL · Policy-first</h3>
+              <p className="card-text">Secure modeling, access controls, audit-ready foundations.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="section section--cta">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Ready to build secure digital infrastructure?</h2>
+            <p className="section-text">
+              Tell us what you’re trying to build. We’ll propose an architecture, delivery plan, and the operational model to run it properly.
+            </p>
+          </div>
+          <Link href="/contact" className="btn btn-primary">
+            Schedule consultation
+          </Link>
+        </div>
       </section>
     </div>
   );

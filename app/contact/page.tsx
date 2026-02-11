@@ -1,164 +1,87 @@
-// app/contact/page.tsx
-'use client';
-
-import { FormEvent, useState } from 'react';
-
-type Status = 'idle' | 'submitting' | 'success' | 'error';
+import Link from "next/link";
 
 export default function ContactPage() {
-  const [status, setStatus] = useState<Status>('idle');
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setStatus('submitting');
-    setError(null);
-
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-
-    const payload = {
-      name: formData.get('name'),
-      organisation: formData.get('organisation'),
-      email: formData.get('email'),
-      type: formData.get('type'),
-      message: formData.get('message'),
-    };
-
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data: { ok?: boolean; error?: string } | null = await res
-        .json()
-        .catch(() => null);
-
-      if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'Unable to send message right now.');
-      }
-
-      setStatus('success');
-      form.reset();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Something went wrong while sending your message.');
-      }
-      setStatus('error');
-    }
-  }
-
-  const isSubmitting = status === 'submitting';
-
   return (
     <div className="page">
-      <p className="page-eyebrow">Contact</p>
-      <h1 className="page-title">Tell us what you are trying to build</h1>
-      <p className="page-subtitle">
-        A few honest lines about your idea or challenge are enough to start.
-        Share what you can now — we will follow up with clarifying questions and
-        possible next steps.
-      </p>
+      <section className="hero hero--matrix">
+        <div className="container">
+          <p className="hero-kicker">Contact</p>
+          <h1 className="hero-main-title">Request a consultation.</h1>
+          <p className="hero-text">
+            Tell us what you’re trying to build. We’ll propose an architecture, delivery approach, and the operational model to run it properly.
+          </p>
 
-      <div className="contact-grid">
-        <div className="contact-card">
-          <strong>Direct contact</strong>
-          <p>
-            You can reach us by email at:
-            <br />
-            <a href="mailto:info@savvyrilla.tech" className="card-link">
-              info@savvyrilla.tech
-            </a>
-          </p>
-          <p>
-            If you already have a brief, deck, or sample materials, feel free to
-            share them. They help us understand your context faster.
-          </p>
-          <p>
-            Based in Juba, South Sudan (EAT / GMT+3). We happily work across
-            time zones for partners in the region and beyond.
-          </p>
+          <div className="hero-actions">
+            <Link href="/platforms" className="btn btn-ghost">Explore platforms</Link>
+            <Link href="/enterprise" className="btn btn-ghost">Enterprise engineering</Link>
+          </div>
         </div>
+      </section>
 
-        <form className="contact-form" onSubmit={handleSubmit}>
-          <div className="form-row">
-            <label htmlFor="name">Name</label>
-            <input
-              id="name"
-              name="name"
-              placeholder="Your full name"
-              required
-              disabled={isSubmitting}
-            />
+      <section className="section">
+        <div className="container">
+          <div className="contact-grid">
+            <div className="twocol-aside">
+              <p style={{ marginTop: 0 }}>
+                <strong>What happens next?</strong>
+              </p>
+              <p>1) We review your request and clarify constraints.</p>
+              <p>2) We propose architecture + delivery plan.</p>
+              <p>3) We align on deployment + support model.</p>
+              <p style={{ marginBottom: 0 }}>
+                <strong>Focus:</strong> secure systems, reporting platforms, dashboards, infrastructure, managed services.
+              </p>
+            </div>
+
+            <form className="card" action="#" method="post">
+              <div style={{ display: "grid", gap: "0.9rem" }}>
+                <div style={{ display: "grid", gap: "0.4rem" }}>
+                  <label htmlFor="name">Name</label>
+                  <input id="name" name="name" type="text" placeholder="Your name" required />
+                </div>
+
+                <div style={{ display: "grid", gap: "0.4rem" }}>
+                  <label htmlFor="email">Email</label>
+                  <input id="email" name="email" type="email" placeholder="you@example.com" required />
+                </div>
+
+                <div style={{ display: "grid", gap: "0.4rem" }}>
+                  <label htmlFor="org">Organisation</label>
+                  <input id="org" name="org" type="text" placeholder="Organisation name" />
+                </div>
+
+                <div style={{ display: "grid", gap: "0.4rem" }}>
+                  <label htmlFor="need">What do you need?</label>
+                  <select id="need" name="need" defaultValue="platform">
+                    <option value="platform">Platform demo</option>
+                    <option value="enterprise">Enterprise system build</option>
+                    <option value="infrastructure">Managed services</option>
+                    <option value="advisory">Architecture advisory</option>
+                  </select>
+                </div>
+
+                <div style={{ display: "grid", gap: "0.4rem" }}>
+                  <label htmlFor="message">Brief description</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    placeholder="What are you trying to build? Constraints? Timeline? Users? Data sensitivity?"
+                    required
+                  />
+                </div>
+
+                <button type="submit" className="btn btn-primary">
+                  Submit request
+                </button>
+
+                <p className="section-text" style={{ margin: 0 }}>
+                  Prefer email? Write to: <strong>hello@savvyrilla.tech</strong>
+                </p>
+              </div>
+            </form>
           </div>
-
-          <div className="form-row">
-            <label htmlFor="org">Organisation / project</label>
-            <input
-              id="org"
-              name="organisation"
-              placeholder="Optional — who you represent"
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              required
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="type">Type of work</label>
-            <select id="type" name="type" disabled={isSubmitting}>
-              <option value="">Select an option</option>
-              <option value="tech">Tech / web app / dashboard</option>
-              <option value="media">Podcast / docu-series / media</option>
-              <option value="strategy">Communication / strategy support</option>
-              <option value="other">Something else</option>
-            </select>
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="message">Project or challenge</label>
-            <textarea
-              id="message"
-              name="message"
-              placeholder="Share what you are trying to do, your timeline, and anything else that feels important."
-              required
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-            {isSubmitting ? 'Sending…' : 'Send message'}
-          </button>
-
-          {status === 'success' && (
-            <p className="hero-meta" style={{ color: '#a0ffa0', marginTop: '0.5rem' }}>
-              Thank you — your message has been sent. We&apos;ll get back to you soon.
-            </p>
-          )}
-
-          {status === 'error' && error && (
-            <p className="hero-meta" style={{ color: '#ffb0b0', marginTop: '0.5rem' }}>
-              {error}
-            </p>
-          )}
-        </form>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
