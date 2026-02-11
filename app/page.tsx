@@ -11,7 +11,6 @@ export default function HomePage() {
       <section className="hero hero--matrix">
         {/* Optional background image layer (add file to /public if you want) */}
         <div className="hero-bg" aria-hidden="true">
-          {/* If you add a background image like /hero-grid.png or /hero-map.png, uncomment: */}
           {/*
           <Image
             src="/hero-map.png"
@@ -24,7 +23,7 @@ export default function HomePage() {
         </div>
 
         <div className="container hero-grid">
-          <Reveal as="div" className="hero-left" delayMs={0}>
+          <Reveal as="div" className="hero-left" delayMs={0} variant="left">
             <p className="hero-kicker">Savvy Rilla Technologies</p>
 
             <h1 className="hero-main-title hero-main-title--provider">
@@ -58,9 +57,9 @@ export default function HomePage() {
           </Reveal>
 
           {/* HERO RIGHT: Command panel + image */}
-          <Reveal as="div" className="hero-right" delayMs={140}>
+          <Reveal as="div" className="hero-right" delayMs={140} variant="right">
             <Parallax strength={10} className="hero-parallax">
-              <div className="hero-panel">
+              <div className="hero-panel" data-depth style={{ ['--d' as any]: 12 }}>
                 <div className="hero-panel-head">
                   <div className="hero-panel-brand">
                     <Image
@@ -103,7 +102,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="hero-image-card">
+              <div className="hero-image-card" data-depth style={{ ['--d' as any]: 18 }}>
                 <Image
                   src="/dashboard.png"
                   alt="Gorilla Ledger dashboard preview"
@@ -129,7 +128,13 @@ export default function HomePage() {
             </p>
           </Reveal>
 
-          <Reveal as="div" className="cards-grid cards-grid--platforms" delayMs={90}>
+          <Reveal
+            as="div"
+            className="cards-grid cards-grid--platforms"
+            delayMs={90}
+            staggerChildren
+            staggerMs={70}
+          >
             <div className="card card--platform">
               <p className="card-tag">Platform · Finance</p>
               <h3 className="card-title">Gorilla Ledger™</h3>
@@ -189,7 +194,7 @@ export default function HomePage() {
             </p>
           </Reveal>
 
-          <Reveal as="div" className="cards-grid" delayMs={90}>
+          <Reveal as="div" className="cards-grid" delayMs={90} staggerChildren staggerMs={70}>
             <div className="card">
               <p className="card-tag">Architecture</p>
               <h3 className="card-title">Systems design &amp; blueprints</h3>
@@ -236,7 +241,7 @@ export default function HomePage() {
             </p>
           </Reveal>
 
-          <Reveal as="div" className="cards-grid" delayMs={90}>
+          <Reveal as="div" className="cards-grid" delayMs={90} staggerChildren staggerMs={70}>
             <div className="card card--industry">
               <p className="card-tag">Finance</p>
               <h3 className="card-title">Financial institutions</h3>
@@ -277,7 +282,7 @@ export default function HomePage() {
             </p>
           </Reveal>
 
-          <Reveal as="div" className="cards-grid" delayMs={90}>
+          <Reveal as="div" className="cards-grid" delayMs={90} staggerChildren staggerMs={70}>
             <div className="card">
               <p className="card-tag">Operations</p>
               <h3 className="card-title">Hosting, monitoring &amp; uptime</h3>
@@ -321,7 +326,7 @@ export default function HomePage() {
             </p>
           </Reveal>
 
-          <Reveal as="div" className="cards-grid" delayMs={90}>
+          <Reveal as="div" className="cards-grid" delayMs={90} staggerChildren staggerMs={70}>
             <div className="card">
               <p className="card-tag">Frontend</p>
               <h3 className="card-title">Next.js · TypeScript</h3>

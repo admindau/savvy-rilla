@@ -97,28 +97,82 @@ function Footer() {
               <span className="footer-badge">API-first</span>
               <span className="footer-badge">Operational support</span>
             </div>
+
+            <div className="footer-infra">
+              <div className="infra-block">
+                <div className="infra-title">Compliance &amp; Security</div>
+                <div className="infra-text">
+                  Policy-first data design • Access control • Audit-ready foundations
+                </div>
+              </div>
+
+              <div className="infra-block">
+                <div className="infra-title">Operational Coverage</div>
+                <div className="infra-text">
+                  East Africa focus • Multi-region cloud deployments • Remote support
+                </div>
+              </div>
+
+              <div className="infra-block">
+                <div className="infra-title">Support Model</div>
+                <div className="infra-text">
+                  SLA options • Incident response • Scheduled maintenance windows
+                </div>
+              </div>
+
+              <div className="infra-block">
+                <div className="infra-title">Status</div>
+                <div className="infra-text">
+                  <Link className="footer-link inline" href="/status">
+                    Status page
+                  </Link>
+                  <span className="sep">•</span>
+                  <Link className="footer-link inline" href="/contact">
+                    Support
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="footer-links">
             <div className="footer-col">
               <div className="footer-col-title">Company</div>
-              <Link className="footer-link" href="/company">About</Link>
-              <Link className="footer-link" href="/insights">Insights</Link>
-              <Link className="footer-link" href="/contact">Contact</Link>
+              <Link className="footer-link" href="/company">
+                About
+              </Link>
+              <Link className="footer-link" href="/insights">
+                Insights
+              </Link>
+              <Link className="footer-link" href="/contact">
+                Contact
+              </Link>
             </div>
 
             <div className="footer-col">
               <div className="footer-col-title">Services</div>
-              <Link className="footer-link" href="/enterprise">Enterprise Engineering</Link>
-              <Link className="footer-link" href="/infrastructure">Infrastructure</Link>
-              <Link className="footer-link" href="/industries">Industries</Link>
+              <Link className="footer-link" href="/enterprise">
+                Enterprise Engineering
+              </Link>
+              <Link className="footer-link" href="/infrastructure">
+                Infrastructure
+              </Link>
+              <Link className="footer-link" href="/industries">
+                Industries
+              </Link>
             </div>
 
             <div className="footer-col">
               <div className="footer-col-title">Platforms</div>
-              <Link className="footer-link" href="/platforms">Platforms</Link>
-              <Link className="footer-link" href="/platforms/gorilla-ledger">Gorilla Ledger™</Link>
-              <Link className="footer-link" href="/platforms/fx-intelligence">FX Intelligence</Link>
+              <Link className="footer-link" href="/platforms">
+                Platforms
+              </Link>
+              <Link className="footer-link" href="/platforms/gorilla-ledger">
+                Gorilla Ledger™
+              </Link>
+              <Link className="footer-link" href="/platforms/fx-intelligence">
+                FX Intelligence
+              </Link>
             </div>
           </div>
         </div>
@@ -152,7 +206,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <div className="site">
           <Nav />
-          {/* Let pages control their own containers for full-bleed sections */}
           <main className="site-main">{children}</main>
           <Footer />
         </div>
