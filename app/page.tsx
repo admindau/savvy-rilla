@@ -9,7 +9,8 @@ export default function HomePage() {
       <section className="hero hero--matrix">
         {/* Optional background image layer (add file to /public if you want) */}
         <div className="hero-bg" aria-hidden="true">
-          {/* If you add a background image like /hero-grid.png or /hero-map.png, uncomment:
+          {/* If you add a background image like /hero-grid.png or /hero-map.png, uncomment: */}
+          {/*
           <Image
             src="/hero-map.png"
             alt=""
@@ -100,23 +101,14 @@ export default function HomePage() {
             </div>
 
             <div className="hero-image-card">
-              {/* Add a real image like /infra.jpg or /dashboard.png to /public */}
-              <div className="hero-image-placeholder" aria-hidden="true">
-                <p className="hero-image-placeholder-text">
-                  Add a product dashboard image here (e.g. /dashboard.png)
-                </p>
-              </div>
-
-              {/* Uncomment when you add an image file:
               <Image
                 src="/dashboard.png"
-                alt="Platform dashboard preview"
+                alt="Gorilla Ledger dashboard preview"
                 width={900}
                 height={620}
                 className="hero-image"
                 priority
               />
-              */}
             </div>
           </div>
         </div>

@@ -49,7 +49,7 @@ body {
   /* deep, premium background */
   background:
     radial-gradient(circle at 18% 0%, rgba(0, 245, 160, 0.08), transparent 45%),
-    radial-gradient(circle at 82% 5%, rgba(0, 217, 255, 0.06), transparent 42%),
+    radial-gradient(circle at 82% 5%, rgba(0, 217, 255, 0.04), transparent 42%),
     radial-gradient(circle at top, #111827 0, var(--bg) 55%);
 
   color: var(--fg);
@@ -100,7 +100,7 @@ a {
   background: linear-gradient(
     to bottom,
     rgba(11, 15, 20, 0.95),
-    rgba(11, 15, 20, 0.72)
+    rgba(11, 15, 20, 0.84)
   );
 }
 
@@ -292,14 +292,12 @@ a {
 }
 
 .hero--matrix {
-  /* full-bleed feel */
   padding-top: 2rem;
   padding-bottom: 2.75rem;
   overflow: hidden;
   border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Background layers */
 .hero-bg {
   position: absolute;
   inset: 0;
@@ -307,14 +305,12 @@ a {
   z-index: 0;
 }
 
-/* (Optional) If you use a hero background image, keep it subtle */
 .hero-bg-img {
   object-fit: cover;
   opacity: 0.22;
   filter: saturate(0.8) contrast(1.05) blur(0.2px);
 }
 
-/* Matrix grid overlay */
 .hero--matrix::before {
   content: '';
   position: absolute;
@@ -343,7 +339,6 @@ a {
   }
 }
 
-/* subtle vignette */
 .hero--matrix::after {
   content: '';
   position: absolute;
@@ -381,6 +376,7 @@ a {
   letter-spacing: 0.03em;
   text-transform: uppercase;
   margin: 0 0 1rem;
+  line-height: 1.05;
 }
 
 .hero-main-title--provider {
@@ -389,7 +385,7 @@ a {
 
 .hero-text {
   font-size: 1rem;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.78);
   max-width: 42rem;
   margin: 0 0 1.4rem;
 }
@@ -426,7 +422,6 @@ a {
   box-shadow: 0 0 16px rgba(0, 245, 160, 0.18);
 }
 
-/* Right column */
 .hero-right {
   display: grid;
   gap: 1rem;
@@ -442,6 +437,12 @@ a {
 
   box-shadow: var(--shadow-soft);
   padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-panel:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-soft), var(--shadow-glow);
 }
 
 .hero-panel-head {
@@ -482,6 +483,12 @@ a {
   border: 1px solid rgba(0, 245, 160, 0.30);
   background: rgba(0, 245, 160, 0.08);
   color: rgba(0, 245, 160, 0.95);
+  animation: statusPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 245, 160, 0.0); }
+  50% { box-shadow: 0 0 18px 2px rgba(0, 245, 160, 0.18); }
 }
 
 .hero-metrics {
@@ -541,26 +548,6 @@ a {
   display: block;
 }
 
-.hero-image-placeholder {
-  min-height: 220px;
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-
-  background:
-    radial-gradient(circle at 35% 25%, rgba(0, 245, 160, 0.08), transparent 55%),
-    radial-gradient(circle at 75% 80%, rgba(0, 217, 255, 0.05), transparent 60%),
-    rgba(12, 16, 22, 0.9);
-}
-
-.hero-image-placeholder-text {
-  margin: 0;
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.62);
-  text-align: center;
-  max-width: 22rem;
-}
-
 /* Sections */
 .section {
   padding-top: 1.75rem;
@@ -585,7 +572,6 @@ a {
   border-top: 1px solid rgba(0, 245, 160, 0.14);
 }
 
-/* Section header */
 .section-header {
   display: flex;
   flex-direction: column;
@@ -593,7 +579,6 @@ a {
   margin-bottom: 1.25rem;
 }
 
-/* Cards */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -659,7 +644,7 @@ a {
   margin-top: 0.75rem;
 }
 
-/* Two-column layouts (if you use them elsewhere) */
+/* Two-column layouts */
 .twocol {
   display: grid;
   grid-template-columns: minmax(0, 2.1fr) minmax(0, 2.3fr);
@@ -677,7 +662,7 @@ a {
   color: var(--muted);
 }
 
-/* Forms (kept solid for enterprise) */
+/* Forms */
 .contact-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 2.1fr);
@@ -807,5 +792,11 @@ select:focus {
   .btn,
   .card {
     transition: none;
+  }
+  .hero-panel {
+    transition: none;
+  }
+  .hero-panel-badge {
+    animation: none;
   }
 }
