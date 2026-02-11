@@ -933,3 +933,192 @@ a {
   );
   will-change: transform;
 }
+
+/* =========================================================
+   NEXT LEVEL ADD-ONS
+   - Hero status ticker
+   - Interactive platform cards
+   - Low-power motion reduction
+   ========================================================= */
+
+/* Hero ticker */
+.hero-ticker {
+  margin-top: 1.05rem;
+  position: relative;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  overflow: hidden;
+}
+
+.ticker-viewport {
+  overflow: hidden;
+}
+
+.ticker-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.55rem 0.9rem;
+  white-space: nowrap;
+  will-change: transform;
+  animation: tickerMove 24s linear infinite;
+}
+
+.hero-ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes tickerMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.tick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.86rem;
+  color: rgba(255,255,255,0.74);
+}
+
+.tick b {
+  color: rgba(0, 245, 160, 0.92);
+  text-shadow: 0 0 18px rgba(0, 245, 160, 0.12);
+}
+
+.tick-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(0,245,160,0.65);
+  box-shadow: 0 0 18px rgba(0,245,160,0.16);
+}
+
+.ticker-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ticker-fade-left {
+  left: 0;
+  background: linear-gradient(to right, rgba(11,15,20,0.95), transparent);
+}
+
+.ticker-fade-right {
+  right: 0;
+  background: linear-gradient(to left, rgba(11,15,20,0.95), transparent);
+}
+
+/* Interactive platform cards */
+.card--interactive {
+  position: relative;
+  overflow: hidden;
+}
+
+.card--interactive .card-rail {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(90deg, rgba(0,245,160,0.0), rgba(0,245,160,0.10), rgba(0,217,255,0.06), rgba(0,245,160,0.0));
+  filter: blur(18px);
+  transition: opacity 220ms ease;
+}
+
+.card--interactive:hover .card-rail {
+  opacity: 1;
+}
+
+.card--interactive .card-hover {
+  margin-top: 0.85rem;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  padding-top: 0.75rem;
+  opacity: 0;
+  transform: translateY(6px);
+  filter: blur(1px);
+  transition: opacity 260ms ease, transform 260ms ease, filter 260ms ease;
+}
+
+.card--interactive:hover .card-hover {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.card-metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+
+.cm {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cm-k {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.58);
+}
+
+.cm-v {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.80);
+}
+
+.card-cta {
+  border-color: rgba(0,245,160,0.18);
+}
+
+.card--interactive:hover .card-cta {
+  border-color: rgba(0,245,160,0.34);
+  box-shadow: 0 0 0 1px rgba(0,245,160,0.12) inset;
+}
+
+.cta-arrow {
+  margin-left: 0.15rem;
+  transition: transform 220ms ease;
+}
+
+.card--interactive:hover .cta-arrow {
+  transform: translateX(2px);
+}
+
+/* Low-power performance polish */
+.low-power .site-grid,
+.low-power .hero--matrix::before,
+.low-power .hero-bg::after {
+  animation: none !important;
+}
+
+.low-power .ticker-track {
+  animation-duration: 36s; /* slower */
+}
+
+.low-power .card--interactive .card-hover {
+  transition: none;
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Mobile tuning for ticker */
+@media (max-width: 520px) {
+  .ticker-track {
+    padding: 0.5rem 0.75rem;
+    gap: 1rem;
+  }
+  .tick {
+    font-size: 0.82rem;
+  }
+}

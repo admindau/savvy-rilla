@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Image from 'next/image';
 import Link from 'next/link';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Savvy Rilla Technologies',
@@ -98,18 +99,19 @@ function Footer() {
               <span className="footer-badge">Operational support</span>
             </div>
 
+            {/* Infra credibility blocks */}
             <div className="footer-infra">
               <div className="infra-block">
                 <div className="infra-title">Compliance &amp; Security</div>
                 <div className="infra-text">
-                  Policy-first data design • Access control • Audit-ready foundations
+                  Policy-first data • Access control • Audit-ready foundations
                 </div>
               </div>
 
               <div className="infra-block">
                 <div className="infra-title">Operational Coverage</div>
                 <div className="infra-text">
-                  East Africa focus • Multi-region cloud deployments • Remote support
+                  East Africa focus • Multi-region deployments • Remote support
                 </div>
               </div>
 
@@ -138,41 +140,24 @@ function Footer() {
           <div className="footer-links">
             <div className="footer-col">
               <div className="footer-col-title">Company</div>
-              <Link className="footer-link" href="/company">
-                About
-              </Link>
-              <Link className="footer-link" href="/insights">
-                Insights
-              </Link>
-              <Link className="footer-link" href="/contact">
-                Contact
-              </Link>
+              <Link className="footer-link" href="/company">About</Link>
+              <Link className="footer-link" href="/insights">Insights</Link>
+              <Link className="footer-link" href="/contact">Contact</Link>
+              <Link className="footer-link" href="/status">Status</Link>
             </div>
 
             <div className="footer-col">
               <div className="footer-col-title">Services</div>
-              <Link className="footer-link" href="/enterprise">
-                Enterprise Engineering
-              </Link>
-              <Link className="footer-link" href="/infrastructure">
-                Infrastructure
-              </Link>
-              <Link className="footer-link" href="/industries">
-                Industries
-              </Link>
+              <Link className="footer-link" href="/enterprise">Enterprise Engineering</Link>
+              <Link className="footer-link" href="/infrastructure">Infrastructure</Link>
+              <Link className="footer-link" href="/industries">Industries</Link>
             </div>
 
             <div className="footer-col">
               <div className="footer-col-title">Platforms</div>
-              <Link className="footer-link" href="/platforms">
-                Platforms
-              </Link>
-              <Link className="footer-link" href="/platforms/gorilla-ledger">
-                Gorilla Ledger™
-              </Link>
-              <Link className="footer-link" href="/platforms/fx-intelligence">
-                FX Intelligence
-              </Link>
+              <Link className="footer-link" href="/platforms">Platforms</Link>
+              <Link className="footer-link" href="/platforms/gorilla-ledger">Gorilla Ledger™</Link>
+              <Link className="footer-link" href="/platforms/fx-intelligence">FX Intelligence</Link>
             </div>
           </div>
         </div>
@@ -199,6 +184,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        {/* Performance polish: auto-reduce motion on low-end devices */}
+        <Script
+          id="low-power-detect"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+(function(){
+  try {
+    var nav = navigator || {};
+    var conn = nav.connection || nav.mozConnection || nav.webkitConnection;
+    var saveData = !!(conn && conn.saveData);
+    var mem = nav.deviceMemory || 0;
+    var cores = nav.hardwareConcurrency || 0;
+
+    // conservative thresholds
+    var lowPower = saveData || (mem && mem <= 4) || (cores && cores <= 4);
+    if (lowPower) document.documentElement.classList.add('low-power');
+  } catch (e) {}
+})();`,
+          }}
+        />
+
         <div className="site-bg" aria-hidden="true">
           <div className="site-grid" />
           <div className="site-vignette" />
@@ -206,6 +213,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <div className="site">
           <Nav />
+          {/* Let pages control their own containers for full-bleed sections */}
           <main className="site-main">{children}</main>
           <Footer />
         </div>
