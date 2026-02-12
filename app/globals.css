@@ -39,7 +39,12 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
     'Segoe UI', sans-serif;
   color: var(--fg);
-  background: radial-gradient(1200px 800px at 50% 0%, rgba(175, 203, 255, 0.10) 0%, rgba(3, 3, 7, 1) 45%, rgba(0,0,0,1) 100%);
+  background: radial-gradient(
+    1200px 800px at 50% 0%,
+    rgba(175, 203, 255, 0.10) 0%,
+    rgba(3, 3, 7, 1) 45%,
+    rgba(0, 0, 0, 1) 100%
+  );
 }
 
 a {
@@ -404,53 +409,155 @@ img {
   to { transform: translate3d(-2%, 1.6%, 0); }
 }
 
-/* Orbital Earth (faint curvature, Africa hinted) */
+/* ------------------ NEW: Full Globe Revolving (no Africa) ------------------ */
+/* The globe is fully visible and "rotates" by scrolling a surface texture band. */
 .hero-orbit {
   position: absolute;
   left: 50%;
-  bottom: -44vh;
-  width: 120vw;
-  height: 120vw;
-  max-width: 1400px;
-  max-height: 1400px;
+  bottom: -14vh;              /* bring it up so the full globe reads */
+  width: min(86vw, 980px);
+  height: min(86vw, 980px);
   transform: translateX(-50%);
   border-radius: 9999px;
+  opacity: 0.70;
 
-  /* Earth body + limb glow + Africa line overlay */
-  background-image:
-    radial-gradient(circle at 50% 35%, rgba(255,255,255,0.10), rgba(3,3,7,0.95) 48%, rgba(0,0,0,1) 70%),
-    radial-gradient(circle at 50% 30%, rgba(127,209,255,0.16), transparent 55%),
-    url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20300%20360%22%3E%0A%20%20%3Cpath%20d=%22M193%2020l22%2026-8%2021%2022%2030-10%2022%2012%2031-8%2025-28%2034-5%2034-36%2028-24%2032-36-8-12-24-31-22-12-34%2010-31-10-23%2019-37%2022-18%2018-38%2034-28%2023%208z%22%0A%20%20%20%20%20%20%20%20fill=%22none%22%20stroke=%22rgba(255,255,255,0.22)%22%20stroke-width=%222.2%22%20stroke-linejoin=%22round%22/%3E%0A%3C/svg%3E");
+  /* Base ocean body + limb shading */
+  background:
+    radial-gradient(circle at 45% 38%, rgba(255,255,255,0.12), rgba(3,3,7,0.96) 52%, rgba(0,0,0,1) 74%),
+    radial-gradient(circle at 50% 32%, rgba(127,209,255,0.16), transparent 58%);
   background-repeat: no-repeat;
-  background-size: cover, cover, 38%;
-  background-position: center, center, 52% 44%;
-  filter: blur(0.0px);
-  opacity: 0.62;
+  background-size: cover, cover;
+  background-position: center, center;
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,0.65),
+    inset 0 0 40px rgba(0,0,0,0.55);
+
+  overflow: hidden;
 }
 
+/* Globe surface: scrolling band to simulate rotation */
 .hero-orbit::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
 
-  /* Atmospheric rim (thin, cinematic) */
-  background:
-    radial-gradient(circle at 50% 25%, rgba(175,203,255,0.26), transparent 55%),
-    radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06), transparent 62%);
-  mix-blend-mode: screen;
-  opacity: 0.6;
+  /* “Map band” + latitude/longitude lines */
+  background-image:
+    /* soft cloud-ish noise bands */
+    radial-gradient(12px 10px at 22% 36%, rgba(255,255,255,0.08), transparent 58%),
+    radial-gradient(16px 14px at 48% 22%, rgba(255,255,255,0.06), transparent 60%),
+    radial-gradient(14px 12px at 68% 54%, rgba(255,255,255,0.07), transparent 60%),
+    radial-gradient(18px 16px at 82% 32%, rgba(255,255,255,0.05), transparent 62%),
+
+    /* continents-ish silhouettes (stylized, non-specific) */
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(175,203,255,0.14) 8%,
+      rgba(175,203,255,0.06) 14%,
+      transparent 20%,
+      rgba(175,203,255,0.12) 32%,
+      rgba(175,203,255,0.05) 40%,
+      transparent 48%,
+      rgba(175,203,255,0.10) 58%,
+      rgba(175,203,255,0.04) 66%,
+      transparent 74%,
+      rgba(175,203,255,0.11) 86%,
+      rgba(175,203,255,0.05) 92%,
+      transparent 100%
+    ),
+
+    /* longitude lines */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.06) 0px,
+      rgba(255,255,255,0.06) 1px,
+      transparent 1px,
+      transparent 36px
+    ),
+
+    /* latitude lines */
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.045) 0px,
+      rgba(255,255,255,0.045) 1px,
+      transparent 1px,
+      transparent 34px
+    );
+
+  background-size:
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    100% 100%,
+
+    /* band textures scroll */
+    220% 100%,
+    220% 100%,
+    100% 100%,
+    100% 100%;
+
+  background-position:
+    center,
+    center,
+    center,
+    center,
+
+    /* these two scroll to simulate rotation */
+    0% 50%,
+    0% 50%,
+    center,
+    center;
+
+  filter: blur(0.25px) saturate(1.05);
+  opacity: 0.68;
+
+  /* This is the “revolving” effect */
+  animation: globeSpin 38s linear infinite;
 }
 
+/* Atmospheric rim + specular highlight */
 .hero-orbit::after {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -2%;
   border-radius: inherit;
+  background:
+    /* atmosphere rim (top edge) */
+    radial-gradient(circle at 50% 18%, rgba(169,199,255,0.28), transparent 55%),
+    /* limb highlight */
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,0.18), transparent 48%),
+    /* subtle terminator (night shadow) */
+    radial-gradient(circle at 75% 52%, rgba(0,0,0,0.55), transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  pointer-events: none;
+}
 
-  /* Limb highlight concentrated on top edge */
-  background: radial-gradient(circle at 50% 18%, rgba(255,255,255,0.20), transparent 48%);
-  opacity: 0.35;
+@keyframes globeSpin {
+  from {
+    background-position:
+      center,
+      center,
+      center,
+      center,
+      0% 50%,
+      0% 50%,
+      center,
+      center;
+  }
+  to {
+    background-position:
+      center,
+      center,
+      center,
+      center,
+      -120% 50%,
+      -120% 50%,
+      center,
+      center;
+  }
 }
 
 /* HUD plane within hero (faint, perspective) */
@@ -1063,6 +1170,7 @@ img {
 .low-power .site-grid,
 .low-power .hero-stars,
 .low-power .hero--orbital::before,
-.low-power .hero--matrix::before {
+.low-power .hero--matrix::before,
+.low-power .hero-orbit::before {
   animation: none !important;
 }
