@@ -409,19 +409,18 @@ img {
   to { transform: translate3d(-2%, 1.6%, 0); }
 }
 
-/* ------------------ NEW: Full Globe Revolving (no Africa) ------------------ */
-/* The globe is fully visible and "rotates" by scrolling a surface texture band. */
+/* ------------------ Globe base (body) ------------------ */
 .hero-orbit {
   position: absolute;
   left: 50%;
-  bottom: -14vh;              /* bring it up so the full globe reads */
+  bottom: -14vh;              /* full globe reads */
   width: min(86vw, 980px);
   height: min(86vw, 980px);
   transform: translateX(-50%);
   border-radius: 9999px;
   opacity: 0.70;
 
-  /* Base ocean body + limb shading */
+  /* Base body + limb shading */
   background:
     radial-gradient(circle at 45% 38%, rgba(255,255,255,0.12), rgba(3,3,7,0.96) 52%, rgba(0,0,0,1) 74%),
     radial-gradient(circle at 50% 32%, rgba(127,209,255,0.16), transparent 58%);
@@ -436,85 +435,47 @@ img {
   overflow: hidden;
 }
 
-/* Globe surface: scrolling band to simulate rotation */
+/* Globe surface: REAL Earth texture scroll to simulate rotation */
 .hero-orbit::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
 
-  /* “Map band” + latitude/longitude lines */
+  /* Key: texture is wider than the sphere so we can scroll it */
   background-image:
-    /* soft cloud-ish noise bands */
-    radial-gradient(12px 10px at 22% 36%, rgba(255,255,255,0.08), transparent 58%),
-    radial-gradient(16px 14px at 48% 22%, rgba(255,255,255,0.06), transparent 60%),
-    radial-gradient(14px 12px at 68% 54%, rgba(255,255,255,0.07), transparent 60%),
-    radial-gradient(18px 16px at 82% 32%, rgba(255,255,255,0.05), transparent 62%),
-
-    /* continents-ish silhouettes (stylized, non-specific) */
-    linear-gradient(90deg,
-      transparent 0%,
-      rgba(175,203,255,0.14) 8%,
-      rgba(175,203,255,0.06) 14%,
-      transparent 20%,
-      rgba(175,203,255,0.12) 32%,
-      rgba(175,203,255,0.05) 40%,
-      transparent 48%,
-      rgba(175,203,255,0.10) 58%,
-      rgba(175,203,255,0.04) 66%,
-      transparent 74%,
-      rgba(175,203,255,0.11) 86%,
-      rgba(175,203,255,0.05) 92%,
-      transparent 100%
-    ),
-
-    /* longitude lines */
+    url('/earth-texture.png'),
+    /* subtle longitude lines */
     repeating-linear-gradient(
       90deg,
-      rgba(255,255,255,0.06) 0px,
-      rgba(255,255,255,0.06) 1px,
-      transparent 1px,
-      transparent 36px
-    ),
-
-    /* latitude lines */
-    repeating-linear-gradient(
-      0deg,
       rgba(255,255,255,0.045) 0px,
       rgba(255,255,255,0.045) 1px,
       transparent 1px,
-      transparent 34px
+      transparent 42px
+    ),
+    /* subtle latitude lines */
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.035) 0px,
+      rgba(255,255,255,0.035) 1px,
+      transparent 1px,
+      transparent 40px
     );
 
-  background-size:
-    100% 100%,
-    100% 100%,
-    100% 100%,
-    100% 100%,
+  background-size: 220% 100%, 100% 100%, 100% 100%;
+  background-position: 0% 50%, center, center;
+  background-repeat: repeat-x, repeat, repeat;
 
-    /* band textures scroll */
-    220% 100%,
-    220% 100%,
-    100% 100%,
-    100% 100%;
+  /* Space-grade grading */
+  filter: saturate(0.9) contrast(1.12) brightness(0.92);
+  opacity: 0.78;
 
-  background-position:
-    center,
-    center,
-    center,
-    center,
+  /* Fade the edges for a more spherical read */
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 62%, transparent 74%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 62%, transparent 74%);
 
-    /* these two scroll to simulate rotation */
-    0% 50%,
-    0% 50%,
-    center,
-    center;
-
-  filter: blur(0.25px) saturate(1.05);
-  opacity: 0.68;
-
-  /* This is the “revolving” effect */
-  animation: globeSpin 38s linear infinite;
+  /* Revolve */
+  animation: globeSpin 36s linear infinite;
 }
 
 /* Atmospheric rim + specular highlight */
@@ -536,28 +497,8 @@ img {
 }
 
 @keyframes globeSpin {
-  from {
-    background-position:
-      center,
-      center,
-      center,
-      center,
-      0% 50%,
-      0% 50%,
-      center,
-      center;
-  }
-  to {
-    background-position:
-      center,
-      center,
-      center,
-      center,
-      -120% 50%,
-      -120% 50%,
-      center,
-      center;
-  }
+  from { background-position: 0% 50%, center, center; }
+  to   { background-position: -120% 50%, center, center; }
 }
 
 /* HUD plane within hero (faint, perspective) */
