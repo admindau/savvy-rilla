@@ -4,6 +4,7 @@ import './globals.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
+import CursorFX from '@/components/cursor-fx';
 
 export const metadata: Metadata = {
   title: 'Savvy Rilla Technologies',
@@ -264,6 +265,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="site-grid" />
           <div className="site-vignette" />
         </div>
+
+        <CursorFX />
 
         <div className="site">
           <Nav />
