@@ -11,8 +11,8 @@ export default function HomePage() {
       <section className="hero hero--orbital">
         {/* Optional background image layer (add file to /public if you want) */}
         <div className="hero-bg" aria-hidden="true">
-          <div className="hero-orbit" />
-          <div className="hero-stars" />
+          <div className="hero-orbit" aria-hidden="true" />
+          <div className="hero-stars" aria-hidden="true" />
           {/*
           <Image
             src="/hero-map.png"

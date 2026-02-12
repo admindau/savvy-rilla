@@ -261,8 +261,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
 
         <div className="site-bg" aria-hidden="true">
-          <div className="site-stars" />
-          <div className="site-nebula" />
           <div className="site-grid" />
           <div className="site-vignette" />
         </div>
