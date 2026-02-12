@@ -1406,3 +1406,201 @@ a {
     grid-template-columns: 1fr;
   }
 }
+/* =========================
+   Phase B — Interactive Panels + Scroll Progress HUD
+   ========================= */
+
+:root {
+  --hud-accent: rgba(0, 245, 160, 1);
+  --hud-accent-soft: rgba(0, 245, 160, 0.18);
+  --hud-glass: rgba(12, 22, 24, 0.58);
+}
+
+.hero,
+.section {
+  scroll-margin-top: 92px; /* accounts for the sealed header */
+}
+
+/* Top scroll progress bar */
+.scroll-progress {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 2px;
+  z-index: 80;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, rgba(0, 245, 160, 0), rgba(0, 245, 160, 0.9), rgba(0, 245, 160, 0));
+  filter: drop-shadow(0 0 10px rgba(0, 245, 160, 0.25));
+}
+
+/* Right-side section rail */
+.scroll-rail {
+  position: fixed;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 75;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(8, 12, 14, 0.35);
+  box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.06) inset, 0 20px 60px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.rail-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35) inset;
+  cursor: pointer;
+  transition: transform 200ms ease, background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.rail-dot:hover {
+  transform: scale(1.12);
+  border-color: rgba(0, 245, 160, 0.35);
+  box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.14) inset, 0 0 16px rgba(0, 245, 160, 0.14);
+}
+
+.rail-dot.is-active {
+  background: rgba(0, 245, 160, 0.55);
+  border-color: rgba(0, 245, 160, 0.65);
+  box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.22) inset, 0 0 24px rgba(0, 245, 160, 0.18);
+}
+
+.rail-dot:focus-visible {
+  outline: 2px solid rgba(0, 245, 160, 0.8);
+  outline-offset: 3px;
+}
+
+/* Hide rail on mobile (keeps the top progress bar) */
+@media (max-width: 920px) {
+  .scroll-rail {
+    display: none;
+  }
+}
+
+/* Interactive “AAA sci‑fi UI” treatment for hero panels + cards */
+.hud-panel--interactive,
+.card--interactive {
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-panel--interactive::before,
+.card--interactive::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 420px at 30% -10%, rgba(0, 245, 160, 0.11), rgba(0, 245, 160, 0) 55%),
+    radial-gradient(900px 380px at 100% 0%, rgba(120, 210, 255, 0.08), rgba(120, 210, 255, 0) 55%);
+  opacity: 0.0;
+  transition: opacity 260ms ease;
+}
+
+.hud-panel--interactive::after,
+.card--interactive::after {
+  content: '';
+  position: absolute;
+  left: -40%;
+  top: -30%;
+  width: 60%;
+  height: 180%;
+  transform: rotate(18deg) translate3d(0, 0, 0);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(0, 245, 160, 0.08),
+    rgba(255, 255, 255, 0)
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hud-panel--interactive:hover,
+.card--interactive:hover {
+  border-color: rgba(0, 245, 160, 0.25);
+  box-shadow:
+    0 0 0 1px rgba(0, 245, 160, 0.14) inset,
+    0 18px 70px rgba(0, 0, 0, 0.55),
+    0 0 34px rgba(0, 245, 160, 0.10);
+  transform: translate3d(0, -1px, 0);
+}
+
+.hud-panel--interactive:hover::before,
+.card--interactive:hover::before {
+  opacity: 1;
+}
+
+.hud-panel--interactive:hover::after,
+.card--interactive:hover::after {
+  opacity: 1;
+  animation: hud-sweep 900ms ease forwards;
+}
+
+@keyframes hud-sweep {
+  from {
+    transform: rotate(18deg) translate3d(-40%, 0, 0);
+  }
+  to {
+    transform: rotate(18deg) translate3d(170%, 0, 0);
+  }
+}
+
+/* Subtle scanline texture on glass surfaces (very light) */
+.hud-panel--interactive,
+.card--interactive,
+.hero-bg {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.0) 18px
+  );
+  background-size: 100% 18px;
+  background-position: 0 0;
+}
+
+.hud-panel--interactive:hover,
+.card--interactive:hover {
+  animation: scan-drift 2.4s linear infinite;
+}
+
+@keyframes scan-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 36px;
+  }
+}
+
+/* Make hero chips breathe slightly (keeps Phase A vibe but more premium) */
+.meta-pill {
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+}
+
+.meta-pill:hover {
+  transform: translate3d(0, -1px, 0);
+  border-color: rgba(0, 245, 160, 0.22);
+  background: rgba(0, 245, 160, 0.05);
+}
+
