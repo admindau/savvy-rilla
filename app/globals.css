@@ -404,6 +404,51 @@ a {
   filter: saturate(0.8) contrast(1.05) blur(0.2px);
 }
 
+/* Cinematic hero background (Phase A polish) */
+.hero--cinema {
+  padding-top: 2rem;
+  padding-bottom: 2.75rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.hero-bg-img--cinema {
+  opacity: 0.88;
+  filter: saturate(1.05) contrast(1.08) brightness(0.92);
+  transform: scale(1.03);
+}
+
+.hero-cinema-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* readable left-side + cinematic vignette */
+  background:
+    radial-gradient(circle at 70% 40%, rgba(120, 170, 255, 0.22), transparent 55%),
+    radial-gradient(circle at 50% 60%, rgba(0, 0, 0, 0.45), transparent 60%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.55) 38%, rgba(0, 0, 0, 0.22) 62%, rgba(0, 0, 0, 0.72) 100%),
+    radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+.hero-cinema-grid {
+  position: absolute;
+  inset: -25% -15%;
+  pointer-events: none;
+  opacity: 0.16;
+  background-image:
+    linear-gradient(rgba(0, 245, 160, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 217, 255, 0.03) 1px, transparent 1px);
+  background-size: 58px 58px;
+  transform: perspective(900px) rotateX(60deg) translateY(-10%);
+  filter: blur(0.2px);
+  animation: cinemaGridDrift 22s linear infinite;
+}
+
+@keyframes cinemaGridDrift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 0 520px, 520px 0; }
+}
+
 /* Local star density in the hero for “space” depth */
 .hero-stars {
   position: absolute;
@@ -582,6 +627,9 @@ a {
   .hero-stars {
     animation: none;
   }
+  .hero-cinema-grid {
+    animation: none;
+  }
 }
 
 .hero-grid {
@@ -717,6 +765,48 @@ a {
   background: rgba(0, 245, 160, 0.08);
   color: rgba(0, 245, 160, 0.95);
   animation: statusPulse 2.4s ease-in-out infinite;
+}
+
+.hero-panel-badge--muted {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.78);
+  animation: none;
+}
+
+.deployments {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.deployments li {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.55rem 0.6rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.d-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(0, 245, 160, 0.65);
+  box-shadow: 0 0 14px rgba(0, 245, 160, 0.22);
+}
+
+.d-time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.68);
 }
 
 @keyframes statusPulse {

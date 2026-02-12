@@ -8,20 +8,18 @@ export default function HomePage() {
   return (
     <div className="page">
       {/* HERO */}
-      <section className="hero hero--orbital">
+      <section className="hero hero--cinema">
         {/* Optional background image layer (add file to /public if you want) */}
         <div className="hero-bg" aria-hidden="true">
-          <div className="hero-orbit" aria-hidden="true" />
-          <div className="hero-stars" aria-hidden="true" />
-          {/*
           <Image
-            src="/hero-map.png"
+            src="/hero-space-earth.png"
             alt=""
             fill
-            className="hero-bg-img"
+            className="hero-bg-img hero-bg-img--cinema"
             priority
           />
-          */}
+          <div className="hero-cinema-overlay" />
+          <div className="hero-cinema-grid" />
         </div>
 
         <div className="container hero-grid">
@@ -64,70 +62,65 @@ export default function HomePage() {
 
           <Parallax className="hero-right" strength={9}>
             <div className="hero-panel" data-depth="0.9">
-              <div className="panel-header">
-                <div className="panel-title">SYSTEM STATUS</div>
-                <div className="panel-chip">LIVE</div>
+              <div className="hero-panel-head">
+                <div className="hero-panel-brand">
+                  <div>
+                    <p className="hero-panel-title">SYSTEM STATUS</p>
+                    <p className="hero-panel-subtitle">Live operational snapshot</p>
+                  </div>
+                </div>
+                <span className="hero-panel-badge">LIVE</span>
               </div>
 
-              <div className="panel-stats">
-                <div className="stat">
-                  <div className="stat-label">Uptime target</div>
-                  <div className="stat-value">99.9%</div>
+              <div className="hero-metrics">
+                <div className="metric">
+                  <p className="metric-label">Uptime target</p>
+                  <p className="metric-value">99.9%</p>
                 </div>
-                <div className="stat">
-                  <div className="stat-label">Incident rate</div>
-                  <div className="stat-value">0 (30d)</div>
+                <div className="metric">
+                  <p className="metric-label">Incident rate</p>
+                  <p className="metric-value">0 (30d)</p>
                 </div>
-                <div className="stat">
-                  <div className="stat-label">Latency (p95)</div>
-                  <div className="stat-value">187ms</div>
+                <div className="metric">
+                  <p className="metric-label">Latency (p95)</p>
+                  <p className="metric-value">187ms</p>
                 </div>
-                <div className="stat">
-                  <div className="stat-label">Deploy cadence</div>
-                  <div className="stat-value">Weekly</div>
+                <div className="metric">
+                  <p className="metric-label">Deploy cadence</p>
+                  <p className="metric-value">Weekly</p>
                 </div>
               </div>
 
-              <div className="panel-divider" />
-
-              <div className="panel-links">
-                <Link className="panel-link" href="/status">
-                  View status
-                </Link>
-                <Link className="panel-link" href="/platforms">
-                  View platforms
-                </Link>
-              </div>
+              <p className="hero-panel-note">
+                <Link href="/status">View status</Link> · <Link href="/platforms">View platforms</Link>
+              </p>
             </div>
 
-            <div className="hero-panel hero-panel--alt" data-depth="0.6">
-              <div className="panel-header">
-                <div className="panel-title">DEPLOYMENTS</div>
-                <div className="panel-chip panel-chip--muted">SYNC</div>
+            <div className="hero-panel" data-depth="0.6">
+              <div className="hero-panel-head">
+                <div className="hero-panel-brand">
+                  <div>
+                    <p className="hero-panel-title">DEPLOYMENTS</p>
+                    <p className="hero-panel-subtitle">Recent system updates</p>
+                  </div>
+                </div>
+                <span className="hero-panel-badge hero-panel-badge--muted">SYNC</span>
               </div>
 
-              <div className="panel-list">
-                <div className="panel-row">
-                  <span className="dot dot--ok" />
-                  <span className="row-text">API gateway deployed</span>
-                  <span className="row-time">2h</span>
-                </div>
-                <div className="panel-row">
-                  <span className="dot dot--ok" />
-                  <span className="row-text">Security rules updated</span>
-                  <span className="row-time">1d</span>
-                </div>
-                <div className="panel-row">
-                  <span className="dot dot--ok" />
-                  <span className="row-text">Observability tuned</span>
-                  <span className="row-time">3d</span>
-                </div>
-                <div className="panel-row">
-                  <span className="dot dot--warn" />
-                  <span className="row-text">Maintenance window scheduled</span>
-                  <span className="row-time">7d</span>
-                </div>
-              </div>
+              <ul className="deployments">
+                <li>
+                  <span className="d-dot" /> API gateway deployed <span className="d-time">2h</span>
+                </li>
+                <li>
+                  <span className="d-dot" /> Security rules updated <span className="d-time">1d</span>
+                </li>
+                <li>
+                  <span className="d-dot" /> Observability tuned <span className="d-time">3d</span>
+                </li>
+                <li>
+                  <span className="d-dot" /> Maintenance window scheduled <span className="d-time">7d</span>
+                </li>
+              </ul>
             </div>
           </Parallax>
         </div>
