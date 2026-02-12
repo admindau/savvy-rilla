@@ -6,7 +6,7 @@ type ParallaxProps = {
   children: React.ReactNode;
   className?: string;
 
-  /** Max rotation strength. Clamped internally. */
+  /** Max rotation strength. Clamped internally to avoid toy-feel. */
   strength?: number;
 };
 
@@ -33,31 +33,23 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
     if (prefersReduced || lowPower) return;
 
     const maxDeg = clamp(strength, 4, 10);
-
-    // “heavier” depth translation is tied to strength, but clamped
-    const maxTranslate = clamp(6 + maxDeg * 0.9, 8, 16);
+    const maxTranslate = clamp(8 + maxDeg * 1.0, 10, 18);
 
     let raf = 0;
 
-    // target + current (for smoothing)
+    // targets + currents (smoothed)
     let tRx = 0;
     let tRy = 0;
     let cRx = 0;
     let cRy = 0;
 
-    // Layer nodes
+    // depth layers: anything inside with data-depth="0.2..1"
     const layers = Array.from(root.querySelectorAll<HTMLElement>('[data-depth]'));
-
-    const setNeutral = () => {
-      tRx = 0;
-      tRy = 0;
-    };
 
     const onMove = (ev: PointerEvent) => {
       const rect = root.getBoundingClientRect();
       const nx = (ev.clientX - rect.left) / rect.width; // 0..1
       const ny = (ev.clientY - rect.top) / rect.height; // 0..1
-
       const px = (nx - 0.5) * 2; // -1..1
       const py = (ny - 0.5) * 2; // -1..1
 
@@ -65,16 +57,19 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
       tRy = clamp(px * maxDeg, -maxDeg, maxDeg);
     };
 
+    const onLeave = () => {
+      tRx = 0;
+      tRy = 0;
+    };
+
     const tick = () => {
-      // smoothing
       cRx = lerp(cRx, tRx, 0.12);
       cRy = lerp(cRy, tRy, 0.12);
 
       inner.style.setProperty('--rx', `${cRx.toFixed(2)}deg`);
       inner.style.setProperty('--ry', `${cRy.toFixed(2)}deg`);
 
-      // translate layers at different rates (“depth”)
-      // depth: 0.2..1 (we clamp)
+      // depth translate: closer elements move more
       for (const node of layers) {
         const d = clamp(Number(node.dataset.depth ?? '0.6'), 0.15, 1);
         const tx = (cRy / maxDeg) * (maxTranslate * d);
@@ -86,14 +81,14 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
     };
 
     root.addEventListener('pointermove', onMove);
-    root.addEventListener('pointerleave', setNeutral);
+    root.addEventListener('pointerleave', onLeave);
 
     raf = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(raf);
       root.removeEventListener('pointermove', onMove);
-      root.removeEventListener('pointerleave', setNeutral);
+      root.removeEventListener('pointerleave', onLeave);
     };
   }, [strength]);
 

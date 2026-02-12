@@ -1,85 +1,89 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-type RevealVariant = "up" | "left" | "right";
-
-type RevealProps = {
-  children: React.ReactNode;
+type RevealProps<T extends React.ElementType> = {
+  as?: T;
   className?: string;
-  as?: React.ElementType;
+  children: React.ReactNode;
+
+  /** Optional delay for sequencing (ms) */
   delayMs?: number;
 
-  /** Adds staggered reveal to each direct child of this wrapper */
-  staggerChildren?: boolean;
-  staggerMs?: number;
+  /** Direction variants */
+  variant?: 'up' | 'down' | 'left' | 'right' | 'none';
 
-  /** Slide direction */
-  variant?: RevealVariant;
-};
+  /** IntersectionObserver tuning */
+  threshold?: number;
+  rootMargin?: string;
 
-export default function Reveal({
+  /** Reveal once then stop observing */
+  once?: boolean;
+} & Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children'>;
+
+export default function Reveal<T extends React.ElementType = 'div'>({
+  as,
+  className = '',
   children,
-  className = "",
-  as: Tag = "div",
   delayMs = 0,
-  staggerChildren = false,
-  staggerMs = 70,
-  variant = "up",
-}: RevealProps) {
+  variant = 'up',
+  threshold = 0.18,
+  rootMargin = '0px 0px -10% 0px',
+  once = true,
+  ...rest
+}: RevealProps<T>) {
+  const Comp = (as ?? 'div') as React.ElementType;
   const ref = useRef<HTMLElement | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  const style = useMemo<React.CSSProperties>(() => {
+    return delayMs ? ({ ['--reveal-delay' as any]: `${delayMs}ms` } as React.CSSProperties) : {};
+  }, [delayMs]);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    // Set base delay
-    el.style.setProperty("--reveal-delay", `${delayMs}ms`);
-
-    // If staggering, mark direct children
-    if (staggerChildren) {
-      el.style.setProperty("--stagger-step", `${staggerMs}ms`);
-      const kids = Array.from(el.children) as HTMLElement[];
-      kids.forEach((k, i) => {
-        k.classList.add("reveal-stagger-item");
-        k.style.setProperty("--stagger-i", String(i));
-      });
-    }
-
-    if (prefersReduced) {
-      el.classList.add("reveal-in");
+    // Respect reduced motion
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lowPower = document.documentElement.classList.contains('low-power');
+    if (prefersReduced || lowPower) {
+      setVisible(true);
       return;
     }
 
     const io = new IntersectionObserver(
       (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            (e.target as HTMLElement).classList.add("reveal-in");
-            io.unobserve(e.target);
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            if (once) io.disconnect();
+          } else if (!once) {
+            setVisible(false);
           }
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -10% 0px" }
+      { threshold, rootMargin }
     );
 
     io.observe(el);
+
     return () => io.disconnect();
-  }, [delayMs, staggerChildren, staggerMs]);
+  }, [threshold, rootMargin, once]);
 
-  const variantClass =
-    variant === "left" ? "reveal--left" : variant === "right" ? "reveal--right" : "";
-
-  const staggerClass = staggerChildren ? "reveal-stagger" : "";
+  const vClass =
+    variant === 'none' ? 'reveal--none' : variant ? `reveal--${variant}` : 'reveal--up';
 
   return (
-    <Tag
-      ref={ref as any}
-      className={`reveal ${variantClass} ${staggerClass} ${className}`.trim()}
+    <Comp
+      ref={(node: any) => {
+        ref.current = node;
+      }}
+      className={`reveal ${vClass} ${visible ? 'is-visible' : ''} ${className}`.trim()}
+      style={{ ...style, ...(rest as any).style }}
+      {...rest}
     >
       {children}
-    </Tag>
+    </Comp>
   );
 }
