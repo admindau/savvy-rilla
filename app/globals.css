@@ -1380,3 +1380,29 @@ html.cursor-down .cursor-ring {
     animation: none;
   }
 }
+
+/* --- Phase D: 3D logo layering (Hero) --- */
+/* Ensures the R3F canvas sits between the hero background image and the hero content/UI. */
+.hero-3d {
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* above .hero-bg (0), below .hero-grid (2) */
+  pointer-events: none;
+}
+
+.hero-3d canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Make sure hero content always wins layering */
+.hero-grid {
+  z-index: 2;
+}
+
+/* Small performance win: contain expensive effects to hero region */
+.hero--orbital,
+.hero--matrix {
+  contain: paint;
+}
