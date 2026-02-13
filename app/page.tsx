@@ -1,5 +1,6 @@
 // app/page.tsx
 import Link from 'next/link';
+
 import Reveal from '@/components/reveal';
 import Parallax from '@/components/parallax';
 import Hero3D from '@/components/hero-3d-loader';
@@ -9,9 +10,9 @@ export default function HomePage() {
     <div className="page">
       {/* HERO */}
       <section className="hero hero--orbital">
-        {/* Pure stars background is handled in CSS (Phase D). */}
+        {/* Stars background + film grain are handled in globals.css */}
 
-        {/* 3D Logo layer (Phase D) */}
+        {/* 3D Logo layer */}
         <div className="hero-3d" aria-hidden="true">
           <Hero3D className="hero-3d-canvas" />
         </div>
@@ -24,12 +25,12 @@ export default function HomePage() {
               Powering Secure Digital Infrastructure Across Africa
             </h1>
 
-            <p className="hero-subtitle">
-              We design, build, and operate secure platforms for financial institutions, governments, and
-              enterprises — engineered for African constraints and global standards.
+            <p className="hero-text">
+              We design, build, and operate secure platforms for financial institutions, governments, and enterprises —
+              engineered for African constraints and global standards.
             </p>
 
-            <div className="hero-ctas">
+            <div className="hero-actions">
               <Link href="/platforms" className="btn btn-primary">
                 Explore Platforms
               </Link>
@@ -38,19 +39,19 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="hero-meta">
-              <div className="meta-pill">
-                <span className="meta-label">NODE</span>
-                <span className="meta-value">ORBIT-AFRICA</span>
-              </div>
-              <div className="meta-pill">
-                <span className="meta-label">STATUS</span>
-                <span className="meta-value">OPERATIONAL</span>
-              </div>
-              <div className="meta-pill">
-                <span className="meta-label">SECURITY</span>
-                <span className="meta-value">HARDENED</span>
-              </div>
+            <div className="hero-strip" aria-label="Status strip">
+              <span className="hero-strip-item">
+                <span className="hero-strip-dot" /> NODE ORBIT-AFRICA
+              </span>
+              <span className="hero-strip-item">
+                <span className="hero-strip-dot" /> STATUS OPERATIONAL
+              </span>
+              <span className="hero-strip-item">
+                <span className="hero-strip-dot" /> SECURITY HARDENED
+              </span>
+              <span className="hero-strip-item">
+                <span className="hero-strip-dot" /> MULTI-REGION READY
+              </span>
             </div>
           </Reveal>
 
@@ -124,7 +125,6 @@ export default function HomePage() {
           </Parallax>
         </div>
       </section>
-
       {/* OPERATIONAL OVERVIEW */}
       <section className="section">
         <div className="container">

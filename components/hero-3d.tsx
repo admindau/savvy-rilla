@@ -7,281 +7,294 @@ import { SVGLoader } from 'three-stdlib';
 
 type Hero3DProps = {
   className?: string;
+  svgUrl?: string; // default: "/srt-logo.svg"
 };
 
-/**
- * Phase D – 3D Integration (Logo Edition)
- * - Replaces Earth globe with an extruded 3D Savvy Rilla logo from SVG.
- * - Slow rotation + subtle float + rim lighting + sparse starfield.
- *
- * Required asset in /public:
- * - /srt-logo.svg  (recommended: rename your SVG to this exact filename)
- *
- * Notes:
- * - This runs client-side only (Canvas/WebGL).
- * - If you want more “metal/glass”, we can tune materials after you deploy.
- */
-export default function Hero3D({ className }: Hero3DProps) {
-  return (
-    <Canvas
-      className={className}
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      camera={{ position: [0, 0, 7.0], fov: 36, near: 0.1, far: 120 }}
-    >
-      {/* Canvas stays transparent; hero background is pure CSS stars. */}
+type SvgScene = {
+  meshes: THREE.Mesh[];
+  bounds: THREE.Box3;
+};
 
-      {/* Lighting: key + fill + rim */}
-      <ambientLight intensity={0.62} />
-      {/* Key */}
-      <directionalLight position={[6, 4, 6]} intensity={1.45} color="#eaffff" />
-      {/* Fill */}
-      <directionalLight position={[-6, 1, 2]} intensity={0.45} color="#bfefff" />
-      {/* Rim */}
-      <pointLight position={[0, 2.8, 7]} intensity={0.95} color="#00f5a0" />
-      <pointLight position={[-4.5, 1.2, 2.8]} intensity={0.55} color="#00f5a0" />
-
-      <Stars />
-
-      <Scene />
-    </Canvas>
-  );
-}
-
-function Scene() {
-  // Keep the logo reliably *in view* across different aspect ratios.
-  const { viewport } = useThree();
-
-  // viewport.width is in “three units”. We bias the logo to the right but clamp so it never exits frame.
-  const x = Math.max(0.7, Math.min(2.15, viewport.width / 2 - 0.25));
-
-  return (
-    <group position={[x, -0.1, -0.55]} rotation={[0.04, -0.32, 0.02]}>
-      <Logo3D />
-    </group>
-  );
-}
-
-function Stars() {
-  const points = useMemo(() => {
-    const count = 900;
-    const positions = new Float32Array(count * 3);
-    const rMin = 10;
-    const rMax = 34;
-
-    for (let i = 0; i < count; i++) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = 2 * Math.PI * u;
-      const phi = Math.acos(2 * v - 1);
-
-      const r = rMin + Math.random() * (rMax - rMin);
-
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta);
-      const z = r * Math.cos(phi);
-
-      positions[i * 3 + 0] = x;
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
-    }
-
-    return positions;
-  }, []);
-
-  const geom = useMemo(() => {
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.BufferAttribute(points, 3));
-    return g;
-  }, [points]);
-
-  return (
-    <points geometry={geom}>
-      <pointsMaterial size={0.04} sizeAttenuation transparent opacity={0.45} color="#ffffff" />
-    </points>
-  );
-}
-
-function Logo3D() {
-  const groupRef = useRef<THREE.Group>(null);
-
-  // Use a URL-safe filename in /public
-  const LOGO_SVG_URL = '/srt-logo.svg';
-
-  const [shapes, setShapes] = useState<THREE.Shape[]>([]);
-  const [viewBoxScale, setViewBoxScale] = useState(1);
-
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
   useEffect(() => {
-    let alive = true;
-    const loader = new SVGLoader();
-
-    loader.load(
-      LOGO_SVG_URL,
-      (dataRaw) => {
-        if (!alive) return;
-
-        // Remove fragile typing differences across SVGLoader versions
-        const data: any = dataRaw;
-
-        const allShapes: THREE.Shape[] = [];
-        for (const path of data.paths ?? []) {
-          const s = SVGLoader.createShapes(path);
-          allShapes.push(...s);
-        }
-
-        // Some SVGs can produce empty shape arrays if they are strokes-only.
-        setShapes(allShapes);
-
-        // Normalize by SVG viewBox for more stable scaling across different logo exports.
-        // ✅ FIX: XMLDocument doesn't have getAttribute; documentElement does.
-        const vb =
-          data?.xml?.documentElement?.getAttribute?.('viewBox') ??
-          data?.xml?.querySelector?.('svg')?.getAttribute?.('viewBox') ??
-          null;
-
-        if (vb) {
-          const parts = String(vb)
-            .trim()
-            .split(/\s+/)
-            .map((n) => Number(n));
-          const w = parts[2] || 1;
-          setViewBoxScale(w);
-        } else {
-          setViewBoxScale(1);
-        }
-      },
-      undefined,
-      () => {
-        // If load fails, keep empty shapes. We’ll render a fallback.
-        setShapes([]);
-      }
-    );
-
-    return () => {
-      alive = false;
-    };
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = () => setReduced(!!mq.matches);
+    onChange();
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
   }, []);
+  return reduced;
+}
 
-  // Extrusion setup (with auto-fit scale based on resulting bounds)
-  const geomData = useMemo(() => {
-    if (!shapes.length) return null;
+async function fetchText(url: string) {
+  const res = await fetch(url, { cache: 'force-cache' });
+  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+  return await res.text();
+}
 
-    const g = new THREE.ExtrudeGeometry(shapes, {
-      depth: 14,
-      bevelEnabled: true,
-      bevelThickness: 2,
-      bevelSize: 1.4,
-      bevelSegments: 3,
-      curveSegments: 12,
-      steps: 1,
-    });
+function buildSvgScene(svgText: string): SvgScene | null {
+  const loader = new SVGLoader();
+  const data = loader.parse(svgText);
+  if (!data?.paths?.length) return null;
 
-    // Center geometry + compute bounds for robust scaling
-    g.computeBoundingBox();
-    const box = g.boundingBox;
-    if (box) {
-      const center = new THREE.Vector3();
-      box.getCenter(center);
-      g.translate(-center.x, -center.y, -center.z);
+  const meshes: THREE.Mesh[] = [];
+  const bounds = new THREE.Box3();
 
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      const maxDim = Math.max(size.x || 1, size.y || 1, size.z || 1);
+  // We render filled shapes as extruded geometry. If the SVG is stroke-only,
+  // shapes may be empty; we still handle it by rendering stroke geometry.
+  let hasAnyGeometry = false;
 
-      // Target size in world units (tuned to sit behind the right-side UI cards)
-      const target = 2.4;
-      const autoScale = target / maxDim;
+  for (const path of data.paths) {
+    const style = path.userData?.style ?? {};
+    const fill = (style.fill ?? '').toString();
+    const stroke = (style.stroke ?? '').toString();
 
-      return { geom: g, scale: autoScale };
+    // Filled shapes
+    const shapes = SVGLoader.createShapes(path);
+    if (shapes?.length) {
+      hasAnyGeometry = true;
+      const geo = new THREE.ExtrudeGeometry(shapes, {
+        depth: 6,
+        bevelEnabled: true,
+        bevelThickness: 1.2,
+        bevelSize: 0.8,
+        bevelSegments: 2,
+        curveSegments: 12,
+      });
+
+      geo.computeBoundingBox();
+
+      const baseColor = new THREE.Color('#f3f6ff');
+      // Respect SVG fill if it's a valid color (optional).
+      try {
+        if (fill && fill !== 'none') baseColor.set(fill);
+      } catch {
+        // ignore invalid
+      }
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: baseColor,
+        metalness: 0.85,
+        roughness: 0.18,
+        emissive: new THREE.Color('#00f5a0'),
+        emissiveIntensity: 0.12,
+      });
+
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.castShadow = false;
+      mesh.receiveShadow = false;
+      meshes.push(mesh);
+
+      const bb = geo.boundingBox;
+      if (bb) bounds.union(bb);
     }
 
-    // If bbox missing for any reason, fall back to a sane scale
-    return { geom: g, scale: 0.004 };
-  }, [shapes]);
+    // Stroke-only fallback (thin “engraved” look)
+    // Only add if no filled geometry exists for this path.
+    if ((!shapes || shapes.length === 0) && stroke && stroke !== 'none') {
+      const strokeWidth = Number(style.strokeWidth ?? 1.5);
+      const points: THREE.Vector2[] = [];
+      for (const sp of path.subPaths) {
+        const pts = sp.getPoints(200);
+        for (const p of pts) points.push(new THREE.Vector2(p.x, p.y));
+      }
+      if (points.length >= 2) {
+        const strokeGeo = SVGLoader.pointsToStroke(points, {
+          strokeWidth,
+          strokeLineCap: (style.strokeLineCap ?? 'round').toString(),
+          strokeLineJoin: (style.strokeLineJoin ?? 'round').toString(),
+          strokeMiterLimit: Number(style.strokeMiterLimit ?? 4),
+        } as any);
 
-  // Material: slightly metallic charcoal + green emissive edge feel
-  // NOTE: Avoid multi-material arrays here (can be fragile across R3F/Three versions).
-  const mainMat = useMemo(() => {
-    return new THREE.MeshStandardMaterial({
-      // Bright "ceramic-metal" so the mark reads clearly over a dark starfield.
-      color: new THREE.Color('#dfe9ee'),
-      roughness: 0.35,
-      metalness: 0.65,
-      emissive: new THREE.Color('#00f5a0'),
-      emissiveIntensity: 0.42,
-    });
-  }, []);
+        if (strokeGeo) {
+          hasAnyGeometry = true;
+          const strokeMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color('#e9f1ff'),
+            metalness: 0.8,
+            roughness: 0.25,
+            emissive: new THREE.Color('#00f5a0'),
+            emissiveIntensity: 0.08,
+          });
+          const strokeMesh = new THREE.Mesh(strokeGeo, strokeMat);
+          meshes.push(strokeMesh);
 
-  // Rim glow shell (cheap additive halo)
-  const rimMat = useMemo(() => {
-    return new THREE.MeshBasicMaterial({
-      color: new THREE.Color('#00f5a0'),
-      transparent: true,
-      opacity: 0.16,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.BackSide,
-    });
-  }, []);
-
-  // Motion: slow rotation + subtle bob
-  useFrame((state, dt) => {
-    const g = groupRef.current;
-    if (!g) return;
-
-    const t = state.clock.getElapsedTime();
-
-    // Slow “core spin”
-    g.rotation.y += dt * 0.18;
-
-    // Gentle hover float
-    g.position.y = Math.sin(t * 0.9) * 0.06;
-
-    // Micro tilt for “alive” feeling
-    g.rotation.x = 0.06 + Math.sin(t * 0.6) * 0.015;
-    g.rotation.z = -0.06 + Math.cos(t * 0.7) * 0.012;
-  });
-
-  // Final scale: prefer geometry-derived scale; fall back to viewBox-based scale.
-  const scale = useMemo(() => {
-    if (geomData?.scale) return geomData.scale;
-    const base = viewBoxScale || 1;
-    return 2.2 / Math.max(220, base / 2);
-  }, [geomData, viewBoxScale]);
-
-  if (!geomData?.geom) {
-    // Fallback if SVG fails: a “core” disc so hero doesn’t look empty
-    return (
-      <group ref={groupRef}>
-        <mesh>
-          <cylinderGeometry args={[1.1, 1.1, 0.18, 64]} />
-          <meshStandardMaterial
-            color="#0f1418"
-            roughness={0.55}
-            metalness={0.25}
-            emissive="#00f5a0"
-            emissiveIntensity={0.16}
-          />
-        </mesh>
-        <mesh scale={[1.08, 1.08, 1.08]}>
-          <cylinderGeometry args={[1.14, 1.14, 0.22, 64]} />
-          <primitive object={rimMat} attach="material" />
-        </mesh>
-      </group>
-    );
+          strokeGeo.computeBoundingBox();
+          const bb = strokeGeo.boundingBox;
+          if (bb) bounds.union(bb);
+        }
+      }
+    }
   }
 
+  if (!hasAnyGeometry) return null;
+
+  // Normalize so +Y is up and Z depth faces camera.
+  // SVGLoader outputs +Y down; flip it.
+  for (const m of meshes) {
+    m.scale.y *= -1;
+  }
+
+  return { meshes, bounds };
+}
+
+function LogoObject({ svgUrl = '/srt-logo.svg' }: { svgUrl?: string }) {
+  const group = useRef<THREE.Group>(null);
+  const { viewport } = useThree();
+
+  const [scene, setScene] = useState<SvgScene | null>(null);
+  const [fallbackTexture, setFallbackTexture] = useState<THREE.Texture | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const svgText = await fetchText(svgUrl);
+        if (cancelled) return;
+
+        const built = buildSvgScene(svgText);
+        if (built) {
+          setScene(built);
+          return;
+        }
+
+        // If we couldn't build geometry (rare SVG export), try rendering the SVG as an image texture.
+        const tex = new THREE.TextureLoader().load(svgUrl);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        setFallbackTexture(tex);
+      } catch {
+        // Last-resort: no-op. The debug ring still shows the canvas is alive.
+        setScene(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [svgUrl]);
+
+  const scaleAndCenter = useMemo(() => {
+    if (!scene) return null;
+
+    const size = new THREE.Vector3();
+    scene.bounds.getSize(size);
+
+    // Target a readable on-screen size (world units). Keep it within 2.0–3.2 units wide.
+    const targetWidth = 2.6;
+    const s = size.x > 0 ? targetWidth / size.x : 1;
+
+    const center = new THREE.Vector3();
+    scene.bounds.getCenter(center);
+
+    return { s, center };
+  }, [scene]);
+
+  useFrame(({ clock }) => {
+    const g = group.current;
+    if (!g) return;
+
+    const t = clock.getElapsedTime();
+    // Slow “museum rotation” + micro bob
+    g.rotation.y = t * 0.18;
+    g.rotation.x = Math.sin(t * 0.25) * 0.06;
+    g.position.y = -0.1 + Math.sin(t * 0.5) * 0.06;
+  });
+
+  // Place towards the right of the hero, but keep it visible on smaller viewports.
+  const x = Math.min(Math.max(viewport.width * 0.25, 0.9), 2.15);
+
   return (
-    <group ref={groupRef} scale={[scale, scale, scale]}>
-      {/* Main extruded logo */}
-      <mesh geometry={geomData.geom}>
-        <primitive attach="material" object={mainMat} />
+    <group ref={group} position={[x, -0.05, 0]}>
+      {/* Debug ring: ensures you always see “something” even if SVG fails. */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0.2, -0.2, -0.4]}>
+        <torusGeometry args={[1.45, 0.035, 16, 90]} />
+        <meshStandardMaterial
+          color="#00f5a0"
+          emissive="#00f5a0"
+          emissiveIntensity={0.18}
+          metalness={0.6}
+          roughness={0.35}
+          transparent
+          opacity={0.25}
+        />
       </mesh>
 
-      {/* Additive rim “halo” shell */}
-      <mesh geometry={geomData.geom} scale={[1.025, 1.025, 1.025]}>
-        <primitive attach="material" object={rimMat} />
-      </mesh>
+      {scene && scaleAndCenter ? (
+        <group
+          scale={[scaleAndCenter.s, scaleAndCenter.s, scaleAndCenter.s]}
+          position={[-scaleAndCenter.center.x * scaleAndCenter.s, -scaleAndCenter.center.y * scaleAndCenter.s, 0]}
+        >
+          {scene.meshes.map((m, i) => (
+            <primitive object={m} key={i} />
+          ))}
+
+          {/* Backplate to help contrast against the starfield */}
+          <mesh position={[0, 0, -3]} scale={[3.4, 3.4, 1]}>
+            <circleGeometry args={[1, 64]} />
+            <meshStandardMaterial
+              color="#04120b"
+              emissive="#00f5a0"
+              emissiveIntensity={0.02}
+              metalness={0.2}
+              roughness={0.9}
+              transparent
+              opacity={0.18}
+            />
+          </mesh>
+        </group>
+      ) : fallbackTexture ? (
+        <group>
+          <mesh>
+            <planeGeometry args={[2.2, 2.2]} />
+            <meshBasicMaterial map={fallbackTexture} transparent opacity={0.95} />
+          </mesh>
+          <mesh position={[0, 0, -0.08]}>
+            <planeGeometry args={[2.2, 2.2]} />
+            <meshBasicMaterial map={fallbackTexture} transparent opacity={0.35} />
+          </mesh>
+        </group>
+      ) : null}
     </group>
+  );
+}
+
+function Scene({ svgUrl }: { svgUrl?: string }) {
+  return (
+    <>
+      <ambientLight intensity={0.55} />
+      <hemisphereLight intensity={0.45} groundColor="#061018" />
+      <directionalLight position={[6, 5, 6]} intensity={1.2} />
+      <pointLight position={[-4, -2, 3]} intensity={0.55} color="#00f5a0" />
+
+      <LogoObject svgUrl={svgUrl} />
+    </>
+  );
+}
+
+export default function Hero3D({ className, svgUrl = '/srt-logo.svg' }: Hero3DProps) {
+  const reducedMotion = usePrefersReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+  if (!mounted || reducedMotion) return null;
+
+  return (
+    <div className={className ?? ''} aria-hidden>
+      <Canvas
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+        }}
+        dpr={[1, 1.8]}
+        camera={{ position: [0, 0, 6], fov: 42 }}
+      >
+        <color attach="background" args={['#000000']} />
+        <fog attach="fog" args={['#000000', 6.5, 10]} />
+        <Scene svgUrl={svgUrl} />
+      </Canvas>
+    </div>
   );
 }

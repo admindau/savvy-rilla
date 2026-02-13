@@ -378,7 +378,11 @@ a {
   position: relative;
   padding-top: 1.5rem;
   padding-bottom: 2.25rem;
+
+  min-height: calc(100vh - var(--header-h));
+  padding-top: calc(var(--header-h) + 1.25rem);
 }
+
 
 .hero--matrix {
   padding-top: 2rem;
@@ -1233,6 +1237,8 @@ a {
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  opacity: 0.95;
+  mix-blend-mode: screen;
 }
 
 .hero-3d canvas {
