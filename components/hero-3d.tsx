@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SVGLoader } from 'three-stdlib';
 
@@ -29,7 +29,7 @@ export default function Hero3D({ className }: Hero3DProps) {
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       camera={{ position: [0, 0, 6.2], fov: 38, near: 0.1, far: 100 }}
     >
-      <color attach="background" args={['#000000']} />
+      {/* IMPORTANT: keep the canvas transparent so the hero background image shows through */}
 
       {/* Lighting: key + fill + rim */}
       <ambientLight intensity={0.35} />
@@ -40,11 +40,22 @@ export default function Hero3D({ className }: Hero3DProps) {
 
       <Stars />
 
-      {/* Position the logo in the same “hero right side” zone */}
-      <group position={[3.0, -0.15, -0.6]} rotation={[0.02, -0.25, 0]}>
-        <Logo3D />
-      </group>
+      <Scene />
     </Canvas>
+  );
+}
+
+function Scene() {
+  // Keep the logo reliably *in view* across different aspect ratios.
+  const { viewport } = useThree();
+
+  // viewport.width is in “three units”. We bias the logo to the right but clamp so it never exits frame.
+  const x = Math.max(0.85, Math.min(2.35, viewport.width / 2 - 0.15));
+
+  return (
+    <group position={[x, -0.15, 0]} rotation={[0.02, -0.25, 0]}>
+      <Logo3D />
+    </group>
   );
 }
 
@@ -83,7 +94,7 @@ function Stars() {
 
   return (
     <points geometry={geom}>
-      <pointsMaterial size={0.055} sizeAttenuation transparent opacity={0.6} color="#ffffff" />
+      <pointsMaterial size={0.04} sizeAttenuation transparent opacity={0.45} color="#ffffff" />
     </points>
   );
 }
@@ -148,8 +159,8 @@ function Logo3D() {
     };
   }, []);
 
-  // Extrusion setup
-  const geom = useMemo(() => {
+  // Extrusion setup (with auto-fit scale based on resulting bounds)
+  const geomData = useMemo(() => {
     if (!shapes.length) return null;
 
     const g = new THREE.ExtrudeGeometry(shapes, {
@@ -162,36 +173,38 @@ function Logo3D() {
       steps: 1,
     });
 
-    // Center geometry
+    // Center geometry + compute bounds for robust scaling
     g.computeBoundingBox();
     const box = g.boundingBox;
     if (box) {
       const center = new THREE.Vector3();
       box.getCenter(center);
       g.translate(-center.x, -center.y, -center.z);
+
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      const maxDim = Math.max(size.x || 1, size.y || 1, size.z || 1);
+
+      // Target size in world units (tuned to sit behind the right-side UI cards)
+      const target = 2.4;
+      const autoScale = target / maxDim;
+
+      return { geom: g, scale: autoScale };
     }
 
-    return g;
+    // If bbox missing for any reason, fall back to a sane scale
+    return { geom: g, scale: 0.004 };
   }, [shapes]);
 
-  // Materials: slightly metallic charcoal + green emissive edge feel
-  const frontMat = useMemo(() => {
+  // Material: slightly metallic charcoal + green emissive edge feel
+  // NOTE: Avoid multi-material arrays here (can be fragile across R3F/Three versions).
+  const mainMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       color: new THREE.Color('#0f1418'),
-      roughness: 0.55,
+      roughness: 0.6,
       metalness: 0.25,
       emissive: new THREE.Color('#00f5a0'),
-      emissiveIntensity: 0.22,
-    });
-  }, []);
-
-  const sideMat = useMemo(() => {
-    return new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#0a0d10'),
-      roughness: 0.75,
-      metalness: 0.15,
-      emissive: new THREE.Color('#00f5a0'),
-      emissiveIntensity: 0.14,
+      emissiveIntensity: 0.18,
     });
   }, []);
 
@@ -225,15 +238,14 @@ function Logo3D() {
     g.rotation.z = -0.06 + Math.cos(t * 0.7) * 0.012;
   });
 
-  // Scale: normalize to consistent on-screen size
+  // Final scale: prefer geometry-derived scale; fall back to viewBox-based scale.
   const scale = useMemo(() => {
-    // viewBoxScale is typically ~1000–3000 depending on export.
-    // We normalize it into a stable range.
+    if (geomData?.scale) return geomData.scale;
     const base = viewBoxScale || 1;
-    return 2.05 / Math.max(180, base / 2);
-  }, [viewBoxScale]);
+    return 2.2 / Math.max(220, base / 2);
+  }, [geomData, viewBoxScale]);
 
-  if (!geom) {
+  if (!geomData?.geom) {
     // Fallback if SVG fails: a “core” disc so hero doesn’t look empty
     return (
       <group ref={groupRef}>
@@ -258,13 +270,12 @@ function Logo3D() {
   return (
     <group ref={groupRef} scale={[scale, scale, scale]}>
       {/* Main extruded logo */}
-      <mesh geometry={geom}>
-        {/* Use multi-material: front/back + sides */}
-        <primitive attach="material" object={[frontMat, sideMat]} />
+      <mesh geometry={geomData.geom}>
+        <primitive attach="material" object={mainMat} />
       </mesh>
 
       {/* Additive rim “halo” shell */}
-      <mesh geometry={geom} scale={[1.025, 1.025, 1.025]}>
+      <mesh geometry={geomData.geom} scale={[1.025, 1.025, 1.025]}>
         <primitive attach="material" object={rimMat} />
       </mesh>
     </group>
