@@ -94,13 +94,14 @@ function Earth() {
   const earthRef = useRef<THREE.Mesh>(null);
   const cloudRef = useRef<THREE.Mesh>(null);
   const [tex, setTex] = useState<THREE.Texture | null>(null);
+  const [isDayNight, setIsDayNight] = useState(false);
 
   useEffect(() => {
     let alive = true;
     const loader = new THREE.TextureLoader();
 
-    // Try a realistic map if user adds it later. Otherwise fall back to earth-texture.png.
-    const candidates = ['/earth-day.jpg', '/earth-day.png', '/earth-texture.png'];
+    // Prefer the combined day/night map if present. Otherwise fall back to a day map, then earth-texture.png.
+    const candidates = ['/earth-day-night.jpg','/earth-day-night.png','/earth-day.jpg','/earth-day.png','/earth-texture.png'];
 
     const tryNext = (idx: number) => {
       if (!alive) return;
@@ -113,6 +114,7 @@ function Earth() {
           t.colorSpace = THREE.SRGBColorSpace;
           t.anisotropy = 4;
           setTex(t);
+          setIsDayNight(candidates[idx].includes('earth-day-night'));
         },
         undefined,
         () => tryNext(idx + 1)
@@ -123,6 +125,13 @@ function Earth() {
     return () => {
       alive = false;
     };
+  }, []);
+
+  useEffect(() => {
+    // Show the "other side" by default (Western Hemisphere).
+    // This is a simple longitude offset; adjust if you want a different hemisphere centered.
+    if (earthRef.current) earthRef.current.rotation.y = Math.PI;
+    if (cloudRef.current) cloudRef.current.rotation.y = Math.PI;
   }, []);
 
   const terminatorTex = useMemo(() => makeTerminatorTexture(), []);
@@ -181,18 +190,15 @@ function Earth() {
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-
-      {/* Terminator / night shadow */}
-      <mesh>
-        <sphereGeometry args={[1.255, 64, 64]} />
-        <meshBasicMaterial
-          transparent
-          opacity={0.55}
-          side={THREE.FrontSide}
-        >
-          <primitive attach="map" object={terminatorTex} />
-        </meshBasicMaterial>
-      </mesh>
+      {/* Terminator / night shadow (only when not using the combined day/night texture) */}
+      {!isDayNight && (
+        <mesh>
+          <sphereGeometry args={[1.255, 64, 64]} />
+          <meshBasicMaterial transparent opacity={0.55} side={THREE.FrontSide}>
+            <primitive attach="map" object={terminatorTex} />
+          </meshBasicMaterial>
+        </mesh>
+      )}
     </group>
   );
 }
