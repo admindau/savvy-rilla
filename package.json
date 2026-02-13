@@ -15,7 +15,8 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "resend": "^6.4.2",
-    "three": "^0.182.0"
+    "three": "^0.182.0",
+    "three-stdlib": "^2.36.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

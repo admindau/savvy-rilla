@@ -3,23 +3,23 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { SVGLoader } from 'three-stdlib';
 
 type Hero3DProps = {
   className?: string;
 };
 
 /**
- * Phase D – 3D Integration
- * - Lightweight Earth sphere + atmospheric rim + sparse starfield.
- * - Uses /earth-texture.png if present (fallbacks to procedural oceans/land tint).
- * - Pointer events disabled by parent wrapper; mobile + reduced-motion handled in CSS.
+ * Phase D – 3D Integration (Logo Edition)
+ * - Replaces Earth globe with an extruded 3D Savvy Rilla logo from SVG.
+ * - Slow rotation + subtle float + rim lighting + sparse starfield.
  *
- * Optional (recommended) assets in /public for higher realism:
- * - /earth-day.jpg (or png)
- * - /earth-night.jpg (night lights)
- * - /earth-clouds.png (transparent)
+ * Required asset in /public:
+ * - /srt-logo.svg  (recommended: rename your SVG to this exact filename)
  *
- * For now we try /earth-texture.png first to avoid extra assets.
+ * Notes:
+ * - This runs client-side only (Canvas/WebGL).
+ * - If you want more “metal/glass”, we can tune materials after you deploy.
  */
 export default function Hero3D({ className }: Hero3DProps) {
   return (
@@ -27,17 +27,21 @@ export default function Hero3D({ className }: Hero3DProps) {
       className={className}
       dpr={[1, 1.5]}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      camera={{ position: [0, 0, 4.2], fov: 40, near: 0.1, far: 100 }}
+      camera={{ position: [0, 0, 6.2], fov: 38, near: 0.1, far: 100 }}
     >
       <color attach="background" args={['#000000']} />
-      <ambientLight intensity={0.45} />
-      <directionalLight position={[4, 2, 3]} intensity={1.15} />
-      <directionalLight position={[-4, -1, -2]} intensity={0.25} />
+
+      {/* Lighting: key + fill + rim */}
+      <ambientLight intensity={0.35} />
+      <directionalLight position={[5, 3, 5]} intensity={1.25} />
+      <directionalLight position={[-6, -2, -4]} intensity={0.25} />
+      <pointLight position={[0, 2.5, 6]} intensity={0.75} />
 
       <Stars />
 
-      <group position={[1.4, -0.15, 0]} rotation={[0.03, -0.35, 0]}>
-        <Earth />
+      {/* Position the logo in the same “hero right side” zone */}
+      <group position={[1.6, -0.05, 0]} rotation={[0.02, -0.25, 0]}>
+        <Logo3D />
       </group>
     </Canvas>
   );
@@ -51,7 +55,6 @@ function Stars() {
     const rMax = 34;
 
     for (let i = 0; i < count; i++) {
-      // random direction
       const u = Math.random();
       const v = Math.random();
       const theta = 2 * Math.PI * u;
@@ -79,151 +82,190 @@ function Stars() {
 
   return (
     <points geometry={geom}>
-      <pointsMaterial
-        size={0.055}
-        sizeAttenuation
-        transparent
-        opacity={0.6}
-        color="#ffffff"
-      />
+      <pointsMaterial size={0.055} sizeAttenuation transparent opacity={0.6} color="#ffffff" />
     </points>
   );
 }
 
-function Earth() {
-  const earthRef = useRef<THREE.Mesh>(null);
-  const cloudRef = useRef<THREE.Mesh>(null);
-  const [tex, setTex] = useState<THREE.Texture | null>(null);
-  const [isDayNight, setIsDayNight] = useState(false);
+function Logo3D() {
+  const groupRef = useRef<THREE.Group>(null);
+
+  // Use a URL-safe filename in /public
+  const LOGO_SVG_URL = '/srt-logo.svg';
+
+  const [shapes, setShapes] = useState<THREE.Shape[]>([]);
+  const [viewBoxScale, setViewBoxScale] = useState(1);
 
   useEffect(() => {
     let alive = true;
-    const loader = new THREE.TextureLoader();
+    const loader = new SVGLoader();
 
-    // Prefer the combined day/night map if present. Otherwise fall back to a day map, then earth-texture.png.
-    const candidates = ['/earth-day-night.jpg','/earth-day-night.png','/earth-day.jpg','/earth-day.png','/earth-texture.png'];
+    loader.load(
+      LOGO_SVG_URL,
+      (dataRaw) => {
+        if (!alive) return;
 
-    const tryNext = (idx: number) => {
-      if (!alive) return;
-      if (idx >= candidates.length) return;
+        // Remove fragile typing differences across SVGLoader versions
+        const data: any = dataRaw;
 
-      loader.load(
-        candidates[idx],
-        (t) => {
-          if (!alive) return;
-          t.colorSpace = THREE.SRGBColorSpace;
-          t.anisotropy = 4;
-          setTex(t);
-          setIsDayNight(candidates[idx].includes('earth-day-night'));
-        },
-        undefined,
-        () => tryNext(idx + 1)
-      );
-    };
+        const allShapes: THREE.Shape[] = [];
+        for (const path of data.paths ?? []) {
+          const s = SVGLoader.createShapes(path);
+          allShapes.push(...s);
+        }
 
-    tryNext(0);
+        // Some SVGs can produce empty shape arrays if they are strokes-only.
+        setShapes(allShapes);
+
+        // Normalize by SVG viewBox for more stable scaling across different logo exports.
+        // ✅ FIX: XMLDocument doesn't have getAttribute; documentElement does.
+        const vb =
+          data?.xml?.documentElement?.getAttribute?.('viewBox') ??
+          data?.xml?.querySelector?.('svg')?.getAttribute?.('viewBox') ??
+          null;
+
+        if (vb) {
+          const parts = String(vb)
+            .trim()
+            .split(/\s+/)
+            .map((n) => Number(n));
+          const w = parts[2] || 1;
+          setViewBoxScale(w);
+        } else {
+          setViewBoxScale(1);
+        }
+      },
+      undefined,
+      () => {
+        // If load fails, keep empty shapes. We’ll render a fallback.
+        setShapes([]);
+      }
+    );
+
     return () => {
       alive = false;
     };
   }, []);
 
-  useEffect(() => {
-    // Show the "other side" by default (Western Hemisphere).
-    // This is a simple longitude offset; adjust if you want a different hemisphere centered.
-    if (earthRef.current) earthRef.current.rotation.y = Math.PI;
-    if (cloudRef.current) cloudRef.current.rotation.y = Math.PI;
-  }, []);
+  // Extrusion setup
+  const geom = useMemo(() => {
+    if (!shapes.length) return null;
 
-  const terminatorTex = useMemo(() => makeTerminatorTexture(), []);
+    const g = new THREE.ExtrudeGeometry(shapes, {
+      depth: 14,
+      bevelEnabled: true,
+      bevelThickness: 2,
+      bevelSize: 1.4,
+      bevelSegments: 3,
+      curveSegments: 12,
+      steps: 1,
+    });
 
-  const oceanMat = useMemo(() => {
-    // Procedural-ish fallback (not a true earth map, but looks “planetary”).
+    // Center geometry
+    g.computeBoundingBox();
+    const box = g.boundingBox;
+    if (box) {
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      g.translate(-center.x, -center.y, -center.z);
+    }
+
+    return g;
+  }, [shapes]);
+
+  // Materials: slightly metallic charcoal + green emissive edge feel
+  const frontMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#0b1b2e'),
-      roughness: 1,
-      metalness: 0,
+      color: new THREE.Color('#0f1418'),
+      roughness: 0.55,
+      metalness: 0.25,
+      emissive: new THREE.Color('#00f5a0'),
+      emissiveIntensity: 0.12,
     });
   }, []);
 
-  useFrame((_, dt) => {
-    // slow rotation
-    if (earthRef.current) earthRef.current.rotation.y += dt * 0.08;
-    if (cloudRef.current) cloudRef.current.rotation.y += dt * 0.11;
+  const sideMat = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#0a0d10'),
+      roughness: 0.75,
+      metalness: 0.15,
+      emissive: new THREE.Color('#00f5a0'),
+      emissiveIntensity: 0.06,
+    });
+  }, []);
+
+  // Rim glow shell (cheap additive halo)
+  const rimMat = useMemo(() => {
+    return new THREE.MeshBasicMaterial({
+      color: new THREE.Color('#00f5a0'),
+      transparent: true,
+      opacity: 0.10,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.BackSide,
+    });
+  }, []);
+
+  // Motion: slow rotation + subtle bob
+  useFrame((state, dt) => {
+    const g = groupRef.current;
+    if (!g) return;
+
+    const t = state.clock.getElapsedTime();
+
+    // Slow “core spin”
+    g.rotation.y += dt * 0.18;
+
+    // Gentle hover float
+    g.position.y = Math.sin(t * 0.9) * 0.06;
+
+    // Micro tilt for “alive” feeling
+    g.rotation.x = 0.06 + Math.sin(t * 0.6) * 0.015;
+    g.rotation.z = -0.06 + Math.cos(t * 0.7) * 0.012;
   });
 
-  return (
-    <group>
-      {/* Earth surface */}
-      <mesh ref={earthRef}>
-        <sphereGeometry args={[1.25, 64, 64]} />
-        {tex ? (
-          <meshStandardMaterial
-            map={tex}
-            roughness={1}
-            metalness={0}
-            emissive={new THREE.Color('#000000')}
-          />
-        ) : (
-          oceanMat && <primitive object={oceanMat} attach="material" />
-        )}
-      </mesh>
+  // Scale: normalize to consistent on-screen size
+  const scale = useMemo(() => {
+    // viewBoxScale is typically ~1000–3000 depending on export.
+    // We normalize it into a stable range.
+    const base = viewBoxScale || 1;
+    return 1.45 / Math.max(180, base / 2);
+  }, [viewBoxScale]);
 
-      {/* Atmospheric rim (additive glow) */}
-      <mesh>
-        <sphereGeometry args={[1.285, 64, 64]} />
-        <meshBasicMaterial
-          color={new THREE.Color('#7bd7ff')}
-          transparent
-          opacity={0.18}
-          blending={THREE.AdditiveBlending}
-          side={THREE.BackSide}
-        />
-      </mesh>
-
-      {/* Cloud layer (very subtle, optional) */}
-      <mesh ref={cloudRef}>
-        <sphereGeometry args={[1.265, 64, 64]} />
-        <meshBasicMaterial
-          color={new THREE.Color('#ffffff')}
-          transparent
-          opacity={0.04}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-      {/* Terminator / night shadow (only when not using the combined day/night texture) */}
-      {!isDayNight && (
+  if (!geom) {
+    // Fallback if SVG fails: a “core” disc so hero doesn’t look empty
+    return (
+      <group ref={groupRef}>
         <mesh>
-          <sphereGeometry args={[1.255, 64, 64]} />
-          <meshBasicMaterial transparent opacity={0.55} side={THREE.FrontSide}>
-            <primitive attach="map" object={terminatorTex} />
-          </meshBasicMaterial>
+          <cylinderGeometry args={[1.1, 1.1, 0.18, 64]} />
+          <meshStandardMaterial
+            color="#0f1418"
+            roughness={0.55}
+            metalness={0.25}
+            emissive="#00f5a0"
+            emissiveIntensity={0.10}
+          />
         </mesh>
-      )}
+        <mesh scale={[1.08, 1.08, 1.08]}>
+          <cylinderGeometry args={[1.14, 1.14, 0.22, 64]} />
+          <primitive object={rimMat} attach="material" />
+        </mesh>
+      </group>
+    );
+  }
+
+  return (
+    <group ref={groupRef} scale={[scale, scale, scale]}>
+      {/* Main extruded logo */}
+      <mesh geometry={geom}>
+        {/* Use multi-material: front/back + sides */}
+        <primitive attach="material" object={[frontMat, sideMat]} />
+      </mesh>
+
+      {/* Additive rim “halo” shell */}
+      <mesh geometry={geom} scale={[1.025, 1.025, 1.025]}>
+        <primitive attach="material" object={rimMat} />
+      </mesh>
     </group>
   );
-}
-
-/**
- * Creates a tiny gradient texture used as a soft "terminator" overlay.
- * This is cheap and helps the sphere read as 3D even without a real earth map.
- */
-function makeTerminatorTexture() {
-  const size = 64;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
-  const grad = ctx.createRadialGradient(size * 0.25, size * 0.35, size * 0.05, size * 0.55, size * 0.5, size * 0.55);
-  grad.addColorStop(0, 'rgba(0,0,0,0)');
-  grad.addColorStop(0.55, 'rgba(0,0,0,0.18)');
-  grad.addColorStop(1, 'rgba(0,0,0,0.92)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, size, size);
-
-  const t = new THREE.CanvasTexture(canvas);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.wrapS = THREE.ClampToEdgeWrapping;
-  t.wrapT = THREE.ClampToEdgeWrapping;
-  t.needsUpdate = true;
-  return t;
 }
