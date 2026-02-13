@@ -2,8 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-type RevealProps<T extends React.ElementType> = {
-  as?: T;
+type RevealProps = {
+  as?: React.ElementType;
   className?: string;
   children: React.ReactNode;
 
@@ -19,9 +19,9 @@ type RevealProps<T extends React.ElementType> = {
 
   /** Reveal once then stop observing */
   once?: boolean;
-} & Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children'>;
+} & React.HTMLAttributes<HTMLElement>;
 
-export default function Reveal<T extends React.ElementType = 'div'>({
+export default function Reveal({
   as,
   className = '',
   children,
@@ -30,9 +30,12 @@ export default function Reveal<T extends React.ElementType = 'div'>({
   threshold = 0.18,
   rootMargin = '0px 0px -10% 0px',
   once = true,
+  style: styleProp,
   ...rest
-}: RevealProps<T>) {
-  const Comp = (as ?? 'div') as React.ElementType;
+}: RevealProps) {
+  // Cast to `any` to avoid TS inferring children as `never` for polymorphic JSX tags.
+  const Comp: any = as ?? 'div';
+
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -67,7 +70,6 @@ export default function Reveal<T extends React.ElementType = 'div'>({
     );
 
     io.observe(el);
-
     return () => io.disconnect();
   }, [threshold, rootMargin, once]);
 
@@ -80,7 +82,7 @@ export default function Reveal<T extends React.ElementType = 'div'>({
         ref.current = node;
       }}
       className={`reveal ${vClass} ${visible ? 'is-visible' : ''} ${className}`.trim()}
-      style={{ ...style, ...(rest as any).style }}
+      style={{ ...style, ...(styleProp as any) }}
       {...rest}
     >
       {children}

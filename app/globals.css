@@ -400,6 +400,44 @@ a {
   filter: saturate(0.8) contrast(1.05) blur(0.2px);
 }
 
+
+
+/* Phase D: 3D integration (WebGL layer) */
+.hero-3d-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* above hero background layers, below content */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-3d-canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0.78;
+  filter: saturate(1.05) contrast(1.06);
+  transform: translate3d(0, 0, 0);
+}
+
+/* soften edges + preserve readability on the left */
+.hero-3d-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 70% 40%, rgba(0, 245, 160, 0.06), transparent 55%),
+    radial-gradient(circle at 30% 40%, rgba(0, 0, 0, 0.6), transparent 58%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.1) 60%, transparent 78%);
+  pointer-events: none;
+}
+
+@media (max-width: 920px) {
+  .hero-3d-wrap { display: none; } /* keep mobile fast */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-3d-wrap { display: none; }
+}
 .hero--matrix::before {
   content: '';
   position: absolute;
@@ -439,7 +477,7 @@ a {
 
 .hero-grid {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 2.2rem;

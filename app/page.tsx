@@ -1,8 +1,10 @@
 // app/page.tsx
 import Link from 'next/link';
 import Image from 'next/image';
+import Hero3D from '@/components/hero-3d-loader';
 import Reveal from '@/components/reveal';
 import Parallax from '@/components/parallax';
+
 
 export default function HomePage() {
   return (
@@ -20,6 +22,11 @@ export default function HomePage() {
             priority
           />
           */}
+        </div>
+
+        {/* Phase D: 3D layer */}
+        <div className="hero-3d-wrap" aria-hidden="true">
+          <Hero3D className="hero-3d-canvas" />
         </div>
 
         <div className="container hero-grid">
