@@ -1173,6 +1173,52 @@ a {
   overflow: hidden; /* contain absolute layers */
 }
 
+/* =========================
+   Phase D – Stars-only Hero Background
+   Removes Earth imagery entirely and uses layered CSS starfields.
+   ========================= */
+.hero--orbital {
+  background:
+    radial-gradient(1200px 800px at 75% 35%, rgba(0, 245, 160, 0.08), rgba(0, 245, 160, 0) 55%),
+    radial-gradient(1000px 700px at 15% 15%, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(900px 600px at 30% 85%, rgba(0, 245, 160, 0.05), rgba(0, 245, 160, 0) 55%),
+    linear-gradient(180deg, rgba(0,0,0,0.88), rgba(0,0,0,0.98));
+}
+
+.hero--orbital::before,
+.hero--orbital::after {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Dense stars (tiny) */
+.hero--orbital::before {
+  opacity: 0.75;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.85) 0 1px, rgba(255,255,255,0) 2px) 0 0 / 220px 220px,
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.75) 0 1px, rgba(255,255,255,0) 2px) 0 0 / 260px 260px,
+    radial-gradient(circle at 45% 70%, rgba(255,255,255,0.65) 0 1px, rgba(255,255,255,0) 2px) 0 0 / 300px 300px,
+    radial-gradient(circle at 65% 55%, rgba(255,255,255,0.55) 0 1px, rgba(255,255,255,0) 2px) 0 0 / 340px 340px;
+  filter: blur(0.2px);
+  transform: translate3d(0,0,0);
+}
+
+/* Sparse big stars + subtle nebula haze */
+.hero--orbital::after {
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,0.9) 0 2px, rgba(255,255,255,0) 5px),
+    radial-gradient(circle at 78% 40%, rgba(255,255,255,0.75) 0 2px, rgba(255,255,255,0) 6px),
+    radial-gradient(circle at 42% 62%, rgba(255,255,255,0.65) 0 2px, rgba(255,255,255,0) 6px),
+    radial-gradient(900px 600px at 65% 35%, rgba(40, 120, 255, 0.10), rgba(40, 120, 255, 0) 60%),
+    radial-gradient(900px 700px at 20% 55%, rgba(0, 245, 160, 0.08), rgba(0, 245, 160, 0) 65%);
+  filter: blur(0.35px);
+  transform: translate3d(0,0,0);
+}
+
 /* Background image sits at the back */
 .hero-bg {
   position: absolute;

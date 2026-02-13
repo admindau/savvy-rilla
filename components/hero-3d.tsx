@@ -25,18 +25,21 @@ export default function Hero3D({ className }: Hero3DProps) {
   return (
     <Canvas
       className={className}
-      dpr={[1, 1.5]}
+      dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      camera={{ position: [0, 0, 6.2], fov: 38, near: 0.1, far: 100 }}
+      camera={{ position: [0, 0, 7.0], fov: 36, near: 0.1, far: 120 }}
     >
-      {/* IMPORTANT: keep the canvas transparent so the hero background image shows through */}
+      {/* Canvas stays transparent; hero background is pure CSS stars. */}
 
       {/* Lighting: key + fill + rim */}
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[5, 3, 5]} intensity={1.25} />
-      <directionalLight position={[-6, -2, -4]} intensity={0.25} />
-      <pointLight position={[0, 2.5, 6]} intensity={0.75} />
-      <pointLight position={[-4, 0.8, 2.5]} intensity={0.65} />
+      <ambientLight intensity={0.62} />
+      {/* Key */}
+      <directionalLight position={[6, 4, 6]} intensity={1.45} color="#eaffff" />
+      {/* Fill */}
+      <directionalLight position={[-6, 1, 2]} intensity={0.45} color="#bfefff" />
+      {/* Rim */}
+      <pointLight position={[0, 2.8, 7]} intensity={0.95} color="#00f5a0" />
+      <pointLight position={[-4.5, 1.2, 2.8]} intensity={0.55} color="#00f5a0" />
 
       <Stars />
 
@@ -50,10 +53,10 @@ function Scene() {
   const { viewport } = useThree();
 
   // viewport.width is in “three units”. We bias the logo to the right but clamp so it never exits frame.
-  const x = Math.max(0.85, Math.min(2.35, viewport.width / 2 - 0.15));
+  const x = Math.max(0.7, Math.min(2.15, viewport.width / 2 - 0.25));
 
   return (
-    <group position={[x, -0.15, 0]} rotation={[0.02, -0.25, 0]}>
+    <group position={[x, -0.1, -0.55]} rotation={[0.04, -0.32, 0.02]}>
       <Logo3D />
     </group>
   );
@@ -200,11 +203,12 @@ function Logo3D() {
   // NOTE: Avoid multi-material arrays here (can be fragile across R3F/Three versions).
   const mainMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#0f1418'),
-      roughness: 0.6,
-      metalness: 0.25,
+      // Bright "ceramic-metal" so the mark reads clearly over a dark starfield.
+      color: new THREE.Color('#dfe9ee'),
+      roughness: 0.35,
+      metalness: 0.65,
       emissive: new THREE.Color('#00f5a0'),
-      emissiveIntensity: 0.18,
+      emissiveIntensity: 0.42,
     });
   }, []);
 

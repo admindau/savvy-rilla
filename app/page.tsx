@@ -1,6 +1,5 @@
 // app/page.tsx
 import Link from 'next/link';
-import Image from 'next/image';
 import Reveal from '@/components/reveal';
 import Parallax from '@/components/parallax';
 import Hero3D from '@/components/hero-3d-loader';
@@ -10,17 +9,7 @@ export default function HomePage() {
     <div className="page">
       {/* HERO */}
       <section className="hero hero--orbital">
-        {/* Optional background image layer (add file to /public if you want) */}
-        <div className="hero-bg" aria-hidden="true">
-          <Image
-            src="/hero-space-earth.png"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="hero-bg-img hero-bg-img--drift"
-          />
-        </div>
+        {/* Pure stars background is handled in CSS (Phase D). */}
 
         {/* 3D Logo layer (Phase D) */}
         <div className="hero-3d" aria-hidden="true">
