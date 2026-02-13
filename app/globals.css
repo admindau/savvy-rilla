@@ -400,44 +400,6 @@ a {
   filter: saturate(0.8) contrast(1.05) blur(0.2px);
 }
 
-
-
-/* Phase D: 3D integration (WebGL layer) */
-.hero-3d-wrap {
-  position: absolute;
-  inset: 0;
-  z-index: 1; /* above hero background layers, below content */
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.hero-3d-canvas {
-  width: 100%;
-  height: 100%;
-  opacity: 0.78;
-  filter: saturate(1.05) contrast(1.06);
-  transform: translate3d(0, 0, 0);
-}
-
-/* soften edges + preserve readability on the left */
-.hero-3d-wrap::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 70% 40%, rgba(0, 245, 160, 0.06), transparent 55%),
-    radial-gradient(circle at 30% 40%, rgba(0, 0, 0, 0.6), transparent 58%),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.1) 60%, transparent 78%);
-  pointer-events: none;
-}
-
-@media (max-width: 920px) {
-  .hero-3d-wrap { display: none; } /* keep mobile fast */
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-3d-wrap { display: none; }
-}
 .hero--matrix::before {
   content: '';
   position: absolute;
@@ -477,7 +439,7 @@ a {
 
 .hero-grid {
   position: relative;
-  z-index: 3;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 2.2rem;
@@ -1202,207 +1164,39 @@ a {
   }
 }
 
-/* =============================
-   Phase C — Cursor + Micro FX
-   ============================= */
-
-/* The CursorFX component toggles `html.has-cursor-fx` on supported devices. */
-html.has-cursor-fx,
-html.has-cursor-fx body {
-  cursor: none;
-}
-
-.cursor-ring,
-.cursor-dot {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 9999;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.cursor-ring {
-  width: 38px;
-  height: 38px;
-  margin-left: -19px;
-  margin-top: -19px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 245, 160, 0.22);
-  background: rgba(0, 245, 160, 0.05);
-  box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.08) inset, 0 0 22px rgba(0, 245, 160, 0.10);
-  backdrop-filter: blur(4px);
-  transform: translate3d(var(--cx, 50vw), var(--cy, 50vh), 0);
-  transition: width 180ms ease, height 180ms ease, margin 180ms ease,
-    border-color 180ms ease, background 180ms ease, box-shadow 220ms ease;
-}
-
-.cursor-dot {
-  width: 7px;
-  height: 7px;
-  margin-left: -3.5px;
-  margin-top: -3.5px;
-  border-radius: 999px;
-  background: rgba(0, 245, 160, 0.92);
-  box-shadow: 0 0 18px rgba(0, 245, 160, 0.55);
-  transform: translate3d(var(--cx, 50vw), var(--cy, 50vh), 0);
-}
-
-/* Hover state: ring tightens and brightens */
-html.cursor-hover .cursor-ring {
-  width: 30px;
-  height: 30px;
-  margin-left: -15px;
-  margin-top: -15px;
-  border-color: rgba(0, 245, 160, 0.34);
-  background: rgba(0, 245, 160, 0.08);
-  box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.12) inset, 0 0 26px rgba(0, 245, 160, 0.14);
-}
-
-/* Click state: quick pulse */
-html.cursor-down .cursor-ring {
-  width: 44px;
-  height: 44px;
-  margin-left: -22px;
-  margin-top: -22px;
-  background: rgba(0, 245, 160, 0.10);
-}
-
-/* Magnet micro-lift; actual translation is applied inline by CursorFX */
-.magnet-active {
-  transition: transform 120ms ease, box-shadow 200ms ease;
-}
-
-/* Click ripple */
-.has-ripple {
+/* =========================
+   Phase D – 3D Logo Layering
+   Ensures R3F canvas is visible between hero background and UI.
+   ========================= */
+.hero {
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* contain absolute layers */
 }
 
-.click-ripple {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  transform: translate3d(-50%, -50%, 0) scale(1);
-  background: radial-gradient(circle, rgba(0, 245, 160, 0.40), rgba(0, 245, 160, 0.0) 62%);
-  opacity: 0.85;
-  pointer-events: none;
-  animation: rippleOut 720ms ease-out forwards;
-}
-
-@keyframes rippleOut {
-  from {
-    transform: translate3d(-50%, -50%, 0) scale(1);
-    opacity: 0.85;
-  }
-  to {
-    transform: translate3d(-50%, -50%, 0) scale(34);
-    opacity: 0;
-  }
-}
-
-/* Micro sheen sweep on interactive surfaces */
-.btn,
-.nav-cta,
-.card,
-.hero-panel,
-.hero-image-card,
-.footer-cta {
-  position: relative;
-}
-
-.btn::before,
-.nav-cta::before,
-.card::before,
-.hero-panel::before,
-.hero-image-card::before,
-.footer-cta::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.06), transparent 60%);
-  transform: translate3d(-120%, 0, 0);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.btn:hover::before,
-.nav-cta:hover::before,
-.card:hover::before,
-.hero-panel:hover::before,
-.hero-image-card:hover::before,
-.footer-cta:hover::before {
-  opacity: 1;
-  animation: sheenSweep 820ms ease-out;
-}
-
-@keyframes sheenSweep {
-  from { transform: translate3d(-120%, 0, 0); }
-  to   { transform: translate3d(120%, 0, 0); }
-}
-
-/* Subtle film grain overlay (site-wide) */
-.site-bg::after {
-  content: '';
+/* Background image sits at the back */
+.hero-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.07;
-  mix-blend-mode: overlay;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  animation: grainDrift 9s steps(10) infinite;
+  z-index: 0;
 }
 
-@keyframes grainDrift {
-  0%   { transform: translate3d(0,0,0); }
-  25%  { transform: translate3d(-2%, 1%,0); }
-  50%  { transform: translate3d(-1%, -2%,0); }
-  75%  { transform: translate3d(2%, 1%,0); }
-  100% { transform: translate3d(0,0,0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html.has-cursor-fx,
-  html.has-cursor-fx body {
-    cursor: auto;
-  }
-
-  .cursor-ring,
-  .cursor-dot {
-    display: none;
-  }
-
-  .site-bg::after {
-    animation: none;
-  }
-}
-
-/* --- Phase D: 3D logo layering (Hero) --- */
-/* Ensures the R3F canvas sits between the hero background image and the hero content/UI. */
+/* 3D canvas sits above background but below content */
 .hero-3d {
   position: absolute;
   inset: 0;
-  z-index: 1; /* above .hero-bg (0), below .hero-grid (2) */
+  z-index: 1;
   pointer-events: none;
 }
 
 .hero-3d canvas {
-  display: block;
   width: 100% !important;
   height: 100% !important;
+  display: block;
 }
 
-/* Make sure hero content always wins layering */
+/* Foreground content sits on top */
 .hero-grid {
+  position: relative;
   z-index: 2;
-}
-
-/* Small performance win: contain expensive effects to hero region */
-.hero--orbital,
-.hero--matrix {
-  contain: paint;
 }

@@ -24,7 +24,7 @@ export default function HomePage() {
 
         {/* 3D Logo layer (Phase D) */}
         <div className="hero-3d" aria-hidden="true">
-          <Hero3D />
+          <Hero3D className="hero-3d-canvas" />
         </div>
 
         <div className="container hero-grid">

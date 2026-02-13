@@ -36,11 +36,12 @@ export default function Hero3D({ className }: Hero3DProps) {
       <directionalLight position={[5, 3, 5]} intensity={1.25} />
       <directionalLight position={[-6, -2, -4]} intensity={0.25} />
       <pointLight position={[0, 2.5, 6]} intensity={0.75} />
+      <pointLight position={[-4, 0.8, 2.5]} intensity={0.65} />
 
       <Stars />
 
       {/* Position the logo in the same “hero right side” zone */}
-      <group position={[1.6, -0.05, 0]} rotation={[0.02, -0.25, 0]}>
+      <group position={[3.0, -0.15, -0.6]} rotation={[0.02, -0.25, 0]}>
         <Logo3D />
       </group>
     </Canvas>
@@ -180,7 +181,7 @@ function Logo3D() {
       roughness: 0.55,
       metalness: 0.25,
       emissive: new THREE.Color('#00f5a0'),
-      emissiveIntensity: 0.12,
+      emissiveIntensity: 0.22,
     });
   }, []);
 
@@ -190,7 +191,7 @@ function Logo3D() {
       roughness: 0.75,
       metalness: 0.15,
       emissive: new THREE.Color('#00f5a0'),
-      emissiveIntensity: 0.06,
+      emissiveIntensity: 0.14,
     });
   }, []);
 
@@ -199,7 +200,7 @@ function Logo3D() {
     return new THREE.MeshBasicMaterial({
       color: new THREE.Color('#00f5a0'),
       transparent: true,
-      opacity: 0.10,
+      opacity: 0.16,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.BackSide,
@@ -229,7 +230,7 @@ function Logo3D() {
     // viewBoxScale is typically ~1000–3000 depending on export.
     // We normalize it into a stable range.
     const base = viewBoxScale || 1;
-    return 1.45 / Math.max(180, base / 2);
+    return 2.05 / Math.max(180, base / 2);
   }, [viewBoxScale]);
 
   if (!geom) {
@@ -243,7 +244,7 @@ function Logo3D() {
             roughness={0.55}
             metalness={0.25}
             emissive="#00f5a0"
-            emissiveIntensity={0.10}
+            emissiveIntensity={0.16}
           />
         </mesh>
         <mesh scale={[1.08, 1.08, 1.08]}>
