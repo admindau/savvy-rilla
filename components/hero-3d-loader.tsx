@@ -18,11 +18,15 @@ type Hero3DProps = {
 
 const Hero3D = dynamic<Hero3DProps>(() => import("@/components/hero-3d"), {
   ssr: false,
+  // Keep loading ultra-light; visuals are handled by CSS + fallback mark
   loading: () => <div className="hero3d-fallback" aria-hidden="true" />,
 });
 
 type Props = {
+  /** Preferred prop name */
   src?: string;
+  /** Legacy alias (some older page.tsx versions used this) */
+  svgUrl?: string;
   scale?: number;
   depth?: number;
   className?: string;
@@ -38,19 +42,20 @@ function useFlags() {
       typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches;
 
     const lowPower =
-      typeof document !== "undefined" &&
-      document.documentElement.classList.contains("low-power");
+      typeof document !== "undefined" && document.documentElement.classList.contains("low-power");
 
     return { prefersReduced: !!prefersReduced, coarse: !!coarse, lowPower: !!lowPower };
   }, []);
 }
 
 export default function Hero3DLoader({
-  src = "/srt-logo.svg",
+  src,
+  svgUrl,
   scale = 1,
   depth = 0.22,
   className,
 }: Props) {
+  const resolvedSrc = src ?? svgUrl ?? "/srt-logo.svg";
   const { prefersReduced, coarse, lowPower } = useFlags();
   const [wideEnough, setWideEnough] = useState(false);
 
@@ -61,14 +66,14 @@ export default function Hero3DLoader({
     return () => window.removeEventListener("resize", compute);
   }, []);
 
-  // Allow 3D for desktop widths. Do NOT fully disable just because low-power is true.
+  // Enable 3D for desktop widths.
   // Reduced motion or touch/small screens -> fallback 2D mark (still visible).
   const allow3d = wideEnough && !prefersReduced && !coarse;
 
   if (!allow3d) {
     return (
       <div className={`hero3d-fallback ${className ?? ""}`.trim()} aria-hidden="true">
-        <img className="hero3d-fallback-mark" src={src} alt="" />
+        <img className="hero3d-fallback-mark" src={resolvedSrc} alt="" />
       </div>
     );
   }
@@ -76,5 +81,13 @@ export default function Hero3DLoader({
   // Low-power: render 3D but reduce motion
   const animate = !prefersReduced && !lowPower;
 
-  return <Hero3D src={src} scale={scale} depth={depth} animate={animate} className={className} />;
+  return (
+    <Hero3D
+      src={resolvedSrc}
+      scale={scale}
+      depth={depth}
+      animate={animate}
+      className={className}
+    />
+  );
 }
