@@ -3,15 +3,15 @@
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 
-type Hero3DComponentProps = {
-  src?: string;
+type Hero3DProps = {
+  textureUrl?: string;
+  animate?: boolean;
   scale?: number;
   depth?: number;
-  animate?: boolean;
   className?: string;
 };
 
-const Hero3D = dynamic<Hero3DComponentProps>(() => import("@/components/hero-3d"), {
+const Hero3D = dynamic<Hero3DProps>(() => import("@/components/hero-3d"), {
   ssr: false,
 });
 
@@ -19,36 +19,30 @@ function Fallback() {
   return (
     <div
       aria-hidden="true"
-      style={{
-        width: "100%",
-        height: "100%",
-        borderRadius: 24,
-        background:
-          "radial-gradient(closest-side, rgba(0,245,160,0.10), rgba(0,0,0,0) 70%)",
-      }}
+      className="hero3d-fallback"
     />
   );
 }
 
 type Props = {
-  /** public path to svg */
+  /** Prefer PNG texture for reliable “3D logo” */
+  textureUrl?: string;
+
+  /** Kept for backward compat — ignored in this texture-based version */
   src?: string;
-  /** backward-compat alias */
   svgUrl?: string;
+
   scale?: number;
   depth?: number;
   className?: string;
 };
 
 export default function Hero3DLoader({
-  src,
-  svgUrl,
+  textureUrl = "/logo-white.png",
   scale = 1,
-  depth = 0.22,
+  depth = 0.12,
   className,
 }: Props) {
-  const resolvedSrc = src ?? svgUrl ?? "/srt-logo.svg";
-
   const [allow3d, setAllow3d] = useState(false);
   const [animate, setAnimate] = useState(true);
 
@@ -58,7 +52,7 @@ export default function Hero3DLoader({
     const lowPower = document.documentElement.classList.contains("low-power");
 
     const compute = () => {
-      const wideEnough = window.innerWidth >= 960;
+      const wideEnough = window.innerWidth >= 900;
       setAllow3d(!prefersReduced && !coarse && !lowPower && wideEnough);
     };
 
@@ -73,7 +67,7 @@ export default function Hero3DLoader({
 
   return (
     <Hero3D
-      src={resolvedSrc}
+      textureUrl={textureUrl}
       scale={scale}
       depth={depth}
       animate={animate}

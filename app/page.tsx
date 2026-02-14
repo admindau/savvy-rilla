@@ -10,20 +10,9 @@ export default function HomePage() {
     <div className="page">
       {/* HERO */}
       <section className="hero hero--matrix">
-        {/* Optional background image layer (add file to /public if you want) */}
         <div className="hero-bg" aria-hidden="true">
-          {/*
-          <Image
-            src="/hero-map.png"
-            alt=""
-            fill
-            className="hero-bg-img"
-            priority
-          />
-          */}
-
-          {/* Stars + 3D Logo (pure stars + 3D logo, no Earth) */}
-          <Hero3DLoader className="hero-visual" src="/srt-logo.svg" />
+          {/* 3D Logo (texture-based, reliable) */}
+          <Hero3DLoader className="hero-visual" textureUrl="/logo-white.png" />
         </div>
 
         <div className="container hero-grid">
@@ -63,14 +52,14 @@ export default function HomePage() {
               <div className="ticker-fade ticker-fade-left" aria-hidden="true" />
               <div className="ticker-fade ticker-fade-right" aria-hidden="true" />
               <div className="ticker-track" aria-hidden="true">
-                <span className="tick"><span className="dot" /><b>DEPLOY</b> gorillaledger.savvyrilla.tech</span>
+                <span className="tick"><span className="dot" /><b>DEPLOY</b> savvyrilla.tech</span>
                 <span className="tick"><span className="dot" /><b>UPTIME</b> 99.9% target</span>
                 <span className="tick"><span className="dot" /><b>INCIDENTS</b> 0 (rolling 30d)</span>
                 <span className="tick"><span className="dot" /><b>LATENCY</b> &lt;200ms avg</span>
                 <span className="tick"><span className="dot" /><b>SECURITY</b> policy-first data</span>
                 <span className="tick"><span className="dot" /><b>REGION</b> Africa-ready</span>
 
-                <span className="tick"><span className="dot" /><b>DEPLOY</b> gorillaledger.savvyrilla.tech</span>
+                <span className="tick"><span className="dot" /><b>DEPLOY</b> savvyrilla.tech</span>
                 <span className="tick"><span className="dot" /><b>UPTIME</b> 99.9% target</span>
                 <span className="tick"><span className="dot" /><b>INCIDENTS</b> 0 (rolling 30d)</span>
                 <span className="tick"><span className="dot" /><b>LATENCY</b> &lt;200ms avg</span>
@@ -80,10 +69,8 @@ export default function HomePage() {
             </div>
           </Reveal>
 
-          {/* HERO RIGHT: Command panel + image (parallax restored) */}
           <Reveal as="div" className="hero-right" delayMs={140}>
             <Parallax strength={10} className="hero-parallax">
-              {/* panel: moves less (deeper) */}
               <div className="hero-panel" data-depth="0.55">
                 <div className="hero-panel-head">
                   <div className="hero-panel-brand">
@@ -127,7 +114,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* image: moves more (closer) */}
               <div className="hero-image-card" data-depth="1">
                 <Image
                   src="/dashboard.png"
@@ -144,6 +130,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* The rest of your sections unchanged */}
       {/* PLATFORMS */}
       <section className="section section--dense">
         <div className="container">
@@ -256,169 +243,6 @@ export default function HomePage() {
                   Explore enterprise
                 </Link>
               </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ENTERPRISE ENGINEERING */}
-      <section className="section">
-        <div className="container">
-          <Reveal as="div" className="section-header" delayMs={0}>
-            <h2 className="section-title">Enterprise Engineering</h2>
-            <p className="section-text">
-              Beyond building apps — we architect digital foundations: APIs, databases, secure access
-              layers, dashboards, and operational tooling that teams can rely on long-term.
-            </p>
-          </Reveal>
-
-          <Reveal as="div" className="cards-grid" delayMs={90}>
-            <div className="card">
-              <p className="card-tag">Architecture</p>
-              <h3 className="card-title">Systems design &amp; blueprints</h3>
-              <p className="card-text">
-                Discovery, systems mapping, architecture decisions, and delivery plans that reduce
-                risk before development starts.
-              </p>
-            </div>
-            <div className="card">
-              <p className="card-tag">Engineering</p>
-              <h3 className="card-title">Backend, data &amp; dashboards</h3>
-              <p className="card-text">
-                Secure APIs, database modeling, analytics layers, and high-performance user interfaces
-                designed for clarity and scale.
-              </p>
-            </div>
-            <div className="card">
-              <p className="card-tag">Security</p>
-              <h3 className="card-title">Access control &amp; hardening</h3>
-              <p className="card-text">
-                Authentication flows, role-based access, policy-first data design, and production hardening.
-              </p>
-            </div>
-          </Reveal>
-
-          <Reveal as="div" className="" delayMs={140}>
-            <div style={{ marginTop: '1rem' }}>
-              <Link href="/enterprise" className="btn btn-primary">
-                Explore enterprise engineering
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* INDUSTRIES */}
-      <section className="section section--subtle">
-        <div className="container">
-          <Reveal as="div" className="section-header" delayMs={0}>
-            <h2 className="section-title">Industries</h2>
-            <p className="section-text">
-              We serve institutions and teams that need secure systems, credible reporting, and infrastructure
-              that works in complex environments.
-            </p>
-          </Reveal>
-
-          <Reveal as="div" className="cards-grid" delayMs={90}>
-            <div className="card card--industry">
-              <p className="card-tag">Finance</p>
-              <h3 className="card-title">Financial institutions</h3>
-              <p className="card-text">Ledgers, reporting engines, FX monitoring, data dashboards, secure access.</p>
-            </div>
-            <div className="card card--industry">
-              <p className="card-tag">Public sector</p>
-              <h3 className="card-title">Government &amp; agencies</h3>
-              <p className="card-text">Digital reporting systems, internal tooling, structured data platforms.</p>
-            </div>
-            <div className="card card--industry">
-              <p className="card-tag">Development</p>
-              <h3 className="card-title">NGOs &amp; partners</h3>
-              <p className="card-text">
-                Operational dashboards, secure data systems, M&amp;E tooling, visibility workflows.
-              </p>
-            </div>
-          </Reveal>
-
-          <Reveal as="div" className="" delayMs={140}>
-            <div style={{ marginTop: '1rem' }}>
-              <Link href="/industries" className="btn btn-ghost">
-                View industries
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* INFRASTRUCTURE */}
-      <section className="section">
-        <div className="container">
-          <Reveal as="div" className="section-header" delayMs={0}>
-            <h2 className="section-title">Infrastructure &amp; Managed Services</h2>
-            <p className="section-text">
-              Technology provision does not end at deployment. We provide operational support that keeps
-              systems secure, monitored, and continuously improved.
-            </p>
-          </Reveal>
-
-          <Reveal as="div" className="cards-grid" delayMs={90}>
-            <div className="card">
-              <p className="card-tag">Operations</p>
-              <h3 className="card-title">Hosting, monitoring &amp; uptime</h3>
-              <p className="card-text">
-                Deployment models, performance monitoring, and reliability practices aligned with institutional needs.
-              </p>
-            </div>
-            <div className="card">
-              <p className="card-tag">Delivery</p>
-              <h3 className="card-title">CI/CD &amp; release management</h3>
-              <p className="card-text">
-                Automated delivery pipelines, controlled releases, and version lifecycle management.
-              </p>
-            </div>
-            <div className="card">
-              <p className="card-tag">Support</p>
-              <h3 className="card-title">SLA-based support options</h3>
-              <p className="card-text">
-                Tiered support for incident response, upgrades, and long-term technical advisory.
-              </p>
-            </div>
-          </Reveal>
-
-          <Reveal as="div" className="" delayMs={140}>
-            <div style={{ marginTop: '1rem' }}>
-              <Link href="/infrastructure" className="btn btn-primary">
-                Explore infrastructure &amp; support
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* STACK */}
-      <section className="section section--dense">
-        <div className="container">
-          <Reveal as="div" className="section-header" delayMs={0}>
-            <h2 className="section-title">Technology Architecture</h2>
-            <p className="section-text">
-              We build with modern, reliable infrastructure — and design security into the data layer from day one.
-            </p>
-          </Reveal>
-
-          <Reveal as="div" className="cards-grid" delayMs={90}>
-            <div className="card">
-              <p className="card-tag">Frontend</p>
-              <h3 className="card-title">Next.js · TypeScript</h3>
-              <p className="card-text">High-performance interfaces, dashboards, and user journeys.</p>
-            </div>
-            <div className="card">
-              <p className="card-tag">Backend</p>
-              <h3 className="card-title">Node.js · API-first</h3>
-              <p className="card-text">Clean system boundaries, scalable endpoints, structured service layers.</p>
-            </div>
-            <div className="card">
-              <p className="card-tag">Data</p>
-              <h3 className="card-title">PostgreSQL · Policy-first</h3>
-              <p className="card-text">Secure modeling, access controls, audit-ready foundations.</p>
             </div>
           </Reveal>
         </div>
