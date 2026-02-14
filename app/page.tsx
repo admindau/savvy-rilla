@@ -1,29 +1,23 @@
 // app/page.tsx
-import Link from 'next/link';
-import Image from 'next/image';
-import Reveal from '@/components/reveal';
-import Parallax from '@/components/parallax';
-import Hero3DLoader from '@/components/hero-3d-loader';
+import Link from "next/link";
+import Image from "next/image";
+import Reveal from "@/components/reveal";
+import Parallax from "@/components/parallax";
+import Hero3DLoader from "@/components/hero-3d-loader";
 
 export default function HomePage() {
   return (
     <div className="page">
       {/* HERO */}
       <section className="hero hero--matrix">
-        {/* Optional background image layer (add file to /public if you want) */}
         <div className="hero-bg" aria-hidden="true">
-          {/*
-          <Image
-            src="/hero-map.png"
-            alt=""
-            fill
-            className="hero-bg-img"
-            priority
-          />
-          */}
-
           {/* Stars + 3D Logo (pure stars + 3D logo, no Earth) */}
-          <Hero3DLoader className="hero-visual" src="/srt-logo.svg" scale={0.92} depth={0.20} />
+          <Hero3DLoader
+            className="hero-visual"
+            src="/srt-logo.svg"
+            scale={0.98}
+            depth={0.22}
+          />
         </div>
 
         <div className="container hero-grid">
@@ -59,23 +53,50 @@ export default function HomePage() {
               <span className="hero-strip-item">Multi-region ready</span>
             </div>
 
-            <div className="ticker-wrap" aria-label="Live status ticker">
+            <div className="ticker-wrap" aria-label="Operational status ticker">
               <div className="ticker-fade ticker-fade-left" aria-hidden="true" />
               <div className="ticker-fade ticker-fade-right" aria-hidden="true" />
               <div className="ticker-track" aria-hidden="true">
-                <span className="tick"><span className="dot" /><b>DEPLOY</b> gorillaledger.savvyrilla.tech</span>
-                <span className="tick"><span className="dot" /><b>UPTIME</b> 99.9% target</span>
-                <span className="tick"><span className="dot" /><b>INCIDENTS</b> 0 (rolling 30d)</span>
-                <span className="tick"><span className="dot" /><b>LATENCY</b> &lt;200ms avg</span>
-                <span className="tick"><span className="dot" /><b>SECURITY</b> policy-first data</span>
-                <span className="tick"><span className="dot" /><b>REGION</b> Africa-ready</span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>UPTIME</b> 99.9% target
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>INCIDENTS</b> 0 (rolling 30d)
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>LATENCY</b> &lt;200ms avg
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>SECURITY</b> policy-first data
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>REGION</b> Africa-ready
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>DEPLOY</b>{" "}
+                  gorillaledger.savvyrilla.tech
+                </span>
 
-                <span className="tick"><span className="dot" /><b>DEPLOY</b> gorillaledger.savvyrilla.tech</span>
-                <span className="tick"><span className="dot" /><b>UPTIME</b> 99.9% target</span>
-                <span className="tick"><span className="dot" /><b>INCIDENTS</b> 0 (rolling 30d)</span>
-                <span className="tick"><span className="dot" /><b>LATENCY</b> &lt;200ms avg</span>
-                <span className="tick"><span className="dot" /><b>SECURITY</b> policy-first data</span>
-                <span className="tick"><span className="dot" /><b>REGION</b> Africa-ready</span>
+                {/* duplicate for seamless loop */}
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>UPTIME</b> 99.9% target
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>INCIDENTS</b> 0 (rolling 30d)
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>LATENCY</b> &lt;200ms avg
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>SECURITY</b> policy-first data
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>REGION</b> Africa-ready
+                </span>
+                <span className="tick">
+                  <span className="dot" aria-hidden="true" /> <b>DEPLOY</b>{" "}
+                  gorillaledger.savvyrilla.tech
+                </span>
               </div>
             </div>
           </Reveal>
