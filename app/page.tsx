@@ -1,23 +1,29 @@
 // app/page.tsx
-import Link from "next/link";
-import Image from "next/image";
-import Reveal from "@/components/reveal";
-import Parallax from "@/components/parallax";
-import Hero3DLoader from "@/components/hero-3d-loader";
+import Link from 'next/link';
+import Image from 'next/image';
+import Reveal from '@/components/reveal';
+import Parallax from '@/components/parallax';
+import Hero3DLoader from '@/components/hero-3d-loader';
 
 export default function HomePage() {
   return (
     <div className="page">
       {/* HERO */}
       <section className="hero hero--matrix">
-        <div className="hero-bg" aria-hidden="true">
-          {/* Stars + 3D Logo (pure stars + 3D logo, no Earth) */}
-          <Hero3DLoader
-            className="hero-visual"
-            src="/srt-logo.svg"
-            scale={0.98}
-            depth={0.22}
+        {/* Optional background image layer (add file to /public if you want) */}
+        <div className="hero-bg" aria-hidden="true" style={{ overflow: "visible" }}>
+          {/*
+          <Image
+            src="/hero-map.png"
+            alt=""
+            fill
+            className="hero-bg-img"
+            priority
           />
+          */}
+
+          {/* Stars + 3D Logo (pure stars + 3D logo, no Earth) */}
+          <Hero3DLoader className="hero-visual" src="/srt-logo.svg" scale={0.88} depth={0.24} />
         </div>
 
         <div className="container hero-grid">
@@ -52,54 +58,54 @@ export default function HomePage() {
               <span className="hero-strip-dot" aria-hidden="true" />
               <span className="hero-strip-item">Multi-region ready</span>
             </div>
-
-            <div className="ticker-wrap" aria-label="Operational status ticker">
-              <div className="ticker-fade ticker-fade-left" aria-hidden="true" />
-              <div className="ticker-fade ticker-fade-right" aria-hidden="true" />
-              <div className="ticker-track" aria-hidden="true">
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>UPTIME</b> 99.9% target
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>INCIDENTS</b> 0 (rolling 30d)
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>LATENCY</b> &lt;200ms avg
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>SECURITY</b> policy-first data
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>REGION</b> Africa-ready
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>DEPLOY</b>{" "}
-                  gorillaledger.savvyrilla.tech
-                </span>
-
-                {/* duplicate for seamless loop */}
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>UPTIME</b> 99.9% target
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>INCIDENTS</b> 0 (rolling 30d)
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>LATENCY</b> &lt;200ms avg
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>SECURITY</b> policy-first data
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>REGION</b> Africa-ready
-                </span>
-                <span className="tick">
-                  <span className="dot" aria-hidden="true" /> <b>DEPLOY</b>{" "}
-                  gorillaledger.savvyrilla.tech
-                </span>
-              </div>
-            </div>
           </Reveal>
+
+          <div className="ticker-wrap" aria-label="Operational status ticker">
+            <div className="ticker-fade ticker-fade-left" aria-hidden="true" />
+            <div className="ticker-fade ticker-fade-right" aria-hidden="true" />
+            <div className="ticker-track" aria-hidden="true">
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>UPTIME</b> 99.9% target
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>INCIDENTS</b> 0 (rolling 30d)
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>LATENCY</b> &lt;200ms avg
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>SECURITY</b> policy-first data
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>REGION</b> Africa-ready
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>DEPLOY</b>{' '}
+                gorillaledger.savvyrilla.tech
+              </span>
+
+              {/* duplicate for seamless loop */}
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>UPTIME</b> 99.9% target
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>INCIDENTS</b> 0 (rolling 30d)
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>LATENCY</b> &lt;200ms avg
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>SECURITY</b> policy-first data
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>REGION</b> Africa-ready
+              </span>
+              <span className="tick">
+                <span className="dot" aria-hidden="true" /> <b>DEPLOY</b>{' '}
+                gorillaledger.savvyrilla.tech
+              </span>
+            </div>
+          </div>
 
           {/* HERO RIGHT: Command panel + image (parallax restored) */}
           <Reveal as="div" className="hero-right" delayMs={140}>
@@ -177,8 +183,7 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal as="div" className="cards-grid cards-grid--platforms" delayMs={90}>
-            <div className="card card--interactive card--platform">
-              <div className="card-rail" aria-hidden="true" />
+            <div className="card card--platform">
               <p className="card-tag">Platform · Finance</p>
               <h3 className="card-title">Gorilla Ledger™</h3>
               <p className="card-text">
@@ -186,99 +191,222 @@ export default function HomePage() {
                 management, structured reporting, and scalable analytics.
               </p>
               <p className="card-meta">Deployment: Cloud • Roadmap: Multi-tenant • Security: RLS-ready</p>
-
-              <div className="card-hover">
-                <div className="card-metrics">
-                  <div className="cm">
-                    <span className="cm-k">Security</span>
-                    <span className="cm-v">RLS-ready</span>
-                  </div>
-                  <div className="cm">
-                    <span className="cm-k">Data</span>
-                    <span className="cm-v">PostgreSQL</span>
-                  </div>
-                  <div className="cm">
-                    <span className="cm-k">Mode</span>
-                    <span className="cm-v">Build + Operate</span>
-                  </div>
-                </div>
-              </div>
-
               <div className="card-actions">
-                <Link href="/platforms/gorilla-ledger" className="btn btn-ghost btn-sm card-cta">
+                <Link href="/platforms/gorilla-ledger" className="btn btn-ghost btn-sm">
                   View platform
                 </Link>
               </div>
             </div>
 
-            <div className="card card--interactive card--platform">
-              <div className="card-rail" aria-hidden="true" />
+            <div className="card card--platform">
               <p className="card-tag">Platform · Market Intelligence</p>
               <h3 className="card-title">FX Intelligence Engine</h3>
               <p className="card-text">
                 Multi-currency monitoring and analytics delivering clean visualisation, trend insights,
                 and reporting workflows for institutions and analysts.
               </p>
-              <p className="card-meta">Signals: Live rates • Analytics: Trends • Output: Reporting</p>
-
-              <div className="card-hover">
-                <div className="card-metrics">
-                  <div className="cm">
-                    <span className="cm-k">Latency</span>
-                    <span className="cm-v">&lt;200ms</span>
-                  </div>
-                  <div className="cm">
-                    <span className="cm-k">Modes</span>
-                    <span className="cm-v">Charts + API</span>
-                  </div>
-                  <div className="cm">
-                    <span className="cm-k">Coverage</span>
-                    <span className="cm-v">Multi-currency</span>
-                  </div>
-                </div>
-              </div>
-
+              <p className="card-meta">Deployment: Cloud • Data: Time-series • UX: Command-center dashboards</p>
               <div className="card-actions">
-                <Link href="/platforms/fx-intelligence" className="btn btn-ghost btn-sm card-cta">
+                <Link href="/platforms/fx-intelligence" className="btn btn-ghost btn-sm">
                   View platform
                 </Link>
               </div>
             </div>
 
-            <div className="card card--interactive card--platform">
-              <div className="card-rail" aria-hidden="true" />
-              <p className="card-tag">Platform · Infrastructure</p>
-              <h3 className="card-title">Managed Systems</h3>
+            <div className="card card--platform">
+              <p className="card-tag">Platform · Systems</p>
+              <h3 className="card-title">Custom Enterprise Systems</h3>
               <p className="card-text">
-                Production-grade deployment, monitoring, incident response, and optimisation for critical
-                systems — with security and uptime as first-class constraints.
+                Purpose-built platforms tailored to institutional needs — reporting dashboards, internal
+                tools, secure data hubs, and operational systems.
               </p>
-              <p className="card-meta">SLA options • Observability • Hardening • Continuous improvement</p>
-
-              <div className="card-hover">
-                <div className="card-metrics">
-                  <div className="cm">
-                    <span className="cm-k">Ops</span>
-                    <span className="cm-v">24/7 ready</span>
-                  </div>
-                  <div className="cm">
-                    <span className="cm-k">Infra</span>
-                    <span className="cm-v">Multi-region</span>
-                  </div>
-                  <div className="cm">
-                    <span className="cm-k">Security</span>
-                    <span className="cm-v">Defense-in-depth</span>
-                  </div>
-                </div>
-              </div>
-
+              <p className="card-meta">Model: Build + Operate • Security: Access control • Support: SLA options</p>
               <div className="card-actions">
-                <Link href="/infrastructure" className="btn btn-ghost btn-sm card-cta">
-                  View platform
+                <Link href="/enterprise" className="btn btn-ghost btn-sm">
+                  Explore enterprise
                 </Link>
               </div>
             </div>
           </Reveal>
+        </div>
+      </section>
+
+      {/* ENTERPRISE ENGINEERING */}
+      <section className="section">
+        <div className="container">
+          <Reveal as="div" className="section-header" delayMs={0}>
+            <h2 className="section-title">Enterprise Engineering</h2>
+            <p className="section-text">
+              Beyond building apps — we architect digital foundations: APIs, databases, secure access
+              layers, dashboards, and operational tooling that teams can rely on long-term.
+            </p>
+          </Reveal>
+
+          <Reveal as="div" className="cards-grid" delayMs={90}>
+            <div className="card">
+              <p className="card-tag">Architecture</p>
+              <h3 className="card-title">Systems design &amp; blueprints</h3>
+              <p className="card-text">
+                Discovery, systems mapping, architecture decisions, and delivery plans that reduce
+                risk before development starts.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Engineering</p>
+              <h3 className="card-title">Backend, data &amp; dashboards</h3>
+              <p className="card-text">
+                Secure APIs, database modeling, analytics layers, and high-performance user interfaces
+                designed for clarity and scale.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Security</p>
+              <h3 className="card-title">Access control &amp; hardening</h3>
+              <p className="card-text">
+                Authentication flows, role-based access, policy-first data design, and production hardening.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal as="div" className="" delayMs={140}>
+            <div style={{ marginTop: '1rem' }}>
+              <Link href="/enterprise" className="btn btn-primary">
+                Explore enterprise engineering
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* INDUSTRIES */}
+      <section className="section section--subtle">
+        <div className="container">
+          <Reveal as="div" className="section-header" delayMs={0}>
+            <h2 className="section-title">Industries</h2>
+            <p className="section-text">
+              We serve institutions and teams that need secure systems, credible reporting, and infrastructure
+              that works in complex environments.
+            </p>
+          </Reveal>
+
+          <Reveal as="div" className="cards-grid" delayMs={90}>
+            <div className="card card--industry">
+              <p className="card-tag">Finance</p>
+              <h3 className="card-title">Financial institutions</h3>
+              <p className="card-text">Ledgers, reporting engines, FX monitoring, data dashboards, secure access.</p>
+            </div>
+            <div className="card card--industry">
+              <p className="card-tag">Public sector</p>
+              <h3 className="card-title">Government &amp; agencies</h3>
+              <p className="card-text">Digital reporting systems, internal tooling, structured data platforms.</p>
+            </div>
+            <div className="card card--industry">
+              <p className="card-tag">Development</p>
+              <h3 className="card-title">NGOs &amp; partners</h3>
+              <p className="card-text">
+                Operational dashboards, secure data systems, M&amp;E tooling, visibility workflows.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal as="div" className="" delayMs={140}>
+            <div style={{ marginTop: '1rem' }}>
+              <Link href="/industries" className="btn btn-ghost">
+                View industries
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* INFRASTRUCTURE */}
+      <section className="section">
+        <div className="container">
+          <Reveal as="div" className="section-header" delayMs={0}>
+            <h2 className="section-title">Infrastructure &amp; Managed Services</h2>
+            <p className="section-text">
+              Technology provision does not end at deployment. We provide operational support that keeps
+              systems secure, monitored, and continuously improved.
+            </p>
+          </Reveal>
+
+          <Reveal as="div" className="cards-grid" delayMs={90}>
+            <div className="card">
+              <p className="card-tag">Operations</p>
+              <h3 className="card-title">Hosting, monitoring &amp; uptime</h3>
+              <p className="card-text">
+                Deployment models, performance monitoring, and reliability practices aligned with institutional needs.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Delivery</p>
+              <h3 className="card-title">CI/CD &amp; release management</h3>
+              <p className="card-text">
+                Automated delivery pipelines, controlled releases, and version lifecycle management.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Support</p>
+              <h3 className="card-title">SLA-based support options</h3>
+              <p className="card-text">
+                Tiered support for incident response, upgrades, and long-term technical advisory.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal as="div" className="" delayMs={140}>
+            <div style={{ marginTop: '1rem' }}>
+              <Link href="/infrastructure" className="btn btn-primary">
+                Explore infrastructure &amp; support
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* STACK */}
+      <section className="section section--dense">
+        <div className="container">
+          <Reveal as="div" className="section-header" delayMs={0}>
+            <h2 className="section-title">Technology Architecture</h2>
+            <p className="section-text">
+              We build with modern, reliable infrastructure — and design security into the data layer from day one.
+            </p>
+          </Reveal>
+
+          <Reveal as="div" className="cards-grid" delayMs={90}>
+            <div className="card">
+              <p className="card-tag">Frontend</p>
+              <h3 className="card-title">Next.js · TypeScript</h3>
+              <p className="card-text">High-performance interfaces, dashboards, and user journeys.</p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Backend</p>
+              <h3 className="card-title">Node.js · API-first</h3>
+              <p className="card-text">Clean system boundaries, scalable endpoints, structured service layers.</p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Data</p>
+              <h3 className="card-title">PostgreSQL · Policy-first</h3>
+              <p className="card-text">Secure modeling, access controls, audit-ready foundations.</p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="section section--cta">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Ready to build secure digital infrastructure?</h2>
+            <p className="section-text">
+              Tell us what you’re trying to build. We’ll propose an architecture, delivery plan, and the
+              operational model to run it properly.
+            </p>
+          </div>
+          <Link href="/contact" className="btn btn-primary">
+            Schedule consultation
+          </Link>
         </div>
       </section>
     </div>
