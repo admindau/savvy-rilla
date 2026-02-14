@@ -11,7 +11,7 @@ export default function HomePage() {
       {/* HERO */}
       <section className="hero hero--matrix">
         {/* Optional background image layer (add file to /public if you want) */}
-        <div className="hero-bg" aria-hidden="true" style={{ overflow: "visible" }}>
+        <div className="hero-bg" aria-hidden="true">
           {/*
           <Image
             src="/hero-map.png"
@@ -23,7 +23,7 @@ export default function HomePage() {
           */}
 
           {/* Stars + 3D Logo (pure stars + 3D logo, no Earth) */}
-          <Hero3DLoader className="hero-visual" src="/srt-logo.svg" scale={0.88} depth={0.24} />
+          <Hero3DLoader className="hero-visual" src="/srt-logo.svg" scale={0.92} depth={0.24} />
         </div>
 
         <div className="container hero-grid">
@@ -268,7 +268,7 @@ export default function HomePage() {
             </div>
           </Reveal>
 
-          <Reveal as="div" className="" delayMs={140}>
+          <Reveal as="div" delayMs={140}>
             <div style={{ marginTop: '1rem' }}>
               <Link href="/enterprise" className="btn btn-primary">
                 Explore enterprise engineering
@@ -309,7 +309,7 @@ export default function HomePage() {
             </div>
           </Reveal>
 
-          <Reveal as="div" className="" delayMs={140}>
+          <Reveal as="div" delayMs={140}>
             <div style={{ marginTop: '1rem' }}>
               <Link href="/industries" className="btn btn-ghost">
                 View industries
@@ -354,7 +354,7 @@ export default function HomePage() {
             </div>
           </Reveal>
 
-          <Reveal as="div" className="" delayMs={140}>
+          <Reveal as="div" delayMs={140}>
             <div style={{ marginTop: '1rem' }}>
               <Link href="/infrastructure" className="btn btn-primary">
                 Explore infrastructure &amp; support
