@@ -23,7 +23,7 @@ export default function HomePage() {
           */}
 
           {/* Stars + 3D Logo (pure stars + 3D logo, no Earth) */}
-          <Hero3DLoader className="hero-visual" svgUrl="/srt-logo.svg" />
+          <Hero3DLoader className="hero-visual" src="/srt-logo.svg" />
         </div>
 
         <div className="container hero-grid">
@@ -57,6 +57,26 @@ export default function HomePage() {
               <span className="hero-strip-item">Performance optimized</span>
               <span className="hero-strip-dot" aria-hidden="true" />
               <span className="hero-strip-item">Multi-region ready</span>
+            </div>
+
+            <div className="ticker-wrap" aria-label="Live status ticker">
+              <div className="ticker-fade ticker-fade-left" aria-hidden="true" />
+              <div className="ticker-fade ticker-fade-right" aria-hidden="true" />
+              <div className="ticker-track" aria-hidden="true">
+                <span className="tick"><span className="dot" /><b>DEPLOY</b> gorillaledger.savvyrilla.tech</span>
+                <span className="tick"><span className="dot" /><b>UPTIME</b> 99.9% target</span>
+                <span className="tick"><span className="dot" /><b>INCIDENTS</b> 0 (rolling 30d)</span>
+                <span className="tick"><span className="dot" /><b>LATENCY</b> &lt;200ms avg</span>
+                <span className="tick"><span className="dot" /><b>SECURITY</b> policy-first data</span>
+                <span className="tick"><span className="dot" /><b>REGION</b> Africa-ready</span>
+
+                <span className="tick"><span className="dot" /><b>DEPLOY</b> gorillaledger.savvyrilla.tech</span>
+                <span className="tick"><span className="dot" /><b>UPTIME</b> 99.9% target</span>
+                <span className="tick"><span className="dot" /><b>INCIDENTS</b> 0 (rolling 30d)</span>
+                <span className="tick"><span className="dot" /><b>LATENCY</b> &lt;200ms avg</span>
+                <span className="tick"><span className="dot" /><b>SECURITY</b> policy-first data</span>
+                <span className="tick"><span className="dot" /><b>REGION</b> Africa-ready</span>
+              </div>
             </div>
           </Reveal>
 
@@ -136,7 +156,8 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal as="div" className="cards-grid cards-grid--platforms" delayMs={90}>
-            <div className="card card--platform">
+            <div className="card card--interactive card--platform">
+              <div className="card-rail" aria-hidden="true" />
               <p className="card-tag">Platform · Finance</p>
               <h3 className="card-title">Gorilla Ledger™</h3>
               <p className="card-text">
@@ -144,14 +165,33 @@ export default function HomePage() {
                 management, structured reporting, and scalable analytics.
               </p>
               <p className="card-meta">Deployment: Cloud • Roadmap: Multi-tenant • Security: RLS-ready</p>
+
+              <div className="card-hover">
+                <div className="card-metrics">
+                  <div className="cm">
+                    <span className="cm-k">Security</span>
+                    <span className="cm-v">RLS-ready</span>
+                  </div>
+                  <div className="cm">
+                    <span className="cm-k">Data</span>
+                    <span className="cm-v">PostgreSQL</span>
+                  </div>
+                  <div className="cm">
+                    <span className="cm-k">Mode</span>
+                    <span className="cm-v">Build + Operate</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="card-actions">
-                <Link href="/platforms/gorilla-ledger" className="btn btn-ghost btn-sm">
+                <Link href="/platforms/gorilla-ledger" className="btn btn-ghost btn-sm card-cta">
                   View platform
                 </Link>
               </div>
             </div>
 
-            <div className="card card--platform">
+            <div className="card card--interactive card--platform">
+              <div className="card-rail" aria-hidden="true" />
               <p className="card-tag">Platform · Market Intelligence</p>
               <h3 className="card-title">FX Intelligence Engine</h3>
               <p className="card-text">
@@ -159,14 +199,33 @@ export default function HomePage() {
                 and reporting workflows for institutions and analysts.
               </p>
               <p className="card-meta">Deployment: Cloud • Data: Time-series • UX: Command-center dashboards</p>
+
+              <div className="card-hover">
+                <div className="card-metrics">
+                  <div className="cm">
+                    <span className="cm-k">Data</span>
+                    <span className="cm-v">Time-series</span>
+                  </div>
+                  <div className="cm">
+                    <span className="cm-k">Insight</span>
+                    <span className="cm-v">Trend + signals</span>
+                  </div>
+                  <div className="cm">
+                    <span className="cm-k">UX</span>
+                    <span className="cm-v">Command-center</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="card-actions">
-                <Link href="/platforms/fx-intelligence" className="btn btn-ghost btn-sm">
+                <Link href="/platforms/fx-intelligence" className="btn btn-ghost btn-sm card-cta">
                   View platform
                 </Link>
               </div>
             </div>
 
-            <div className="card card--platform">
+            <div className="card card--interactive card--platform">
+              <div className="card-rail" aria-hidden="true" />
               <p className="card-tag">Platform · Systems</p>
               <h3 className="card-title">Custom Enterprise Systems</h3>
               <p className="card-text">
@@ -174,8 +233,26 @@ export default function HomePage() {
                 tools, secure data hubs, and operational systems.
               </p>
               <p className="card-meta">Model: Build + Operate • Security: Access control • Support: SLA options</p>
+
+              <div className="card-hover">
+                <div className="card-metrics">
+                  <div className="cm">
+                    <span className="cm-k">Delivery</span>
+                    <span className="cm-v">Institutional</span>
+                  </div>
+                  <div className="cm">
+                    <span className="cm-k">Access</span>
+                    <span className="cm-v">Role-based</span>
+                  </div>
+                  <div className="cm">
+                    <span className="cm-k">Support</span>
+                    <span className="cm-v">SLA options</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="card-actions">
-                <Link href="/enterprise" className="btn btn-ghost btn-sm">
+                <Link href="/enterprise" className="btn btn-ghost btn-sm card-cta">
                   Explore enterprise
                 </Link>
               </div>

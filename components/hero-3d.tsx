@@ -1,266 +1,289 @@
-'use client';
+"use client";
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-import { SVGLoader } from 'three-stdlib';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+import { SVGLoader } from "three-stdlib";
 
 type Hero3DProps = {
+  /** disable animation (reduced motion / low power) */
+  animate?: boolean;
+  /** public path to the svg, e.g. "/srt-logo.svg" */
+  src?: string;
+  /** overall scale in world units */
+  scale?: number;
+  /** thickness for extruded fills */
+  depth?: number;
   className?: string;
-  /** Public path to the SVG (default: /srt-logo.svg) */
-  svgUrl?: string;
 };
 
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
+type ParsedSVG = {
+  paths: any[];
+  xml?: Document | undefined;
+};
+
+function clamp(n: number, a: number, b: number) {
+  return Math.max(a, Math.min(b, n));
 }
 
-function Stars({ count = 900 }: { count?: number }) {
-  const points = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    const sizes = new Float32Array(count);
-
-    // A gentle "tunnel" distribution so stars feel denser behind the logo.
-    for (let i = 0; i < count; i++) {
-      const r = Math.random();
-      const theta = Math.random() * Math.PI * 2;
-      const z = -3 - Math.pow(Math.random(), 1.4) * 10;
-      const spread = 8;
-      const x = Math.cos(theta) * spread * r;
-      const y = (Math.random() * 2 - 1) * spread * r;
-
-      positions[i * 3 + 0] = x;
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
-      sizes[i] = 0.5 + Math.random() * 1.5;
-    }
-
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-
-    return geo;
-  }, [count]);
-
+function GlowDisc({ radius = 2.6 }: { radius?: number }) {
   const mat = useMemo(() => {
-    // Slightly warm white to match the cinematic grade.
-    return new THREE.PointsMaterial({
-      color: new THREE.Color('#dbe7ff'),
-      size: 0.012,
-      sizeAttenuation: true,
+    const m = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(0x00f5a0),
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.1,
+      blending: THREE.AdditiveBlending,
       depthWrite: false,
-    });
-  }, []);
-
-  const ref = useRef<THREE.Points | null>(null);
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    if (!ref.current) return;
-    // Tiny drift so background feels alive.
-    ref.current.position.x = Math.sin(t * 0.05) * 0.08;
-    ref.current.position.y = Math.cos(t * 0.04) * 0.06;
-  });
-
-  return <points ref={ref} geometry={points} material={mat} />;
-}
-
-type SvgMesh = {
-  meshes: { geometry: THREE.ExtrudeGeometry; material: THREE.MeshStandardMaterial }[];
-  bounds: { size: THREE.Vector3; center: THREE.Vector3 };
-};
-
-function useExtrudedSvg(svgUrl: string): SvgMesh | null {
-  const [svgText, setSvgText] = useState<string | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      try {
-        const res = await fetch(svgUrl, { cache: 'force-cache' });
-        if (!res.ok) throw new Error(`Failed to fetch ${svgUrl}: ${res.status}`);
-        const text = await res.text();
-        if (!alive) return;
-        setSvgText(text);
-      } catch (e) {
-        // Fail silently (we still want the page to render).
-        if (!alive) return;
-        setSvgText(null);
-        console.error(e);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, [svgUrl]);
-
-  return useMemo(() => {
-    if (!svgText) return null;
-
-    const loader = new SVGLoader();
-    const data = loader.parse(svgText);
-
-    const meshes: SvgMesh['meshes'] = [];
-    const tmpBox = new THREE.Box3();
-    const totalBox = new THREE.Box3();
-    const hasBox = false;
-    void hasBox;
-
-    // Material: emissive sci‑fi glassy metal, double-sided so the back renders.
-    const baseMaterial = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#e9fff8'),
-      metalness: 0.35,
-      roughness: 0.35,
-      emissive: new THREE.Color('#10b981'),
-      emissiveIntensity: 0.22,
-      transparent: true,
-      opacity: 0.98,
       side: THREE.DoubleSide,
     });
-
-    // Convert SVG paths -> shapes -> extrude.
-    for (const p of data.paths) {
-      const shapes = SVGLoader.createShapes(p);
-      for (const shape of shapes) {
-        const geo = new THREE.ExtrudeGeometry(shape, {
-          depth: 8,
-          bevelEnabled: true,
-          bevelThickness: 1.2,
-          bevelSize: 0.9,
-          bevelOffset: 0,
-          bevelSegments: 2,
-          curveSegments: 8,
-          steps: 1,
-        });
-
-        // SVG Y axis is inverted in most exports; flip the geometry once.
-        geo.scale(0.01, -0.01, 0.01);
-        geo.computeVertexNormals();
-
-        tmpBox.setFromBufferAttribute(geo.getAttribute('position') as THREE.BufferAttribute);
-        totalBox.union(tmpBox);
-
-        meshes.push({
-          geometry: geo,
-          material: baseMaterial.clone(),
-        });
-      }
-    }
-
-    if (meshes.length === 0) return null;
-
-    // Compute stable bounds.
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    totalBox.getSize(size);
-    totalBox.getCenter(center);
-
-    // Normalize viewBox parsing (fix for XMLDocument typing) – but we do it safely.
-    // If the SVG has a viewBox we use its aspect to slightly stabilize scale.
-    try {
-      const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
-      const vb = doc.documentElement.getAttribute('viewBox');
-      if (vb) {
-        const parts = vb.split(/\s+/).map((n) => Number(n));
-        if (parts.length === 4 && parts.every((n) => Number.isFinite(n))) {
-          // Subtle nudge: keep Z depth proportional to XY.
-          // (No direct scaling change needed; bounds already computed.)
-        }
-      }
-    } catch {
-      // ignore
-    }
-
-    return {
-      meshes,
-      bounds: { size, center },
-    };
-  }, [svgText]);
-}
-
-function Logo3D({ svgUrl }: { svgUrl: string }) {
-  const groupRef = useRef<THREE.Group | null>(null);
-  const svg = useExtrudedSvg(svgUrl);
-
-  // Camera-relative slight tilt and continuous rotation.
-  useFrame(({ clock, pointer }) => {
-    const g = groupRef.current;
-    if (!g) return;
-
-    const t = clock.getElapsedTime();
-    const px = clamp(pointer.x, -1, 1);
-    const py = clamp(pointer.y, -1, 1);
-
-    // Idle spin + small pointer tilt.
-    g.rotation.y = t * 0.35 + px * 0.25;
-    g.rotation.x = -0.08 + py * 0.12;
-
-    // Gentle bobbing.
-    g.position.y = Math.sin(t * 0.8) * 0.03;
-  });
-
-  // If SVG not loaded yet, render nothing (stars still show).
-  if (!svg) return null;
-
-  const { size, center } = svg.bounds;
-  const maxXY = Math.max(size.x, size.y);
-  const scale = maxXY > 0 ? 2.2 / maxXY : 1;
+    return m;
+  }, []);
 
   return (
-    <group ref={groupRef}>
-      {/* A faint halo ring behind the logo */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -0.12]}>
-        <ringGeometry args={[0.9, 1.12, 128]} />
-        <meshBasicMaterial
-          color={new THREE.Color('#10b981')}
-          transparent
-          opacity={0.18}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-        />
+    <group renderOrder={1} frustumCulled={false}>
+      <mesh frustumCulled={false} renderOrder={1}>
+        <circleGeometry args={[radius, 128]} />
+        <primitive object={mat} attach="material" />
       </mesh>
 
-      <group
-        // Center the SVG around origin and normalize scale.
-        scale={[scale, scale, scale]}
-        position={[-center.x * scale, -center.y * scale, 0]}
-      >
-        {svg.meshes.map((m, i) => (
-          <mesh
-            key={i}
-            geometry={m.geometry}
-            material={m.material}
-            // Ensure back side shows even if normals get flipped.
-            frustumCulled
-          />
-        ))}
-      </group>
+      <mesh frustumCulled={false} renderOrder={0} scale={1.35}>
+        <ringGeometry args={[radius * 0.82, radius * 1.05, 128]} />
+        <meshBasicMaterial
+          color={"#00f5a0"}
+          transparent
+          opacity={0.06}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
     </group>
   );
 }
 
-export default function Hero3D({ className, svgUrl = '/srt-logo.svg' }: Hero3DProps) {
+function SVGMark({
+  parsed,
+  depth = 0.22,
+  animate = true,
+}: {
+  parsed: ParsedSVG | null;
+  depth?: number;
+  animate?: boolean;
+}) {
+  const group = useRef<THREE.Group>(null);
+
+  const { fillMeshes, strokeObjects, boundsScale } = useMemo(() => {
+    if (!parsed?.paths?.length) {
+      return { fillMeshes: [] as any[], strokeObjects: [] as THREE.Object3D[], boundsScale: 1 };
+    }
+
+    const fillMeshes: {
+      geom: THREE.ExtrudeGeometry;
+      material: THREE.MeshStandardMaterial;
+      key: string;
+    }[] = [];
+
+    const strokeObjects: THREE.Object3D[] = [];
+    const tmpGroup = new THREE.Group();
+
+    parsed.paths.forEach((p: any, i: number) => {
+      const style = p.userData?.style ?? {};
+      const fill = (style.fill ?? "").toString().trim();
+      const stroke = (style.stroke ?? "").toString().trim();
+      const fillOpacity = Number(style.fillOpacity ?? style.opacity ?? 1);
+      const strokeOpacity = Number(style.strokeOpacity ?? style.opacity ?? 1);
+      const strokeWidth = Number(style.strokeWidth ?? 1);
+
+      // FILLS
+      if (fill && fill !== "none" && fillOpacity > 0.001) {
+        const shapes = SVGLoader.createShapes(p);
+        shapes.forEach((s: THREE.Shape, j: number) => {
+          const geom = new THREE.ExtrudeGeometry(s, {
+            depth,
+            bevelEnabled: false,
+            curveSegments: 8,
+          });
+          geom.computeVertexNormals();
+
+          const baseColor = new THREE.Color("#e9eef7");
+          const emissive = new THREE.Color("#00f5a0");
+
+          const material = new THREE.MeshStandardMaterial({
+            color: baseColor,
+            metalness: 0.45,
+            roughness: 0.22,
+            emissive,
+            emissiveIntensity: 0.12,
+            transparent: true,
+            opacity: clamp(fillOpacity, 0, 1),
+            side: THREE.DoubleSide,
+          });
+
+          const key = `fill-${i}-${j}`;
+          fillMeshes.push({ geom, material, key });
+
+          const mesh = new THREE.Mesh(geom, material);
+          mesh.frustumCulled = false;
+          tmpGroup.add(mesh);
+        });
+      }
+
+      // STROKES (render as THREE.Line, not JSX <line>)
+      if (stroke && stroke !== "none" && strokeOpacity > 0.001) {
+        const subPaths: any[] = p.subPaths ?? [];
+        const targets = subPaths.length ? subPaths : [p];
+
+        targets.forEach((sp: any, k: number) => {
+          const pts: THREE.Vector2[] = sp.getPoints?.(220) ?? p.getPoints?.(220) ?? [];
+          if (!pts?.length) return;
+
+          const pts3 = pts.map((v) => new THREE.Vector3(v.x, -v.y, 0));
+          const geom = new THREE.BufferGeometry().setFromPoints(pts3);
+
+          const material = new THREE.LineBasicMaterial({
+            color: new THREE.Color("#00f5a0"),
+            transparent: true,
+            opacity: clamp(strokeOpacity, 0, 1) * 0.95,
+            depthWrite: false,
+          });
+
+          // Fake “strokeWidth”
+          material.opacity = clamp(material.opacity * (1 + (strokeWidth - 1) * 0.08), 0, 1);
+
+          // Front line
+          const lineFront = new THREE.Line(geom, material);
+          lineFront.frustumCulled = false;
+          lineFront.renderOrder = 3;
+          lineFront.position.set(0, 0, 0);
+
+          // Back line (so it never disappears on rotation)
+          const lineBack = new THREE.Line(geom, material);
+          lineBack.frustumCulled = false;
+          lineBack.renderOrder = 3;
+          lineBack.position.set(0, 0, depth);
+
+          // Give stable names for debugging
+          lineFront.name = `stroke-${i}-${k}`;
+          lineBack.name = `stroke-${i}-${k}-back`;
+
+          strokeObjects.push(lineFront, lineBack);
+          tmpGroup.add(lineFront);
+          tmpGroup.add(lineBack);
+        });
+      }
+    });
+
+    // Normalize scale using bounds
+    const box = new THREE.Box3().setFromObject(tmpGroup);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const boundsScale = maxDim > 0 ? 4.4 / maxDim : 1;
+
+    return { fillMeshes, strokeObjects, boundsScale };
+  }, [parsed, depth]);
+
+  useFrame((_, delta) => {
+    if (!group.current) return;
+    if (!animate) return;
+    group.current.rotation.y += delta * 0.16;
+    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -0.1, 0.05);
+    group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, 0.06, 0.05);
+  });
+
+  if (!parsed?.paths?.length) {
+    return (
+      <group ref={group} position={[0, 0, 0]} frustumCulled={false}>
+        <GlowDisc />
+        <mesh frustumCulled={false} position={[0, 0, 0.02]}>
+          <torusGeometry args={[1.65, 0.05, 16, 96]} />
+          <meshBasicMaterial
+            color={"#00f5a0"}
+            transparent
+            opacity={0.12}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+    );
+  }
+
   return (
-    <div className={className} aria-hidden>
+    <group
+      ref={group}
+      frustumCulled={false}
+      scale={[boundsScale, boundsScale, boundsScale]}
+      position={[0, -0.1, 0]}
+    >
+      <GlowDisc radius={2.5} />
+
+      {fillMeshes.map(({ geom, material, key }) => (
+        <mesh key={key} geometry={geom} material={material} frustumCulled={false} renderOrder={2} />
+      ))}
+
+      {/* Render THREE.Line objects explicitly */}
+      {strokeObjects.map((obj) => (
+        <primitive key={obj.uuid} object={obj} />
+      ))}
+    </group>
+  );
+}
+
+export default function Hero3D({
+  src = "/srt-logo.svg",
+  scale = 1,
+  depth = 0.22,
+  animate = true,
+  className,
+}: Hero3DProps) {
+  const [parsed, setParsed] = useState<ParsedSVG | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function run() {
+      try {
+        const res = await fetch(src, { cache: "force-cache" });
+        if (!res.ok) throw new Error(`SVG fetch failed: ${res.status}`);
+        const text = await res.text();
+
+        const loader = new SVGLoader();
+        const out = loader.parse(text) as any;
+
+        const paths = Array.isArray(out?.paths) ? out.paths : [];
+        if (!paths.length) throw new Error("SVG parsed but no paths found.");
+
+        if (mounted) setParsed({ paths, xml: out.xml });
+      } catch {
+        if (mounted) setParsed(null);
+      }
+    }
+
+    run();
+    return () => {
+      mounted = false;
+    };
+  }, [src]);
+
+  return (
+    <div className={className} style={{ width: "100%", height: "100%" }}>
       <Canvas
         dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-        camera={{ position: [0, 0.15, 3.1], fov: 42, near: 0.1, far: 50 }}
+        gl={{ antialias: true, alpha: true, powerPreference: "default" }}
+        camera={{ position: [0, 0.25, 8.5], fov: 35, near: 0.1, far: 200 }}
       >
-        {/* Lighting: keep enough ambient so the back face is visible. */}
-        {/* Lighting: key + fill + soft hemisphere so the back side never goes blank */}
-        <ambientLight intensity={0.7} />
-        <hemisphereLight intensity={0.35} args={['#b9fff0', '#00120d', 0.35]} />
-        <directionalLight position={[3, 2, 3]} intensity={1.1} />
-        <directionalLight position={[-3, 1, -3]} intensity={0.9} />
-        <pointLight position={[0, 0, 2]} intensity={0.4} color={new THREE.Color('#10b981')} />
+        <color attach="background" args={["transparent"]} />
 
-        <Stars />
-        <Logo3D svgUrl={svgUrl} />
+        <ambientLight intensity={0.55} />
+        <directionalLight position={[6, 6, 10]} intensity={1.15} />
+        <directionalLight position={[-6, -3, -6]} intensity={0.45} />
+
+        <fog attach="fog" args={["#000000", 12, 26]} />
+
+        <group scale={[scale, scale, scale]} frustumCulled={false}>
+          <SVGMark parsed={parsed} depth={depth} animate={animate} />
+        </group>
       </Canvas>
     </div>
   );

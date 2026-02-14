@@ -124,8 +124,8 @@ export default function CursorFX() {
     const tick = () => {
       rx += (x - rx) * 0.14;
       ry += (y - ry) * 0.14;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
-      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate3d(-50%, -50%, 0)`;
+      dot.style.transform = `translate3d(${x}px, ${y}px, 0) translate3d(-50%, -50%, 0)`;
       raf = window.requestAnimationFrame(tick);
     };
     raf = window.requestAnimationFrame(tick);

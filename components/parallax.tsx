@@ -36,6 +36,7 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
     const maxTranslate = clamp(8 + maxDeg * 1.0, 10, 18);
 
     let raf = 0;
+    let running = false;
 
     // targets + currents (smoothed)
     let tRx = 0;
@@ -46,6 +47,19 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
     // depth layers: anything inside with data-depth="0.2..1"
     const layers = Array.from(root.querySelectorAll<HTMLElement>('[data-depth]'));
 
+    // idle detection
+    let settleFrames = 0;
+    const settleThreshold = 0.02; // degrees
+    const settleNeeded = 18; // ~300ms @60fps
+
+    const wake = () => {
+      settleFrames = 0;
+      if (!running) {
+        running = true;
+        raf = requestAnimationFrame(tick);
+      }
+    };
+
     const onMove = (ev: PointerEvent) => {
       const rect = root.getBoundingClientRect();
       const nx = (ev.clientX - rect.left) / rect.width; // 0..1
@@ -55,11 +69,18 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
 
       tRx = clamp(py * -maxDeg, -maxDeg, maxDeg);
       tRy = clamp(px * maxDeg, -maxDeg, maxDeg);
+
+      wake();
+    };
+
+    const onEnter = () => {
+      wake();
     };
 
     const onLeave = () => {
       tRx = 0;
       tRy = 0;
+      wake();
     };
 
     const tick = () => {
@@ -77,16 +98,33 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
         node.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
       }
 
+      const near =
+        Math.abs(cRx - tRx) < settleThreshold &&
+        Math.abs(cRy - tRy) < settleThreshold &&
+        Math.abs(cRx) < 0.12 &&
+        Math.abs(cRy) < 0.12;
+
+      if (near) settleFrames += 1;
+      else settleFrames = 0;
+
+      if (settleFrames >= settleNeeded) {
+        running = false;
+        raf = 0;
+        return;
+      }
+
       raf = requestAnimationFrame(tick);
     };
 
-    root.addEventListener('pointermove', onMove);
+    root.addEventListener('pointerenter', onEnter);
+    root.addEventListener('pointermove', onMove, { passive: true });
     root.addEventListener('pointerleave', onLeave);
 
-    raf = requestAnimationFrame(tick);
+    // Start only on interaction (no always-on RAF)
 
     return () => {
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
+      root.removeEventListener('pointerenter', onEnter);
       root.removeEventListener('pointermove', onMove);
       root.removeEventListener('pointerleave', onLeave);
     };
