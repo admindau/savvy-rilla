@@ -10,9 +10,20 @@ export default function HomePage() {
     <div className="page">
       {/* HERO */}
       <section className="hero hero--matrix">
+        {/* Optional background image layer (add file to /public if you want) */}
         <div className="hero-bg" aria-hidden="true">
-          {/* 3D Logo (texture-based, reliable) */}
-          <Hero3DLoader className="hero-visual" textureUrl="/logo-white.png" />
+          {/*
+          <Image
+            src="/hero-map.png"
+            alt=""
+            fill
+            className="hero-bg-img"
+            priority
+          />
+          */}
+
+          {/* Stars + 3D Logo (pure stars + 3D logo, no Earth) */}
+          <Hero3DLoader className="hero-visual" src="/srt-logo.svg" scale={0.92} depth={0.20} />
         </div>
 
         <div className="container hero-grid">
@@ -52,14 +63,14 @@ export default function HomePage() {
               <div className="ticker-fade ticker-fade-left" aria-hidden="true" />
               <div className="ticker-fade ticker-fade-right" aria-hidden="true" />
               <div className="ticker-track" aria-hidden="true">
-                <span className="tick"><span className="dot" /><b>DEPLOY</b> savvyrilla.tech</span>
+                <span className="tick"><span className="dot" /><b>DEPLOY</b> gorillaledger.savvyrilla.tech</span>
                 <span className="tick"><span className="dot" /><b>UPTIME</b> 99.9% target</span>
                 <span className="tick"><span className="dot" /><b>INCIDENTS</b> 0 (rolling 30d)</span>
                 <span className="tick"><span className="dot" /><b>LATENCY</b> &lt;200ms avg</span>
                 <span className="tick"><span className="dot" /><b>SECURITY</b> policy-first data</span>
                 <span className="tick"><span className="dot" /><b>REGION</b> Africa-ready</span>
 
-                <span className="tick"><span className="dot" /><b>DEPLOY</b> savvyrilla.tech</span>
+                <span className="tick"><span className="dot" /><b>DEPLOY</b> gorillaledger.savvyrilla.tech</span>
                 <span className="tick"><span className="dot" /><b>UPTIME</b> 99.9% target</span>
                 <span className="tick"><span className="dot" /><b>INCIDENTS</b> 0 (rolling 30d)</span>
                 <span className="tick"><span className="dot" /><b>LATENCY</b> &lt;200ms avg</span>
@@ -69,8 +80,10 @@ export default function HomePage() {
             </div>
           </Reveal>
 
+          {/* HERO RIGHT: Command panel + image (parallax restored) */}
           <Reveal as="div" className="hero-right" delayMs={140}>
             <Parallax strength={10} className="hero-parallax">
+              {/* panel: moves less (deeper) */}
               <div className="hero-panel" data-depth="0.55">
                 <div className="hero-panel-head">
                   <div className="hero-panel-brand">
@@ -114,6 +127,7 @@ export default function HomePage() {
                 </div>
               </div>
 
+              {/* image: moves more (closer) */}
               <div className="hero-image-card" data-depth="1">
                 <Image
                   src="/dashboard.png"
@@ -130,7 +144,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* The rest of your sections unchanged */}
       {/* PLATFORMS */}
       <section className="section section--dense">
         <div className="container">
@@ -185,21 +198,21 @@ export default function HomePage() {
                 Multi-currency monitoring and analytics delivering clean visualisation, trend insights,
                 and reporting workflows for institutions and analysts.
               </p>
-              <p className="card-meta">Deployment: Cloud • Data: Time-series • UX: Command-center dashboards</p>
+              <p className="card-meta">Signals: Live rates • Analytics: Trends • Output: Reporting</p>
 
               <div className="card-hover">
                 <div className="card-metrics">
                   <div className="cm">
-                    <span className="cm-k">Data</span>
-                    <span className="cm-v">Time-series</span>
+                    <span className="cm-k">Latency</span>
+                    <span className="cm-v">&lt;200ms</span>
                   </div>
                   <div className="cm">
-                    <span className="cm-k">Insight</span>
-                    <span className="cm-v">Trend + signals</span>
+                    <span className="cm-k">Modes</span>
+                    <span className="cm-v">Charts + API</span>
                   </div>
                   <div className="cm">
-                    <span className="cm-k">UX</span>
-                    <span className="cm-v">Command-center</span>
+                    <span className="cm-k">Coverage</span>
+                    <span className="cm-v">Multi-currency</span>
                   </div>
                 </div>
               </div>
@@ -213,54 +226,38 @@ export default function HomePage() {
 
             <div className="card card--interactive card--platform">
               <div className="card-rail" aria-hidden="true" />
-              <p className="card-tag">Platform · Systems</p>
-              <h3 className="card-title">Custom Enterprise Systems</h3>
+              <p className="card-tag">Platform · Infrastructure</p>
+              <h3 className="card-title">Managed Systems</h3>
               <p className="card-text">
-                Purpose-built platforms tailored to institutional needs — reporting dashboards, internal
-                tools, secure data hubs, and operational systems.
+                Production-grade deployment, monitoring, incident response, and optimisation for critical
+                systems — with security and uptime as first-class constraints.
               </p>
-              <p className="card-meta">Model: Build + Operate • Security: Access control • Support: SLA options</p>
+              <p className="card-meta">SLA options • Observability • Hardening • Continuous improvement</p>
 
               <div className="card-hover">
                 <div className="card-metrics">
                   <div className="cm">
-                    <span className="cm-k">Delivery</span>
-                    <span className="cm-v">Institutional</span>
+                    <span className="cm-k">Ops</span>
+                    <span className="cm-v">24/7 ready</span>
                   </div>
                   <div className="cm">
-                    <span className="cm-k">Access</span>
-                    <span className="cm-v">Role-based</span>
+                    <span className="cm-k">Infra</span>
+                    <span className="cm-v">Multi-region</span>
                   </div>
                   <div className="cm">
-                    <span className="cm-k">Support</span>
-                    <span className="cm-v">SLA options</span>
+                    <span className="cm-k">Security</span>
+                    <span className="cm-v">Defense-in-depth</span>
                   </div>
                 </div>
               </div>
 
               <div className="card-actions">
-                <Link href="/enterprise" className="btn btn-ghost btn-sm card-cta">
-                  Explore enterprise
+                <Link href="/infrastructure" className="btn btn-ghost btn-sm card-cta">
+                  View platform
                 </Link>
               </div>
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      {/* FINAL CTA */}
-      <section className="section section--cta">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">Ready to build secure digital infrastructure?</h2>
-            <p className="section-text">
-              Tell us what you’re trying to build. We’ll propose an architecture, delivery plan, and the
-              operational model to run it properly.
-            </p>
-          </div>
-          <Link href="/contact" className="btn btn-primary">
-            Schedule consultation
-          </Link>
         </div>
       </section>
     </div>
