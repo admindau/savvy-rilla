@@ -1,3 +1,4 @@
+// components/cursor-fx.tsx
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -69,11 +70,12 @@ export default function CursorFX() {
       if (!clickable) return;
 
       const rect = clickable.getBoundingClientRect();
+      const pos = window.getComputedStyle(clickable).position;
+      if (pos === "static") clickable.style.position = "relative";
       const ripple = document.createElement("span");
       ripple.className = "click-ripple";
       ripple.style.left = `${e.clientX - rect.left}px`;
       ripple.style.top = `${e.clientY - rect.top}px`;
-      clickable.classList.add("has-ripple");
       clickable.appendChild(ripple);
       window.setTimeout(() => ripple.remove(), 750);
     };

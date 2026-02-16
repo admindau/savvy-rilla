@@ -11,7 +11,7 @@ type Hero3DProps = {
   src?: string;
   /** overall scale in world units */
   scale?: number;
-  /** thickness for extruded fills */
+  /** thickness for extruded fills (only applies to vector paths) */
   depth?: number;
   /** disable animation (reduced motion / low power) */
   animate?: boolean;
@@ -21,13 +21,18 @@ type Hero3DProps = {
 type ParsedSVG = {
   paths: any[];
   xml?: Document | undefined;
+  hasImageTag?: boolean;
 };
 
 function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
 }
 
-function Stars({ count = 800 }: { count?: number }) {
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+function Stars({ count = 900 }: { count?: number }) {
   const geom = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const rMin = 10;
@@ -61,7 +66,7 @@ function Stars({ count = 800 }: { count?: number }) {
         size: 0.06,
         sizeAttenuation: true,
         transparent: true,
-        opacity: 0.55,
+        opacity: 0.52,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
       }),
@@ -71,24 +76,19 @@ function Stars({ count = 800 }: { count?: number }) {
   return <points geometry={geom} material={mat} frustumCulled={false} />;
 }
 
-function GlowDisc({ radius = 2.6 }: { radius?: number }) {
-  const mat = useMemo(() => {
-    const m = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(0x00f5a0),
-      transparent: true,
-      opacity: 0.11,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-    return m;
-  }, []);
-
+function GlowDisc({ radius = 2.55 }: { radius?: number }) {
   return (
     <group renderOrder={1} frustumCulled={false}>
       <mesh frustumCulled={false} renderOrder={1}>
         <circleGeometry args={[radius, 128]} />
-        <primitive object={mat} attach="material" />
+        <meshBasicMaterial
+          color={"#00f5a0"}
+          transparent
+          opacity={0.09}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+        />
       </mesh>
 
       <mesh frustumCulled={false} renderOrder={0} scale={1.35}>
@@ -96,7 +96,7 @@ function GlowDisc({ radius = 2.6 }: { radius?: number }) {
         <meshBasicMaterial
           color={"#00f5a0"}
           transparent
-          opacity={0.06}
+          opacity={0.05}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           side={THREE.DoubleSide}
@@ -106,7 +106,12 @@ function GlowDisc({ radius = 2.6 }: { radius?: number }) {
   );
 }
 
-function SVGMark({
+/**
+ * VECTOR MODE
+ * - Extrudes SVG paths into actual geometry.
+ * - Works only if the SVG contains real <path> shapes.
+ */
+function SVGExtrudedMark({
   parsed,
   depth = 0.22,
   animate = true,
@@ -149,7 +154,7 @@ function SVGMark({
             curveSegments: 10,
           });
 
-          // Flip Y so SVG fills align with stroke coordinate handling
+          // Flip Y to match SVG coordinate space
           geom.scale(1, -1, 1);
           geom.computeVertexNormals();
 
@@ -161,7 +166,7 @@ function SVGMark({
             metalness: 0.55,
             roughness: 0.25,
             emissive,
-            emissiveIntensity: 0.18,
+            emissiveIntensity: 0.16,
             transparent: true,
             opacity: clamp(fillOpacity, 0, 1),
             side: THREE.DoubleSide,
@@ -176,7 +181,7 @@ function SVGMark({
         });
       }
 
-      // STROKES -> THREE.Line objects (avoid JSX <line> being treated as SVG)
+      // STROKES -> THREE.Line objects (avoid JSX <line> being treated as SVG DOM)
       if (stroke && stroke !== "none" && strokeOpacity > 0.001) {
         const subPaths: any[] = p.subPaths ?? [];
         const targets = subPaths.length ? subPaths : [p];
@@ -191,12 +196,12 @@ function SVGMark({
           const material = new THREE.LineBasicMaterial({
             color: new THREE.Color("#00f5a0"),
             transparent: true,
-            opacity: clamp(strokeOpacity, 0, 1) * 0.95,
+            opacity: clamp(strokeOpacity, 0, 1) * 0.9,
             depthWrite: false,
             blending: THREE.AdditiveBlending,
           });
 
-          // Slight visual weight hint (since WebGL lineWidth is unreliable)
+          // visual hint for width (WebGL lineWidth is unreliable)
           material.opacity = clamp(material.opacity * (1 + (strokeWidth - 1) * 0.08), 0, 1);
 
           const front = new THREE.Line(geom, material);
@@ -209,9 +214,6 @@ function SVGMark({
           back.renderOrder = 3;
           back.position.set(0, 0, depth);
 
-          front.name = `stroke-${i}-${k}`;
-          back.name = `stroke-${i}-${k}-back`;
-
           strokeObjects.push(front, back);
           tmpGroup.add(front);
           tmpGroup.add(back);
@@ -219,26 +221,27 @@ function SVGMark({
       }
     });
 
-    // Normalize to a stable size using bounds.
+    // Normalize to stable size using bounds and center at origin.
     const box = new THREE.Box3().setFromObject(tmpGroup);
     const size = new THREE.Vector3();
     box.getSize(size);
 
-    // Center the mark at origin (many SVGs are not centered, so they'd render off-camera)
     const center = new THREE.Vector3();
     box.getCenter(center);
 
-    for (const m of fillMeshes) {
-      m.geom.translate(-center.x, -center.y, -center.z);
-    }
+    // Translate all geometries so the mark is centered at (0,0,0)
+    for (const m of fillMeshes) m.geom.translate(-center.x, -center.y, -center.z);
+
     for (const o of strokeObjects) {
       const line = o as THREE.Line;
       const g = line.geometry as THREE.BufferGeometry;
-      if ((g as any).translate) (g as any).translate(-center.x, -center.y, -center.z);
+      // BufferGeometry has translate()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (g as any).translate?.(-center.x, -center.y, -center.z);
     }
 
     const maxDim = Math.max(size.x, size.y, size.z);
-    const boundsScale = maxDim > 0 ? 4.35 / maxDim : 1;
+    const boundsScale = maxDim > 0 ? 4.25 / maxDim : 1;
 
     return { fillMeshes, strokeObjects, boundsScale };
   }, [parsed, depth]);
@@ -246,38 +249,17 @@ function SVGMark({
   useFrame((state, delta) => {
     if (!group.current) return;
 
-    // subtle “alive” motion
     if (animate) {
       group.current.rotation.y += delta * 0.18;
-      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -0.1, 0.05);
-      group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, 0.05, 0.05);
+      group.current.rotation.x = lerp(group.current.rotation.x, -0.12, 0.05);
+      group.current.rotation.z = lerp(group.current.rotation.z, 0.06, 0.05);
     }
 
-    // gentle parallax to cursor (desktop only) to add depth
-    const px = clamp(state.pointer.x, -0.6, 0.6);
-    const py = clamp(state.pointer.y, -0.6, 0.6);
-    group.current.rotation.y += px * 0.002;
-    group.current.rotation.x += -py * 0.002;
+    const px = clamp(state.pointer.x, -0.65, 0.65);
+    const py = clamp(state.pointer.y, -0.65, 0.65);
+    group.current.rotation.y += px * 0.0022;
+    group.current.rotation.x += -py * 0.0022;
   });
-
-  // SVG failed or empty => fallback always visible
-  if (!parsed?.paths?.length) {
-    return (
-      <group ref={group} position={[0, 0, 0]} frustumCulled={false}>
-        <GlowDisc />
-        <mesh frustumCulled={false} position={[0, 0, 0.02]}>
-          <torusGeometry args={[1.65, 0.05, 16, 96]} />
-          <meshBasicMaterial
-            color={"#00f5a0"}
-            transparent
-            opacity={0.12}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-          />
-        </mesh>
-      </group>
-    );
-  }
 
   return (
     <group
@@ -286,7 +268,7 @@ function SVGMark({
       scale={[boundsScale, boundsScale, boundsScale]}
       position={[0, -0.06, 0]}
     >
-      <GlowDisc radius={2.45} />
+      <GlowDisc radius={2.4} />
 
       {fillMeshes.map(({ geom, material, key }) => (
         <mesh key={key} geometry={geom} material={material} frustumCulled={false} renderOrder={2} />
@@ -299,6 +281,193 @@ function SVGMark({
   );
 }
 
+/**
+ * TEXTURE MODE
+ * Your /public/srt-logo.svg is mostly <image> content (raster-in-svg).
+ * SVGLoader can’t convert <image> to vector paths, so “extrude” produces nothing.
+ *
+ * This mode:
+ * - Renders the SVG as an alpha mask on a plane.
+ * - Adds “fake depth” by stacking a few offset planes.
+ * - Keeps lighting / depth feel without requiring vector paths.
+ */
+function SVGTextureMark({
+  svgText,
+  animate = true,
+}: {
+  svgText: string;
+  animate?: boolean;
+}) {
+  const group = useRef<THREE.Group>(null);
+  const [mask, setMask] = useState<THREE.Texture | null>(null);
+  const [aspect, setAspect] = useState(1);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function buildMask() {
+      try {
+        const encoded = encodeURIComponent(svgText)
+          .replace(/'/g, "%27")
+          .replace(/"/g, "%22");
+        const dataUrl = `data:image/svg+xml;charset=utf-8,${encoded}`;
+
+        const img = new Image();
+        img.decoding = "async";
+        img.crossOrigin = "anonymous";
+
+        img.onload = () => {
+          if (cancelled) return;
+
+          const w = img.naturalWidth || 1024;
+          const h = img.naturalHeight || 1024;
+          setAspect(w / h);
+
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return;
+
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+
+          const data = ctx.getImageData(0, 0, w, h);
+          const d = data.data;
+
+          // Build an alpha-only mask: anything not transparent becomes solid white.
+          for (let i = 0; i < d.length; i += 4) {
+            const a = d[i + 3]; // alpha
+            // If visible, force RGB to white and keep alpha.
+            if (a > 8) {
+              d[i + 0] = 255;
+              d[i + 1] = 255;
+              d[i + 2] = 255;
+              d[i + 3] = Math.min(255, a + 30); // slightly thicken
+            } else {
+              d[i + 3] = 0;
+            }
+          }
+
+          ctx.putImageData(data, 0, 0);
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.minFilter = THREE.LinearMipmapLinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          tex.anisotropy = 8;
+          tex.needsUpdate = true;
+
+          setMask(tex);
+        };
+
+        img.onerror = () => {
+          if (!cancelled) setMask(null);
+        };
+
+        img.src = dataUrl;
+      } catch {
+        if (!cancelled) setMask(null);
+      }
+    }
+
+    buildMask();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [svgText]);
+
+  useFrame((state, delta) => {
+    if (!group.current) return;
+
+    if (animate) {
+      group.current.rotation.y += delta * 0.14;
+      group.current.rotation.x = lerp(group.current.rotation.x, -0.1, 0.05);
+      group.current.rotation.z = lerp(group.current.rotation.z, 0.045, 0.05);
+    }
+
+    const px = clamp(state.pointer.x, -0.7, 0.7);
+    const py = clamp(state.pointer.y, -0.7, 0.7);
+    group.current.rotation.y += px * 0.002;
+    group.current.rotation.x += -py * 0.002;
+  });
+
+  // Plane sizing: match the mark proportions
+  const width = 3.6 * aspect;
+  const height = 3.6;
+
+  return (
+    <group ref={group} frustumCulled={false} position={[0, -0.05, 0]}>
+      <GlowDisc radius={2.45} />
+
+      {/* If mask not ready, still show a subtle ring so users see “something” loading */}
+      {!mask ? (
+        <mesh frustumCulled={false} position={[0, 0, 0.05]}>
+          <torusGeometry args={[1.6, 0.06, 18, 96]} />
+          <meshBasicMaterial
+            color={"#00f5a0"}
+            transparent
+            opacity={0.12}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
+      ) : (
+        <>
+          {/* Back plates (fake thickness) */}
+          {[0.14, 0.09, 0.05].map((z, idx) => (
+            <mesh key={`plate-${idx}`} frustumCulled={false} position={[0, 0, -z]}>
+              <planeGeometry args={[width, height]} />
+              <meshStandardMaterial
+                color={"#0b1116"}
+                metalness={0.7}
+                roughness={0.32}
+                transparent
+                opacity={0.75}
+                alphaMap={mask}
+                side={THREE.DoubleSide}
+                depthWrite={false}
+              />
+            </mesh>
+          ))}
+
+          {/* Front face */}
+          <mesh frustumCulled={false} position={[0, 0, 0.02]}>
+            <planeGeometry args={[width, height]} />
+            <meshStandardMaterial
+              color={"#e9eef7"}
+              emissive={"#00f5a0"}
+              emissiveIntensity={0.22}
+              metalness={0.55}
+              roughness={0.24}
+              transparent
+              opacity={0.98}
+              alphaMap={mask}
+              side={THREE.DoubleSide}
+              depthWrite={false}
+            />
+          </mesh>
+
+          {/* Outline glow pass */}
+          <mesh frustumCulled={false} position={[0, 0, 0.06]}>
+            <planeGeometry args={[width * 1.02, height * 1.02]} />
+            <meshBasicMaterial
+              color={"#00f5a0"}
+              transparent
+              opacity={0.07}
+              alphaMap={mask}
+              blending={THREE.AdditiveBlending}
+              side={THREE.DoubleSide}
+              depthWrite={false}
+            />
+          </mesh>
+        </>
+      )}
+    </group>
+  );
+}
+
 export default function Hero3D({
   src = "/srt-logo.svg",
   scale = 1,
@@ -307,6 +476,7 @@ export default function Hero3D({
   className,
 }: Hero3DProps) {
   const [parsed, setParsed] = useState<ParsedSVG | null>(null);
+  const [svgText, setSvgText] = useState<string>("");
 
   useEffect(() => {
     let mounted = true;
@@ -317,15 +487,22 @@ export default function Hero3D({
         if (!res.ok) throw new Error(`SVG fetch failed: ${res.status}`);
         const text = await res.text();
 
+        if (!mounted) return;
+
+        setSvgText(text);
+
+        const hasImageTag = /<image\b/i.test(text);
+
+        // Try vector parse anyway — if this SVG is vector, we’ll use the extruded mark.
         const loader = new SVGLoader();
         const out = loader.parse(text) as any;
-
         const paths = Array.isArray(out?.paths) ? out.paths : [];
-        if (!paths.length) throw new Error("SVG parsed but no paths found.");
 
-        if (mounted) setParsed({ paths, xml: out.xml });
+        setParsed({ paths, xml: out.xml, hasImageTag });
       } catch {
-        if (mounted) setParsed(null);
+        if (!mounted) return;
+        setSvgText("");
+        setParsed(null);
       }
     }
 
@@ -335,6 +512,10 @@ export default function Hero3D({
     };
   }, [src]);
 
+  // Decide render mode:
+  // - If SVG contains <image> OR has too few paths, texture mode wins (ensures visibility).
+  const useTextureMode = !!svgText && (!!parsed?.hasImageTag || (parsed?.paths?.length ?? 0) < 2);
+
   return (
     <div className={className} style={{ width: "100%", height: "100%" }}>
       <Canvas
@@ -342,25 +523,31 @@ export default function Hero3D({
         gl={{ antialias: true, alpha: true, powerPreference: "default" }}
         camera={{ position: [0, 0.18, 7.2], fov: 32, near: 0.1, far: 120 }}
         onCreated={({ gl }) => {
-          // Ensure true transparency behind the canvas (so the hero background shows through)
+          // Ensure true transparency behind the canvas (so hero background shows through)
           try {
             gl.setClearColor(0x000000, 0);
           } catch {}
         }}
       >
-        <Stars count={900} />
+        <Stars count={920} />
 
-        {/* lighting tuned for depth */}
-        <ambientLight intensity={0.55} />
-        <hemisphereLight args={[new THREE.Color("#cfefff"), new THREE.Color("#001018"), 0.65]} />
-        <directionalLight position={[6, 7, 10]} intensity={1.2} />
-        <directionalLight position={[-7, -2, -8]} intensity={0.55} />
-        <pointLight position={[0, 2.2, 6]} intensity={0.55} color={new THREE.Color("#00f5a0")} />
+        {/* Lighting tuned for depth */}
+        <ambientLight intensity={0.52} />
+        <hemisphereLight
+          args={[new THREE.Color("#cfefff"), new THREE.Color("#001018"), 0.62]}
+        />
+        <directionalLight position={[6, 7, 10]} intensity={1.18} />
+        <directionalLight position={[-7, -2, -8]} intensity={0.52} />
+        <pointLight position={[0, 2.2, 6]} intensity={0.62} color={new THREE.Color("#00f5a0")} />
 
         <fog attach="fog" args={["#000000", 12, 26]} />
 
         <group scale={[scale, scale, scale]} frustumCulled={false}>
-          <SVGMark parsed={parsed} depth={depth} animate={animate} />
+          {useTextureMode ? (
+            <SVGTextureMark svgText={svgText} animate={animate} />
+          ) : (
+            <SVGExtrudedMark parsed={parsed} depth={depth} animate={animate} />
+          )}
         </group>
       </Canvas>
     </div>
