@@ -404,7 +404,7 @@ a {
   content: '';
   position: absolute;
   inset: -40% -20%;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
 
   background-image:
@@ -432,7 +432,7 @@ a {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
   background: radial-gradient(circle at 50% 30%, transparent 0, rgba(11, 15, 20, 0.75) 70%);
 }

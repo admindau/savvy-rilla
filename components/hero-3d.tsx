@@ -1,743 +1,401 @@
-// components/hero-3d.tsx
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { SVGLoader } from "three-stdlib";
 
 type Hero3DProps = {
-  /** public path to the svg, e.g. "/srt-logo.svg" */
-  src?: string;
-  /** overall scale in world units */
-  scale?: number;
-  /** thickness for extruded fills (only applies to vector paths) */
-  depth?: number;
-  /** disable animation (reduced motion / low power) */
-  animate?: boolean;
+  /** URL to an SVG in /public, e.g. "/srt-logo.svg" */
+  svgUrl?: string;
   className?: string;
+  lowPower?: boolean;
+  /** Force-disable animation (used for reduced-motion or low-power fallbacks) */
+  staticOnly?: boolean;
 };
 
-type ParsedSVG = {
-  paths: any[];
-  xml?: Document | undefined;
-  hasImageTag?: boolean;
-};
+// --- Utils ---------------------------------------------------------------
 
-function clamp(n: number, a: number, b: number) {
-  return Math.max(a, Math.min(b, n));
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
 }
 
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
+function useReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!mq) return;
+    const onChange = () => setReduced(!!mq.matches);
+    onChange();
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
+  return reduced;
 }
 
-function easeOutCubic(t: number) {
-  return 1 - Math.pow(1 - t, 3);
+// Convert an SVG (including embedded raster images) into a luminance alpha-map.
+// This avoids the "big square" problem when the SVG contains a full-rect bitmap.
+function useSVGMaskTexture(svgUrl: string) {
+  const [alpha, setAlpha] = useState<THREE.Texture | null>(null);
+  const [glow, setGlow] = useState<THREE.Texture | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+
+    img.onload = () => {
+      if (cancelled) return;
+      const w = img.naturalWidth || 1024;
+      const h = img.naturalHeight || 1024;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+
+      // Draw
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // Post-process to build an alpha-map from luminance.
+      // This makes the logo visible as a "filled" mark while preserving soft edges.
+      const imgData = ctx.getImageData(0, 0, w, h);
+      const d = imgData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i];
+        const g = d[i + 1];
+        const b = d[i + 2];
+        const a = d[i + 3];
+
+        // Luminance (0-255). Respect existing alpha.
+        const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) * (a / 255);
+
+        // Threshold to kill background haze.
+        const outA = lum < 12 ? 0 : clamp(lum * 1.15, 0, 255);
+
+        // White source, alpha carries the mask.
+        d[i] = 255;
+        d[i + 1] = 255;
+        d[i + 2] = 255;
+        d[i + 3] = outA;
+      }
+      ctx.putImageData(imgData, 0, 0);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.generateMipmaps = true;
+      tex.needsUpdate = true;
+
+      // Build a slightly expanded glow texture.
+      const glowCanvas = document.createElement("canvas");
+      glowCanvas.width = w;
+      glowCanvas.height = h;
+      const gctx = glowCanvas.getContext("2d", { willReadFrequently: true });
+      if (!gctx) return;
+      gctx.clearRect(0, 0, w, h);
+      gctx.filter = "blur(2.2px)";
+      gctx.drawImage(canvas, 0, 0);
+      gctx.filter = "blur(5px)";
+      gctx.globalAlpha = 0.55;
+      gctx.drawImage(canvas, 0, 0);
+
+      const glowTex = new THREE.CanvasTexture(glowCanvas);
+      glowTex.colorSpace = THREE.SRGBColorSpace;
+      glowTex.wrapS = THREE.ClampToEdgeWrapping;
+      glowTex.wrapT = THREE.ClampToEdgeWrapping;
+      glowTex.minFilter = THREE.LinearMipmapLinearFilter;
+      glowTex.magFilter = THREE.LinearFilter;
+      glowTex.generateMipmaps = true;
+      glowTex.needsUpdate = true;
+
+      setAlpha(tex);
+      setGlow(glowTex);
+    };
+
+    // Load SVG via data URL to ensure consistent sizing across browsers.
+    fetch(svgUrl)
+      .then((r) => r.text())
+      .then((svgText) => {
+        if (cancelled) return;
+        const encoded = encodeURIComponent(svgText)
+          .replace(/%0A/g, "")
+          .replace(/%20/g, " ");
+        img.src = `data:image/svg+xml;charset=utf-8,${encoded}`;
+      })
+      .catch(() => {
+        // Fail silently; the scene will still render stars.
+      });
+
+    return () => {
+      cancelled = true;
+      setAlpha(null);
+      setGlow(null);
+    };
+  }, [svgUrl]);
+
+  return { alpha, glow };
 }
 
-/**
- * Ultra-subtle starfield, used as depth texture (not a "space wallpaper").
- */
-function Stars({ count = 900 }: { count?: number }) {
-  const geom = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    const rMin = 10;
-    const rMax = 26;
+// --- Scene parts ---------------------------------------------------------
 
-    for (let i = 0; i < count; i++) {
+function StarsField({ density = 420, radius = 18 }: { density?: number; radius?: number }) {
+  const positions = useMemo(() => {
+    const arr = new Float32Array(density * 3);
+    for (let i = 0; i < density; i++) {
       const u = Math.random();
       const v = Math.random();
       const theta = 2 * Math.PI * u;
       const phi = Math.acos(2 * v - 1);
-
-      const r = rMin + Math.random() * (rMax - rMin);
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta);
-      const z = r * Math.cos(phi);
-
-      positions[i * 3 + 0] = x;
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
+      const rr = radius * (0.35 + 0.65 * Math.pow(Math.random(), 0.7));
+      const x = rr * Math.sin(phi) * Math.cos(theta);
+      const y = rr * Math.sin(phi) * Math.sin(theta);
+      const z = rr * Math.cos(phi);
+      arr[i * 3 + 0] = x;
+      arr[i * 3 + 1] = y;
+      arr[i * 3 + 2] = z;
     }
+    return arr;
+  }, [density, radius]);
 
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    return g;
-  }, [count]);
+  const points = useRef<THREE.Points>(null);
 
-  const mat = useMemo(
-    () =>
-      new THREE.PointsMaterial({
-        color: new THREE.Color("#cfefff"),
-        size: 0.055,
-        sizeAttenuation: true,
-        transparent: true,
-        opacity: 0.48,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      }),
-    []
-  );
-
-  return <points geometry={geom} material={mat} frustumCulled={false} />;
-}
-
-/**
- * Dust / micro particles close to camera to sell atmosphere depth.
- */
-function Dust({ count = 260 }: { count?: number }) {
-  const ref = useRef<THREE.Points>(null);
-
-  const { geom, mat, speeds } = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    const speeds = new Float32Array(count);
-
-    for (let i = 0; i < count; i++) {
-      positions[i * 3 + 0] = (Math.random() - 0.5) * 10;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 6;
-      positions[i * 3 + 2] = -2 - Math.random() * 8;
-
-      speeds[i] = 0.08 + Math.random() * 0.18;
-    }
-
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-
-    const m = new THREE.PointsMaterial({
-      color: new THREE.Color("#9fead3"),
-      size: 0.03,
-      transparent: true,
-      opacity: 0.22,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    });
-
-    return { geom: g, mat: m, speeds };
-  }, [count]);
-
-  useFrame((_, delta) => {
-    const p = ref.current?.geometry.getAttribute("position") as THREE.BufferAttribute | undefined;
-    if (!p) return;
-
-    for (let i = 0; i < count; i++) {
-      let z = p.getZ(i);
-      z += speeds[i] * delta;
-
-      if (z > 1.2) {
-        z = -10 - Math.random() * 8;
-        p.setX(i, (Math.random() - 0.5) * 10);
-        p.setY(i, (Math.random() - 0.5) * 6);
-      }
-      p.setZ(i, z);
-    }
-
-    p.needsUpdate = true;
+  useFrame((state) => {
+    if (!points.current) return;
+    const t = state.clock.elapsedTime;
+    points.current.rotation.y = t * 0.02;
+    points.current.rotation.x = Math.sin(t * 0.08) * 0.015;
   });
 
-  return <points ref={ref} geometry={geom} material={mat} frustumCulled={false} />;
+  return (
+    <points ref={points} frustumCulled={false} renderOrder={-30}>
+      <bufferGeometry>
+        {/* IMPORTANT: use args to satisfy TS typings */}
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.012}
+        transparent
+        opacity={0.55}
+        depthWrite={false}
+        color={new THREE.Color("#d7fff3")}
+      />
+    </points>
+  );
 }
 
-/**
- * Subtle rings / disc used as "holographic cradle" under logo.
- */
-function GlowDisc({ radius = 2.45 }: { radius?: number }) {
+function Dust({ count = 520, radius = 12 }: { count?: number; radius?: number }) {
+  const positions = useMemo(() => {
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      // thin volumetric layer
+      const x = (Math.random() - 0.5) * radius * 2;
+      const y = (Math.random() - 0.5) * radius * 0.9;
+      const z = -3 - Math.random() * 14;
+      arr[i * 3 + 0] = x;
+      arr[i * 3 + 1] = y;
+      arr[i * 3 + 2] = z;
+    }
+    return arr;
+  }, [count, radius]);
+
+  const ref = useRef<THREE.Points>(null);
+
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    ref.current.rotation.y = t * 0.01;
+  });
+
   return (
-    <group renderOrder={1} frustumCulled={false}>
-      <mesh frustumCulled={false} renderOrder={1}>
-        <circleGeometry args={[radius, 128]} />
-        <meshBasicMaterial
-          color={"#00f5a0"}
+    <points ref={ref} frustumCulled={false} renderOrder={-25}>
+      <bufferGeometry>
+        {/* IMPORTANT: use args to satisfy TS typings */}
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.018}
+        transparent
+        opacity={0.12}
+        depthWrite={false}
+        color={new THREE.Color("#66ffd1")}
+      />
+    </points>
+  );
+}
+
+function SVGAtmosphereMark({ svgUrl }: { svgUrl: string }) {
+  const group = useRef<THREE.Group>(null);
+  const { alpha, glow } = useSVGMaskTexture(svgUrl);
+
+  const [target, setTarget] = useState({ x: 0, y: 0 });
+  const [current, setCurrent] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+      setTarget({ x: nx, y: ny });
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, []);
+
+  useFrame((state) => {
+    const g = group.current;
+    if (!g) return;
+
+    // Ease cursor influence.
+    setCurrent((c) => {
+      const nx = c.x + (target.x - c.x) * 0.04;
+      const ny = c.y + (target.y - c.y) * 0.04;
+      return { x: nx, y: ny };
+    });
+
+    // Breathing motion
+    const t = state.clock.elapsedTime;
+    const bob = Math.sin(t * 0.35) * 0.035;
+
+    // Clamp rotation so it never becomes a face-on “giant silhouette”.
+    const rx = clamp(current.y * 0.18 + Math.sin(t * 0.15) * 0.05, -0.22, 0.22);
+    const ry = clamp(current.x * 0.28 + Math.cos(t * 0.12) * 0.06, -0.32, 0.32);
+
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, rx, 4.2, state.clock.getDelta());
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, ry, 4.2, state.clock.getDelta());
+    g.position.y = THREE.MathUtils.damp(g.position.y, bob, 3.2, state.clock.getDelta());
+  });
+
+  const w = 3.1;
+  const h = 3.1;
+
+  return (
+    <group ref={group} position={[0.65, 0.12, -7.8]} scale={[1.05, 1.05, 1.05]}>
+      {/* Core mark */}
+      <mesh>
+        <planeGeometry args={[w, h, 1, 1]} />
+        <meshStandardMaterial
+          color={"#eaf6ff"}
           transparent
-          opacity={0.06}
-          blending={THREE.AdditiveBlending}
+          opacity={0.22}
+          alphaMap={alpha ?? undefined}
+          alphaTest={0.08}
+          emissive={"#64ffd1"}
+          emissiveIntensity={0.08}
+          roughness={0.78}
+          metalness={0.05}
           depthWrite={false}
-          side={THREE.DoubleSide}
         />
       </mesh>
 
-      <mesh frustumCulled={false} renderOrder={0} scale={1.32}>
-        <ringGeometry args={[radius * 0.82, radius * 1.08, 128]} />
+      {/* Glow pass */}
+      <mesh position={[0, 0, -0.02]}>
+        <planeGeometry args={[w * 1.02, h * 1.02, 1, 1]} />
         <meshBasicMaterial
-          color={"#00f5a0"}
+          color={"#66ffd1"}
           transparent
-          opacity={0.04}
-          blending={THREE.AdditiveBlending}
+          opacity={0.16}
+          alphaMap={glow ?? undefined}
+          alphaTest={0.02}
           depthWrite={false}
-          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
         />
       </mesh>
 
-      {/* faint rim ring */}
-      <mesh frustumCulled={false} renderOrder={2} scale={1.0} position={[0, 0, 0.03]}>
-        <ringGeometry args={[radius * 1.01, radius * 1.03, 160]} />
+      {/* Rim highlight */}
+      <mesh position={[0, 0, 0.03]}>
+        <planeGeometry args={[w * 1.01, h * 1.01, 1, 1]} />
         <meshBasicMaterial
-          color={"#00f5a0"}
+          color={"#bfffe9"}
           transparent
-          opacity={0.09}
-          blending={THREE.AdditiveBlending}
+          opacity={0.10}
+          alphaMap={glow ?? undefined}
+          alphaTest={0.03}
           depthWrite={false}
-          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
         />
       </mesh>
     </group>
   );
 }
 
-/**
- * CAMERA MICRO-PARALLAX
- * - very small movement only, prevents “mask” dominance
- */
-function CinematicCameraRig({ enabled = true }: { enabled?: boolean }) {
+function CameraRig({ staticOnly }: { staticOnly: boolean }) {
   const { camera } = useThree();
-  const base = useRef(new THREE.Vector3(0, 0.18, 7.6));
-  const t = useRef(0);
+  const base = useMemo(() => new THREE.Vector3(0, 0.15, 10.8), []);
+  const target = useMemo(() => new THREE.Vector3(0, 0.05, 0), []);
 
-  useFrame((state, delta) => {
-    if (!enabled) return;
+  const [pointer, setPointer] = useState({ x: 0, y: 0 });
 
-    // smooth ramp-in so there’s no “pop”
-    t.current = clamp(t.current + delta * 0.5, 0, 1);
-    const ramp = easeOutCubic(t.current);
+  useEffect(() => {
+    if (staticOnly) return;
+    const onMove = (e: PointerEvent) => {
+      setPointer({
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2,
+      });
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [staticOnly]);
 
-    const px = clamp(state.pointer.x, -0.6, 0.6);
-    const py = clamp(state.pointer.y, -0.6, 0.6);
+  useFrame((_state, dt) => {
+    const tx = base.x + pointer.x * 0.25;
+    const ty = base.y + pointer.y * 0.18;
+    const tz = base.z;
 
-    const target = new THREE.Vector3(
-      base.current.x + px * 0.24 * ramp,
-      base.current.y + py * 0.18 * ramp,
-      base.current.z
-    );
-
-    camera.position.lerp(target, 0.06);
-    camera.lookAt(0, 0, 0);
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, tx, 2.4, dt);
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, ty, 2.4, dt);
+    camera.position.z = THREE.MathUtils.damp(camera.position.z, tz, 2.4, dt);
+    camera.lookAt(target);
   });
 
   return null;
 }
 
-/**
- * VECTOR MODE
- * - Extrudes SVG paths (requires real <path> shapes in SVG).
- */
-function SVGExtrudedMark({
-  parsed,
-  depth = 0.22,
-  animate = true,
-}: {
-  parsed: ParsedSVG | null;
-  depth?: number;
-  animate?: boolean;
-}) {
-  const group = useRef<THREE.Group>(null);
-
-  const { fillMeshes, strokeObjects, boundsScale } = useMemo(() => {
-    if (!parsed?.paths?.length) {
-      return { fillMeshes: [] as any[], strokeObjects: [] as THREE.Object3D[], boundsScale: 1 };
-    }
-
-    const fillMeshes: {
-      geom: THREE.ExtrudeGeometry;
-      material: THREE.MeshStandardMaterial;
-      key: string;
-    }[] = [];
-
-    const strokeObjects: THREE.Object3D[] = [];
-    const tmpGroup = new THREE.Group();
-
-    parsed.paths.forEach((p: any, i: number) => {
-      const style = p.userData?.style ?? {};
-      const fill = (style.fill ?? "").toString().trim();
-      const stroke = (style.stroke ?? "").toString().trim();
-      const fillOpacity = Number(style.fillOpacity ?? style.opacity ?? 1);
-      const strokeOpacity = Number(style.strokeOpacity ?? style.opacity ?? 1);
-      const strokeWidth = Number(style.strokeWidth ?? 1);
-
-      // FILLS
-      if (fill && fill !== "none" && fillOpacity > 0.001) {
-        const shapes = SVGLoader.createShapes(p);
-        shapes.forEach((s: THREE.Shape, j: number) => {
-          const geom = new THREE.ExtrudeGeometry(s, {
-            depth,
-            bevelEnabled: false,
-            curveSegments: 12,
-          });
-
-          // Flip Y to match SVG coordinate space
-          geom.scale(1, -1, 1);
-          geom.computeVertexNormals();
-
-          const baseColor = new THREE.Color("#e9eef7");
-          const emissive = new THREE.Color("#00f5a0");
-
-          const material = new THREE.MeshStandardMaterial({
-            color: baseColor,
-            metalness: 0.62,
-            roughness: 0.23,
-            emissive,
-            emissiveIntensity: 0.14, // cinematic: lower than neon
-            transparent: true,
-            opacity: clamp(fillOpacity, 0, 1) * 0.55,
-            side: THREE.DoubleSide,
-          });
-
-          const key = `fill-${i}-${j}`;
-          fillMeshes.push({ geom, material, key });
-
-          const mesh = new THREE.Mesh(geom, material);
-          mesh.frustumCulled = false;
-          tmpGroup.add(mesh);
-        });
-      }
-
-      // STROKES -> THREE.Line objects (avoid JSX <line> = SVG DOM element)
-      if (stroke && stroke !== "none" && strokeOpacity > 0.001) {
-        const subPaths: any[] = p.subPaths ?? [];
-        const targets = subPaths.length ? subPaths : [p];
-
-        targets.forEach((sp: any, k: number) => {
-          const pts: THREE.Vector2[] = sp.getPoints?.(260) ?? p.getPoints?.(260) ?? [];
-          if (!pts?.length) return;
-
-          const pts3 = pts.map((v) => new THREE.Vector3(v.x, -v.y, 0));
-          const geom = new THREE.BufferGeometry().setFromPoints(pts3);
-
-          const material = new THREE.LineBasicMaterial({
-            color: new THREE.Color("#00f5a0"),
-            transparent: true,
-            opacity: clamp(strokeOpacity, 0, 1) * 0.55,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending,
-          });
-
-          // subtle width hint (webgl linewidth unreliable)
-          material.opacity = clamp(material.opacity * (1 + (strokeWidth - 1) * 0.06), 0, 1);
-
-          const front = new THREE.Line(geom, material);
-          front.frustumCulled = false;
-          front.renderOrder = 3;
-          front.position.set(0, 0, 0);
-
-          const back = new THREE.Line(geom, material);
-          back.frustumCulled = false;
-          back.renderOrder = 3;
-          back.position.set(0, 0, depth);
-
-          strokeObjects.push(front, back);
-          tmpGroup.add(front);
-          tmpGroup.add(back);
-        });
-      }
-    });
-
-    // Normalize bounds
-    const box = new THREE.Box3().setFromObject(tmpGroup);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-
-    const center = new THREE.Vector3();
-    box.getCenter(center);
-
-    for (const m of fillMeshes) m.geom.translate(-center.x, -center.y, -center.z);
-
-    for (const o of strokeObjects) {
-      const line = o as THREE.Line;
-      const g = line.geometry as THREE.BufferGeometry;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (g as any).translate?.(-center.x, -center.y, -center.z);
-    }
-
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const boundsScale = maxDim > 0 ? 4.0 / maxDim : 1;
-
-    return { fillMeshes, strokeObjects, boundsScale };
-  }, [parsed, depth]);
-
-  // Cinematic motion: gentle oscillation (prevents face-on flatten silhouette)
-  const phase = useRef(Math.random() * 10);
-
-  useFrame((state, delta) => {
-    if (!group.current) return;
-
-    const px = clamp(state.pointer.x, -0.55, 0.55);
-    const py = clamp(state.pointer.y, -0.55, 0.55);
-
-    if (animate) {
-      phase.current += delta * 0.35;
-      const ry = Math.sin(phase.current) * 0.38; // clamp rotation range
-      const rx = -0.12 + Math.cos(phase.current * 0.7) * 0.06;
-      const rz = 0.05;
-
-      group.current.rotation.y = lerp(group.current.rotation.y, ry + px * 0.18, 0.06);
-      group.current.rotation.x = lerp(group.current.rotation.x, rx + -py * 0.12, 0.06);
-      group.current.rotation.z = lerp(group.current.rotation.z, rz, 0.06);
-    } else {
-      group.current.rotation.y = lerp(group.current.rotation.y, px * 0.16, 0.06);
-      group.current.rotation.x = lerp(group.current.rotation.x, -0.12 + -py * 0.08, 0.06);
-      group.current.rotation.z = lerp(group.current.rotation.z, 0.05, 0.06);
-    }
-  });
-
+function Scene({ svgUrl, staticOnly }: { svgUrl?: string; staticOnly: boolean }) {
   return (
-    <group
-      ref={group}
-      frustumCulled={false}
-      scale={[boundsScale, boundsScale, boundsScale]}
-      position={[0, -0.05, 0]}
-    >
-      <GlowDisc radius={2.35} />
+    <>
+      <fog attach="fog" args={["#020507", 8.5, 18]} />
 
-      {fillMeshes.map(({ geom, material, key }) => (
-        <mesh key={key} geometry={geom} material={material} frustumCulled={false} renderOrder={2} />
-      ))}
+      <ambientLight intensity={0.22} />
+      <directionalLight position={[6, 5, 7]} intensity={0.45} color={"#dff7ff"} />
+      <directionalLight position={[-6, -2, 5]} intensity={0.18} color={"#6dffd4"} />
+      <pointLight position={[0, 2.5, 6]} intensity={0.32} color={"#66ffd1"} distance={18} />
 
-      {strokeObjects.map((obj) => (
-        <primitive key={obj.uuid} object={obj} />
-      ))}
-    </group>
-  );
-}
+      <StarsField />
+      <Dust />
 
-/**
- * TEXTURE MODE (for raster-in-SVG)
- * - Guaranteed visible for SVGs that contain <image> tags.
- */
-function SVGTextureMark({
-  svgText,
-  animate = true,
-}: {
-  svgText: string;
-  animate?: boolean;
-}) {
-  const group = useRef<THREE.Group>(null);
-  const [mask, setMask] = useState<THREE.Texture | null>(null);
-  const [aspect, setAspect] = useState(1);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function buildMask() {
-      try {
-        const encoded = encodeURIComponent(svgText)
-          .replace(/'/g, "%27")
-          .replace(/"/g, "%22");
-        const dataUrl = `data:image/svg+xml;charset=utf-8,${encoded}`;
-
-        const img = new Image();
-        img.decoding = "async";
-        img.crossOrigin = "anonymous";
-
-        img.onload = () => {
-          if (cancelled) return;
-
-          const w = img.naturalWidth || 1024;
-          const h = img.naturalHeight || 1024;
-          setAspect(w / h);
-
-          const canvas = document.createElement("canvas");
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return;
-
-          ctx.clearRect(0, 0, w, h);
-          ctx.drawImage(img, 0, 0, w, h);
-
-          const data = ctx.getImageData(0, 0, w, h);
-          const d = data.data;
-
-          // Build alpha-only mask.
-          // Some exports are stroke-heavy (or use masked rasters). If we only trust alpha,
-          // the mark can become "outline-only". Derive alpha from BOTH alpha and inverse luminance,
-          // then run a tiny dilation to thicken thin lines.
-          for (let i = 0; i < d.length; i += 4) {
-            const r = d[i + 0];
-            const g = d[i + 1];
-            const b = d[i + 2];
-            const a = d[i + 3];
-
-            const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b; // 0..255
-            const fromLum = 255 - lum;
-            const boosted = Math.max(a, fromLum * 0.92);
-
-            if (boosted > 10) {
-              d[i + 0] = 255;
-              d[i + 1] = 255;
-              d[i + 2] = 255;
-              d[i + 3] = Math.min(255, boosted + 32);
-            } else {
-              d[i + 3] = 0;
-            }
-          }
-
-          // Dilation (2 iterations) for legibility
-          const a0 = new Uint8ClampedArray(w * h);
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              a0[y * w + x] = d[(y * w + x) * 4 + 3];
-            }
-          }
-
-          const dilateOnce = (srcA: Uint8ClampedArray) => {
-            const outA = new Uint8ClampedArray(srcA.length);
-            for (let y = 1; y < h - 1; y++) {
-              for (let x = 1; x < w - 1; x++) {
-                const idx = y * w + x;
-                let m = 0;
-                for (let oy = -1; oy <= 1; oy++) {
-                  for (let ox = -1; ox <= 1; ox++) {
-                    const v = srcA[idx + oy * w + ox];
-                    if (v > m) m = v;
-                  }
-                }
-                outA[idx] = m;
-              }
-            }
-            return outA;
-          };
-
-          let a1 = dilateOnce(a0);
-          a1 = dilateOnce(a1);
-
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              d[(y * w + x) * 4 + 3] = a1[y * w + x];
-            }
-          }
-
-          ctx.putImageData(data, 0, 0);
-
-          const tex = new THREE.CanvasTexture(canvas);
-          tex.colorSpace = THREE.SRGBColorSpace;
-          tex.minFilter = THREE.LinearMipmapLinearFilter;
-          tex.magFilter = THREE.LinearFilter;
-          tex.anisotropy = 8;
-          tex.needsUpdate = true;
-
-          setMask(tex);
-        };
-
-        img.onerror = () => {
-          if (!cancelled) setMask(null);
-        };
-
-        img.src = dataUrl;
-      } catch {
-        if (!cancelled) setMask(null);
-      }
-    }
-
-    buildMask();
-    return () => {
-      cancelled = true;
-    };
-  }, [svgText]);
-
-  const phase = useRef(Math.random() * 10);
-
-  useFrame((state, delta) => {
-    if (!group.current) return;
-
-    const px = clamp(state.pointer.x, -0.6, 0.6);
-    const py = clamp(state.pointer.y, -0.6, 0.6);
-
-    if (animate) {
-      phase.current += delta * 0.34;
-      // Clamp rotation range so the mark never turns into a giant face-on silhouette.
-      const ry = Math.sin(phase.current) * 0.22;
-      const rx = -0.1 + Math.cos(phase.current * 0.72) * 0.04;
-      const rz = 0.045;
-
-      group.current.rotation.y = lerp(group.current.rotation.y, ry + px * 0.12, 0.06);
-      group.current.rotation.x = lerp(group.current.rotation.x, rx + -py * 0.08, 0.06);
-      group.current.rotation.z = lerp(group.current.rotation.z, rz, 0.06);
-    } else {
-      group.current.rotation.y = lerp(group.current.rotation.y, px * 0.14, 0.06);
-      group.current.rotation.x = lerp(group.current.rotation.x, -0.1 + -py * 0.08, 0.06);
-      group.current.rotation.z = lerp(group.current.rotation.z, 0.045, 0.06);
-    }
-  });
-
-  // Slightly smaller mark keeps it "atmospheric" (behind UI) and reduces the giant-mask moment.
-  const width = 2.95 * aspect;
-  const height = 2.95;
-
-  return (
-    <group ref={group} frustumCulled={false} position={[0, -0.04, 0]}>
-      <GlowDisc radius={2.35} />
-
-      {/* faint atmosphere plate behind mark */}
-      <mesh frustumCulled={false} position={[0, 0, -0.42]}>
-        <planeGeometry args={[width * 1.35, height * 1.35]} />
-        <meshBasicMaterial
-          color={"#001015"}
-          transparent
-          opacity={0.22}
-          depthWrite={false}
-          blending={THREE.NormalBlending}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {!mask ? (
-        <mesh frustumCulled={false} position={[0, 0, 0.05]}>
-          <torusGeometry args={[1.55, 0.055, 18, 96]} />
-          <meshBasicMaterial
-            color={"#00f5a0"}
-            transparent
-            opacity={0.1}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-          />
-        </mesh>
-      ) : (
-        <>
-          {/* subtle “fake depth” stack */}
-          {[0.14, 0.095, 0.06].map((z, idx) => (
-            <mesh key={`plate-${idx}`} frustumCulled={false} position={[0, 0, -z]}>
-              <planeGeometry args={[width, height]} />
-              <meshStandardMaterial
-                color={"#081015"}
-                metalness={0.7}
-                roughness={0.34}
-                transparent
-                opacity={0.68}
-                alphaMap={mask}
-                side={THREE.DoubleSide}
-                depthWrite={false}
-              />
-            </mesh>
-          ))}
-
-          {/* front face */}
-          <mesh frustumCulled={false} position={[0, 0, 0.02]}>
-            <planeGeometry args={[width, height]} />
-            <meshStandardMaterial
-              color={"#e9eef7"}
-              emissive={"#00f5a0"}
-              emissiveIntensity={0.35}
-              metalness={0.6}
-              roughness={0.26}
-              transparent
-              opacity={1}
-              alphaMap={mask}
-              side={THREE.DoubleSide}
-              depthWrite={false}
-            />
-          </mesh>
-
-          {/* rim / halo (subtle, not neon) */}
-          <mesh frustumCulled={false} position={[0, 0, 0.06]}>
-            <planeGeometry args={[width * 1.02, height * 1.02]} />
-            <meshBasicMaterial
-              color={"#00f5a0"}
-              transparent
-              opacity={0.09}
-              alphaMap={mask}
-              blending={THREE.AdditiveBlending}
-              side={THREE.DoubleSide}
-              depthWrite={false}
-            />
-          </mesh>
-        </>
-      )}
-    </group>
+      {svgUrl ? <SVGAtmosphereMark svgUrl={svgUrl} /> : null}
+      <CameraRig staticOnly={staticOnly} />
+    </>
   );
 }
 
 export default function Hero3D({
-  src = "/srt-logo.svg",
-  scale = 1,
-  depth = 0.22,
-  animate = true,
+  svgUrl = "/srt-logo.svg",
   className,
+  lowPower,
+  staticOnly,
 }: Hero3DProps) {
-  const [parsed, setParsed] = useState<ParsedSVG | null>(null);
-  const [svgText, setSvgText] = useState<string>("");
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function run() {
-      try {
-        const res = await fetch(src, { cache: "force-cache" });
-        if (!res.ok) throw new Error(`SVG fetch failed: ${res.status}`);
-        const text = await res.text();
-        if (!mounted) return;
-
-        setSvgText(text);
-
-        const hasImageTag = /<image\b/i.test(text);
-
-        const loader = new SVGLoader();
-        const out = loader.parse(text) as any;
-        const paths = Array.isArray(out?.paths) ? out.paths : [];
-
-        setParsed({ paths, xml: out.xml, hasImageTag });
-      } catch {
-        if (!mounted) return;
-        setSvgText("");
-        setParsed(null);
-      }
-    }
-
-    run();
-    return () => {
-      mounted = false;
-    };
-  }, [src]);
-
-  // Use texture mode if SVG is image-based or too few paths to extrude reliably.
-  const useTextureMode = !!svgText && (!!parsed?.hasImageTag || (parsed?.paths?.length ?? 0) < 2);
-
-  // Cinematic presence but less domination:
-  const finalScale = scale * 0.78;
+  const reduced = useReducedMotion();
+  const disableAnim = !!staticOnly || !!lowPower || reduced;
 
   return (
-    <div className={className} style={{ width: "100%", height: "100%" }}>
+    <div className={className} aria-hidden>
       <Canvas
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true, powerPreference: "default" }}
-        camera={{ position: [0, 0.18, 7.6], fov: 32, near: 0.1, far: 140 }}
-        onCreated={({ gl }) => {
-          // cinematic renderer tuning
-          try {
-            gl.setClearColor(0x000000, 0);
-            gl.toneMapping = THREE.ACESFilmicToneMapping;
-            gl.toneMappingExposure = 1.05;
-            gl.outputColorSpace = THREE.SRGBColorSpace;
-          } catch {}
+        dpr={disableAnim ? 1 : [1, 1.5]}
+        camera={{ position: [0, 0.15, 10.8], fov: 50, near: 0.1, far: 40 }}
+        gl={{
+          antialias: !disableAnim,
+          alpha: true,
+          powerPreference: "default",
         }}
       >
-        <CinematicCameraRig enabled={animate} />
-
-        <Stars count={920} />
-        <Dust count={260} />
-
-        {/* Lighting: serious infra + cinematic rim */}
-        <ambientLight intensity={0.48} />
-        <hemisphereLight args={[new THREE.Color("#cfefff"), new THREE.Color("#000b10"), 0.7]} />
-
-        {/* Key (cool) */}
-        <directionalLight position={[7, 8, 10]} intensity={1.15} color={new THREE.Color("#e9f4ff")} />
-
-        {/* Fill (deep) */}
-        <directionalLight position={[-7, -2, -9]} intensity={0.55} color={new THREE.Color("#0b2830")} />
-
-        {/* Teal accent rim */}
-        <pointLight position={[0, 2.4, 6]} intensity={0.7} color={new THREE.Color("#00f5a0")} />
-        <pointLight position={[2.8, -0.2, 3.2]} intensity={0.35} color={new THREE.Color("#00f5a0")} />
-
-        {/* Fog tuned to dissolve edges (depth cue) */}
-        <fog attach="fog" args={["#000000", 11.5, 24.5]} />
-
-        <group scale={[finalScale, finalScale, finalScale]} frustumCulled={false}>
-          {useTextureMode ? (
-            <SVGTextureMark svgText={svgText} animate={animate} />
-          ) : (
-            <SVGExtrudedMark parsed={parsed} depth={depth} animate={animate} />
-          )}
-        </group>
+        <color attach="background" args={["#000000"]} />
+        <Scene svgUrl={svgUrl} staticOnly={disableAnim} />
       </Canvas>
     </div>
   );

@@ -1,165 +1,130 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-type MagnetEl = HTMLElement & { dataset: { magnet?: string } };
-
+/**
+ * Cinematic cursor FX (desktop only).
+ * - Completely disabled on coarse pointers (mobile/touch) and reduced-motion.
+ * - Dot is always centered inside ring (both use identical translate3d coords).
+ * - Hides on text selection + input/textarea/contenteditable.
+ */
 export default function CursorFX() {
   const dotRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
 
+  const [mounted, setMounted] = useState(false);
+  const [enabled, setEnabled] = useState(false);
+
+  // Decide enablement once on mount.
   useEffect(() => {
+    setMounted(true);
+
+    const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const coarse = window.matchMedia?.("(pointer: coarse)")?.matches;
+
+    if (prefersReduced || coarse) {
+      document.documentElement.classList.remove("has-cursor-fx");
+      setEnabled(false);
+      return;
+    }
+
+    document.documentElement.classList.add("has-cursor-fx");
+    setEnabled(true);
+  }, []);
+
+  // Attach listeners only when enabled.
+  useEffect(() => {
+    if (!enabled) return;
+
     const dot = dotRef.current;
     const ring = ringRef.current;
     if (!dot || !ring) return;
 
-    // Respect reduced motion / touch devices
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    if (prefersReduced || coarse) return;
+    let raf = 0;
+    const state = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      tx: window.innerWidth / 2,
+      ty: window.innerHeight / 2,
+    };
 
-    document.documentElement.classList.add("has-cursor-fx");
+    const setPos = (el: HTMLElement, x: number, y: number) => {
+      // Keep both elements in exact sync (no translate(-50%,-50%) surprises).
+      el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    };
 
-    let x = window.innerWidth / 2;
-    let y = window.innerHeight / 2;
-    let rx = x;
-    let ry = y;
-
-    let activeMagnet: MagnetEl | null = null;
-    let magnetRect: DOMRect | null = null;
-    let magnetStrength = 14;
-
-    const setMagnet = (el: MagnetEl | null) => {
-      activeMagnet = el;
-      magnetRect = el ? el.getBoundingClientRect() : null;
-      if (el?.dataset?.magnet) {
-        const n = Number(el.dataset.magnet);
-        if (!Number.isNaN(n)) magnetStrength = Math.max(6, Math.min(24, n));
-      } else {
-        magnetStrength = 14;
-      }
+    const tick = () => {
+      state.x += (state.tx - state.x) * 0.16;
+      state.y += (state.ty - state.y) * 0.16;
+      setPos(dot, state.tx, state.ty);
+      setPos(ring, state.x, state.y);
+      raf = window.requestAnimationFrame(tick);
     };
 
     const onMove = (e: MouseEvent) => {
-      x = e.clientX;
-      y = e.clientY;
-      document.documentElement.style.setProperty("--cx", `${x}px`);
-      document.documentElement.style.setProperty("--cy", `${y}px`);
-
-      if (activeMagnet && magnetRect) {
-        const cx = magnetRect.left + magnetRect.width / 2;
-        const cy = magnetRect.top + magnetRect.height / 2;
-        const dx = x - cx;
-        const dy = y - cy;
-        const mx = Math.max(-magnetStrength, Math.min(magnetStrength, dx * 0.12));
-        const my = Math.max(-magnetStrength, Math.min(magnetStrength, dy * 0.12));
-        activeMagnet.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
-      }
+      state.tx = e.clientX;
+      state.ty = e.clientY;
+      document.documentElement.classList.add("cursor-active");
     };
 
-    const onDown = (e: MouseEvent) => {
-      document.documentElement.classList.add("cursor-down");
+    const onDown = () => document.documentElement.classList.add("cursor-down");
+    const onUp = () => document.documentElement.classList.remove("cursor-down");
 
-      // Click ripple on interactive elements
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      const clickable = target.closest(
-        "a, button, .btn, .nav-cta, .card, .hero-panel, .hero-image-card"
-      ) as HTMLElement | null;
-      if (!clickable) return;
-
-      const rect = clickable.getBoundingClientRect();
-      const ripple = document.createElement("span");
-      ripple.className = "click-ripple";
-      ripple.style.left = `${e.clientX - rect.left}px`;
-      ripple.style.top = `${e.clientY - rect.top}px`;
-      clickable.classList.add("has-ripple");
-      clickable.appendChild(ripple);
-      window.setTimeout(() => ripple.remove(), 750);
+    const isInteractive = (el: Element | null) => {
+      if (!el) return false;
+      return (
+        el.closest(
+          "a, button, [role='button'], input, textarea, select, summary, [data-cursor='hover']"
+        ) !== null
+      );
     };
 
-    const onUp = () => {
-      document.documentElement.classList.remove("cursor-down");
+    const isTexty = (el: Element | null) => {
+      if (!el) return false;
+      return el.closest("input, textarea, [contenteditable='true'], [data-cursor='text']") !== null;
     };
 
     const onOver = (e: MouseEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (!t) return;
-
-      // Inputs/text selection: soften/hide the custom cursor so it never fights usability.
-      const textField = t.closest(
-        "input, textarea, select, [contenteditable='true'], [role='textbox']"
-      ) as HTMLElement | null;
-      if (textField) {
-        document.documentElement.classList.add("cursor-text");
-        document.documentElement.classList.remove("cursor-hover");
-        return;
-      }
-
-      const magnet = t.closest(
-        ".btn, .nav-cta, .card, .hero-panel, .hero-image-card, .footer-cta"
-      ) as MagnetEl | null;
-      if (magnet) {
-        magnet.classList.add("magnet-active");
-        setMagnet(magnet);
-      }
-
-      const interactive = t.closest("a, button, .btn, .nav-cta") as HTMLElement | null;
-      if (interactive) document.documentElement.classList.add("cursor-hover");
+      const t = e.target as Element;
+      if (isInteractive(t)) document.documentElement.classList.add("cursor-hover");
+      if (isTexty(t)) document.documentElement.classList.add("cursor-text");
     };
 
-    const onOut = (e: MouseEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (!t) return;
+    const onOut = () => {
+      document.documentElement.classList.remove("cursor-hover");
+      document.documentElement.classList.remove("cursor-text");
+    };
 
-      const textField = t.closest(
-        "input, textarea, select, [contenteditable='true'], [role='textbox']"
-      ) as HTMLElement | null;
-      if (textField) {
-        document.documentElement.classList.remove("cursor-text");
-      }
-
-      const magnet = t.closest(
-        ".btn, .nav-cta, .card, .hero-panel, .hero-image-card, .footer-cta"
-      ) as MagnetEl | null;
-      if (magnet) {
-        magnet.classList.remove("magnet-active");
-        magnet.style.transform = "";
-        setMagnet(null);
-      }
-
-      const interactive = t.closest("a, button, .btn, .nav-cta") as HTMLElement | null;
-      if (interactive) document.documentElement.classList.remove("cursor-hover");
+    const onSelect = () => {
+      const sel = window.getSelection();
+      const hasSelection = sel && sel.toString().length > 0;
+      document.documentElement.classList.toggle("cursor-selecting", !!hasSelection);
     };
 
     const onScrollOrResize = () => {
-      if (activeMagnet) magnetRect = activeMagnet.getBoundingClientRect();
+      // Prevent ring drift on certain browsers.
+      setPos(ring, state.x, state.y);
     };
-
-    // Render loop for smooth ring lag
-    let raf = 0;
-    const tick = () => {
-      rx += (x - rx) * 0.14;
-      ry += (y - ry) * 0.14;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
-      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      raf = window.requestAnimationFrame(tick);
-    };
-    raf = window.requestAnimationFrame(tick);
 
     window.addEventListener("mousemove", onMove, { passive: true });
-    window.addEventListener("mousedown", onDown);
-    window.addEventListener("mouseup", onUp);
-    window.addEventListener("mouseover", onOver);
-    window.addEventListener("mouseout", onOut);
+    window.addEventListener("mousedown", onDown, { passive: true });
+    window.addEventListener("mouseup", onUp, { passive: true });
+    window.addEventListener("mouseover", onOver, { passive: true });
+    window.addEventListener("mouseout", onOut, { passive: true });
     window.addEventListener("scroll", onScrollOrResize, { passive: true });
     window.addEventListener("resize", onScrollOrResize, { passive: true });
+    document.addEventListener("selectionchange", onSelect);
+
+    tick();
 
     return () => {
       document.documentElement.classList.remove("has-cursor-fx");
+      document.documentElement.classList.remove("cursor-active");
       document.documentElement.classList.remove("cursor-down");
       document.documentElement.classList.remove("cursor-hover");
       document.documentElement.classList.remove("cursor-text");
+      document.documentElement.classList.remove("cursor-selecting");
+
       window.cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mousedown", onDown);
@@ -168,8 +133,12 @@ export default function CursorFX() {
       window.removeEventListener("mouseout", onOut);
       window.removeEventListener("scroll", onScrollOrResize);
       window.removeEventListener("resize", onScrollOrResize);
+      document.removeEventListener("selectionchange", onSelect);
     };
-  }, []);
+  }, [enabled]);
+
+  // Critical: never render the cursor on mobile/coarse pointers.
+  if (!mounted || !enabled) return null;
 
   return (
     <>
