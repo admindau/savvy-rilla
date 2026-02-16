@@ -446,16 +446,62 @@ function SVGTextureMark({
           const data = ctx.getImageData(0, 0, w, h);
           const d = data.data;
 
-          // Build alpha-only mask
+          // Build alpha-only mask.
+          // Some exports are stroke-heavy (or use masked rasters). If we only trust alpha,
+          // the mark can become "outline-only". Derive alpha from BOTH alpha and inverse luminance,
+          // then run a tiny dilation to thicken thin lines.
           for (let i = 0; i < d.length; i += 4) {
+            const r = d[i + 0];
+            const g = d[i + 1];
+            const b = d[i + 2];
             const a = d[i + 3];
-            if (a > 8) {
+
+            const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b; // 0..255
+            const fromLum = 255 - lum;
+            const boosted = Math.max(a, fromLum * 0.92);
+
+            if (boosted > 10) {
               d[i + 0] = 255;
               d[i + 1] = 255;
               d[i + 2] = 255;
-              d[i + 3] = Math.min(255, a + 26);
+              d[i + 3] = Math.min(255, boosted + 32);
             } else {
               d[i + 3] = 0;
+            }
+          }
+
+          // Dilation (2 iterations) for legibility
+          const a0 = new Uint8ClampedArray(w * h);
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+              a0[y * w + x] = d[(y * w + x) * 4 + 3];
+            }
+          }
+
+          const dilateOnce = (srcA: Uint8ClampedArray) => {
+            const outA = new Uint8ClampedArray(srcA.length);
+            for (let y = 1; y < h - 1; y++) {
+              for (let x = 1; x < w - 1; x++) {
+                const idx = y * w + x;
+                let m = 0;
+                for (let oy = -1; oy <= 1; oy++) {
+                  for (let ox = -1; ox <= 1; ox++) {
+                    const v = srcA[idx + oy * w + ox];
+                    if (v > m) m = v;
+                  }
+                }
+                outA[idx] = m;
+              }
+            }
+            return outA;
+          };
+
+          let a1 = dilateOnce(a0);
+          a1 = dilateOnce(a1);
+
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+              d[(y * w + x) * 4 + 3] = a1[y * w + x];
             }
           }
 
@@ -497,12 +543,13 @@ function SVGTextureMark({
 
     if (animate) {
       phase.current += delta * 0.34;
-      const ry = Math.sin(phase.current) * 0.36;
-      const rx = -0.1 + Math.cos(phase.current * 0.72) * 0.05;
+      // Clamp rotation range so the mark never turns into a giant face-on silhouette.
+      const ry = Math.sin(phase.current) * 0.22;
+      const rx = -0.1 + Math.cos(phase.current * 0.72) * 0.04;
       const rz = 0.045;
 
-      group.current.rotation.y = lerp(group.current.rotation.y, ry + px * 0.16, 0.06);
-      group.current.rotation.x = lerp(group.current.rotation.x, rx + -py * 0.1, 0.06);
+      group.current.rotation.y = lerp(group.current.rotation.y, ry + px * 0.12, 0.06);
+      group.current.rotation.x = lerp(group.current.rotation.x, rx + -py * 0.08, 0.06);
       group.current.rotation.z = lerp(group.current.rotation.z, rz, 0.06);
     } else {
       group.current.rotation.y = lerp(group.current.rotation.y, px * 0.14, 0.06);
@@ -511,8 +558,9 @@ function SVGTextureMark({
     }
   });
 
-  const width = 3.35 * aspect;
-  const height = 3.35;
+  // Slightly smaller mark keeps it "atmospheric" (behind UI) and reduces the giant-mask moment.
+  const width = 2.95 * aspect;
+  const height = 2.95;
 
   return (
     <group ref={group} frustumCulled={false} position={[0, -0.04, 0]}>
@@ -567,11 +615,11 @@ function SVGTextureMark({
             <meshStandardMaterial
               color={"#e9eef7"}
               emissive={"#00f5a0"}
-              emissiveIntensity={0.15} // cinematic: reduced
+              emissiveIntensity={0.35}
               metalness={0.6}
               roughness={0.26}
               transparent
-              opacity={0.94}
+              opacity={1}
               alphaMap={mask}
               side={THREE.DoubleSide}
               depthWrite={false}
@@ -584,7 +632,7 @@ function SVGTextureMark({
             <meshBasicMaterial
               color={"#00f5a0"}
               transparent
-              opacity={0.045}
+              opacity={0.09}
               alphaMap={mask}
               blending={THREE.AdditiveBlending}
               side={THREE.DoubleSide}
