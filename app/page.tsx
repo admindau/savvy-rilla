@@ -24,6 +24,7 @@ export default function HomePage() {
 
           {/* Stars + 3D Logo (pure stars + 3D logo, no Earth) */}
           <Hero3DLoader className="hero-visual" src="/srt-logo.svg" />
+        <div className="hero-vignette" aria-hidden="true" />
 
           {/* Subtle vignette above the 3D layer but below the UI */}
           <div className="hero-vignette" aria-hidden="true" />
