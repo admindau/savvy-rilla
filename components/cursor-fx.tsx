@@ -1,4 +1,3 @@
-// components/cursor-fx.tsx
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -70,12 +69,11 @@ export default function CursorFX() {
       if (!clickable) return;
 
       const rect = clickable.getBoundingClientRect();
-      const pos = window.getComputedStyle(clickable).position;
-      if (pos === "static") clickable.style.position = "relative";
       const ripple = document.createElement("span");
       ripple.className = "click-ripple";
       ripple.style.left = `${e.clientX - rect.left}px`;
       ripple.style.top = `${e.clientY - rect.top}px`;
+      clickable.classList.add("has-ripple");
       clickable.appendChild(ripple);
       window.setTimeout(() => ripple.remove(), 750);
     };
@@ -87,6 +85,16 @@ export default function CursorFX() {
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       if (!t) return;
+
+      // Inputs/text selection: soften/hide the custom cursor so it never fights usability.
+      const textField = t.closest(
+        "input, textarea, select, [contenteditable='true'], [role='textbox']"
+      ) as HTMLElement | null;
+      if (textField) {
+        document.documentElement.classList.add("cursor-text");
+        document.documentElement.classList.remove("cursor-hover");
+        return;
+      }
 
       const magnet = t.closest(
         ".btn, .nav-cta, .card, .hero-panel, .hero-image-card, .footer-cta"
@@ -103,6 +111,13 @@ export default function CursorFX() {
     const onOut = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       if (!t) return;
+
+      const textField = t.closest(
+        "input, textarea, select, [contenteditable='true'], [role='textbox']"
+      ) as HTMLElement | null;
+      if (textField) {
+        document.documentElement.classList.remove("cursor-text");
+      }
 
       const magnet = t.closest(
         ".btn, .nav-cta, .card, .hero-panel, .hero-image-card, .footer-cta"
@@ -126,8 +141,8 @@ export default function CursorFX() {
     const tick = () => {
       rx += (x - rx) * 0.14;
       ry += (y - ry) * 0.14;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate3d(-50%, -50%, 0)`;
-      dot.style.transform = `translate3d(${x}px, ${y}px, 0) translate3d(-50%, -50%, 0)`;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       raf = window.requestAnimationFrame(tick);
     };
     raf = window.requestAnimationFrame(tick);
@@ -144,6 +159,7 @@ export default function CursorFX() {
       document.documentElement.classList.remove("has-cursor-fx");
       document.documentElement.classList.remove("cursor-down");
       document.documentElement.classList.remove("cursor-hover");
+      document.documentElement.classList.remove("cursor-text");
       window.cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mousedown", onDown);

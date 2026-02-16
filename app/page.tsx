@@ -23,7 +23,10 @@ export default function HomePage() {
           */}
 
           {/* Stars + 3D Logo (pure stars + 3D logo, no Earth) */}
-          <Hero3DLoader className="hero-visual" src="/srt-logo.svg" scale={0.92} depth={0.20} />
+          <Hero3DLoader className="hero-visual" src="/srt-logo.svg" />
+
+          {/* Subtle vignette above the 3D layer but below the UI */}
+          <div className="hero-vignette" aria-hidden="true" />
         </div>
 
         <div className="container hero-grid">
@@ -57,29 +60,6 @@ export default function HomePage() {
               <span className="hero-strip-item">Performance optimized</span>
               <span className="hero-strip-dot" aria-hidden="true" />
               <span className="hero-strip-item">Multi-region ready</span>
-            </div>
-
-            <div className="status-ticker">
-              <div className="ticker-track">
-                <span className="ticker-item">
-                  <span className="tick-dot" /> DEPLOY <span className="tick-muted">gorillaledger.savvyrilla.tech</span>
-                </span>
-                <span className="ticker-item">
-                  <span className="tick-dot" /> UPTIME <span className="tick-muted">99.9% target</span>
-                </span>
-                <span className="ticker-item">
-                  <span className="tick-dot" /> INCIDENTS <span className="tick-muted">0 (rolling 30d)</span>
-                </span>
-                <span className="ticker-item">
-                  <span className="tick-dot" /> LATENCY <span className="tick-muted">&lt;200ms avg</span>
-                </span>
-                <span className="ticker-item">
-                  <span className="tick-dot" /> SECURITY <span className="tick-muted">policy-first data</span>
-                </span>
-                <span className="ticker-item">
-                  <span className="tick-dot" /> REGION <span className="tick-muted">Africa-ready</span>
-                </span>
-              </div>
             </div>
           </Reveal>
 
@@ -261,43 +241,92 @@ export default function HomePage() {
             <h2 className="section-title">Industries</h2>
             <p className="section-text">
               We serve institutions and teams that need secure systems, credible reporting, and infrastructure
-              that holds up in the real world.
+              that works in complex environments.
             </p>
           </Reveal>
 
           <Reveal as="div" className="cards-grid" delayMs={90}>
-            <div className="card">
-              <p className="card-tag">Financial Institutions</p>
-              <h3 className="card-title">Core systems &amp; reporting</h3>
+            <div className="card card--industry">
+              <p className="card-tag">Finance</p>
+              <h3 className="card-title">Financial institutions</h3>
+              <p className="card-text">Ledgers, reporting engines, FX monitoring, data dashboards, secure access.</p>
+            </div>
+            <div className="card card--industry">
+              <p className="card-tag">Public sector</p>
+              <h3 className="card-title">Government &amp; agencies</h3>
+              <p className="card-text">Digital reporting systems, internal tooling, structured data platforms.</p>
+            </div>
+            <div className="card card--industry">
+              <p className="card-tag">Development</p>
+              <h3 className="card-title">NGOs &amp; partners</h3>
               <p className="card-text">
-                Security-first platforms for compliance, reporting, and operational visibility.
+                Operational dashboards, secure data systems, M&amp;E tooling, visibility workflows.
               </p>
             </div>
-            <div className="card">
-              <p className="card-tag">Public Sector</p>
-              <h3 className="card-title">Government systems</h3>
-              <p className="card-text">
-                Transparent dashboards and secure infrastructure supporting service delivery.
-              </p>
-            </div>
-            <div className="card">
-              <p className="card-tag">NGOs &amp; Programs</p>
-              <h3 className="card-title">Field-ready tooling</h3>
-              <p className="card-text">
-                Lightweight, durable systems built for real constraints and real operators.
-              </p>
+          </Reveal>
+
+          <Reveal as="div" className="" delayMs={140}>
+            <div style={{ marginTop: '1rem' }}>
+              <Link href="/industries" className="btn btn-ghost">
+                View industries
+              </Link>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* TECH STACK */}
+      {/* INFRASTRUCTURE */}
       <section className="section">
         <div className="container">
           <Reveal as="div" className="section-header" delayMs={0}>
-            <h2 className="section-title">Built for performance</h2>
+            <h2 className="section-title">Infrastructure &amp; Managed Services</h2>
             <p className="section-text">
-              A pragmatic stack focused on stability, speed, and maintainability — with policy-first data design.
+              Technology provision does not end at deployment. We provide operational support that keeps
+              systems secure, monitored, and continuously improved.
+            </p>
+          </Reveal>
+
+          <Reveal as="div" className="cards-grid" delayMs={90}>
+            <div className="card">
+              <p className="card-tag">Operations</p>
+              <h3 className="card-title">Hosting, monitoring &amp; uptime</h3>
+              <p className="card-text">
+                Deployment models, performance monitoring, and reliability practices aligned with institutional needs.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Delivery</p>
+              <h3 className="card-title">CI/CD &amp; release management</h3>
+              <p className="card-text">
+                Automated delivery pipelines, controlled releases, and version lifecycle management.
+              </p>
+            </div>
+            <div className="card">
+              <p className="card-tag">Support</p>
+              <h3 className="card-title">SLA-based support options</h3>
+              <p className="card-text">
+                Tiered support for incident response, upgrades, and long-term technical advisory.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal as="div" className="" delayMs={140}>
+            <div style={{ marginTop: '1rem' }}>
+              <Link href="/infrastructure" className="btn btn-primary">
+                Explore infrastructure &amp; support
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* STACK */}
+      <section className="section section--dense">
+        <div className="container">
+          <Reveal as="div" className="section-header" delayMs={0}>
+            <h2 className="section-title">Technology Architecture</h2>
+            <p className="section-text">
+              We build with modern, reliable infrastructure — and design security into the data layer from day one.
             </p>
           </Reveal>
 

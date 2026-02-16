@@ -235,7 +235,6 @@ function SVGExtrudedMark({
     for (const o of strokeObjects) {
       const line = o as THREE.Line;
       const g = line.geometry as THREE.BufferGeometry;
-      // BufferGeometry has translate()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (g as any).translate?.(-center.x, -center.y, -center.z);
     }
@@ -338,12 +337,11 @@ function SVGTextureMark({
           // Build an alpha-only mask: anything not transparent becomes solid white.
           for (let i = 0; i < d.length; i += 4) {
             const a = d[i + 3]; // alpha
-            // If visible, force RGB to white and keep alpha.
             if (a > 8) {
               d[i + 0] = 255;
               d[i + 1] = 255;
               d[i + 2] = 255;
-              d[i + 3] = Math.min(255, a + 30); // slightly thicken
+              d[i + 3] = Math.min(255, a + 30);
             } else {
               d[i + 3] = 0;
             }
@@ -393,7 +391,6 @@ function SVGTextureMark({
     group.current.rotation.x += -py * 0.002;
   });
 
-  // Plane sizing: match the mark proportions
   const width = 3.6 * aspect;
   const height = 3.6;
 
@@ -401,7 +398,6 @@ function SVGTextureMark({
     <group ref={group} frustumCulled={false} position={[0, -0.05, 0]}>
       <GlowDisc radius={2.45} />
 
-      {/* If mask not ready, still show a subtle ring so users see “something” loading */}
       {!mask ? (
         <mesh frustumCulled={false} position={[0, 0, 0.05]}>
           <torusGeometry args={[1.6, 0.06, 18, 96]} />
@@ -415,7 +411,6 @@ function SVGTextureMark({
         </mesh>
       ) : (
         <>
-          {/* Back plates (fake thickness) */}
           {[0.14, 0.09, 0.05].map((z, idx) => (
             <mesh key={`plate-${idx}`} frustumCulled={false} position={[0, 0, -z]}>
               <planeGeometry args={[width, height]} />
@@ -432,7 +427,6 @@ function SVGTextureMark({
             </mesh>
           ))}
 
-          {/* Front face */}
           <mesh frustumCulled={false} position={[0, 0, 0.02]}>
             <planeGeometry args={[width, height]} />
             <meshStandardMaterial
@@ -449,7 +443,6 @@ function SVGTextureMark({
             />
           </mesh>
 
-          {/* Outline glow pass */}
           <mesh frustumCulled={false} position={[0, 0, 0.06]}>
             <planeGeometry args={[width * 1.02, height * 1.02]} />
             <meshBasicMaterial
@@ -493,7 +486,6 @@ export default function Hero3D({
 
         const hasImageTag = /<image\b/i.test(text);
 
-        // Try vector parse anyway — if this SVG is vector, we’ll use the extruded mark.
         const loader = new SVGLoader();
         const out = loader.parse(text) as any;
         const paths = Array.isArray(out?.paths) ? out.paths : [];
@@ -512,8 +504,6 @@ export default function Hero3D({
     };
   }, [src]);
 
-  // Decide render mode:
-  // - If SVG contains <image> OR has too few paths, texture mode wins (ensures visibility).
   const useTextureMode = !!svgText && (!!parsed?.hasImageTag || (parsed?.paths?.length ?? 0) < 2);
 
   return (
@@ -523,7 +513,6 @@ export default function Hero3D({
         gl={{ antialias: true, alpha: true, powerPreference: "default" }}
         camera={{ position: [0, 0.18, 7.2], fov: 32, near: 0.1, far: 120 }}
         onCreated={({ gl }) => {
-          // Ensure true transparency behind the canvas (so hero background shows through)
           try {
             gl.setClearColor(0x000000, 0);
           } catch {}
@@ -531,11 +520,8 @@ export default function Hero3D({
       >
         <Stars count={920} />
 
-        {/* Lighting tuned for depth */}
         <ambientLight intensity={0.52} />
-        <hemisphereLight
-          args={[new THREE.Color("#cfefff"), new THREE.Color("#001018"), 0.62]}
-        />
+        <hemisphereLight args={[new THREE.Color("#cfefff"), new THREE.Color("#001018"), 0.62]} />
         <directionalLight position={[6, 7, 10]} intensity={1.18} />
         <directionalLight position={[-7, -2, -8]} intensity={0.52} />
         <pointLight position={[0, 2.2, 6]} intensity={0.62} color={new THREE.Color("#00f5a0")} />
