@@ -37,6 +37,7 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
 
     let raf = 0;
     let running = false;
+    let settleFrames = 0;
 
     // targets + currents (smoothed)
     let tRx = 0;
@@ -47,17 +48,17 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
     // depth layers: anything inside with data-depth="0.2..1"
     const layers = Array.from(root.querySelectorAll<HTMLElement>('[data-depth]'));
 
-    // idle detection
-    let settleFrames = 0;
-    const settleThreshold = 0.02; // degrees
-    const settleNeeded = 18; // ~300ms @60fps
-
-    const wake = () => {
+    const startRaf = () => {
+      if (running) return;
+      running = true;
       settleFrames = 0;
-      if (!running) {
-        running = true;
-        raf = requestAnimationFrame(tick);
-      }
+      raf = requestAnimationFrame(tick);
+    };
+
+    const stopRaf = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      raf = 0;
     };
 
     const onMove = (ev: PointerEvent) => {
@@ -70,17 +71,14 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
       tRx = clamp(py * -maxDeg, -maxDeg, maxDeg);
       tRy = clamp(px * maxDeg, -maxDeg, maxDeg);
 
-      wake();
-    };
-
-    const onEnter = () => {
-      wake();
+      // only animate when needed
+      startRaf();
     };
 
     const onLeave = () => {
       tRx = 0;
       tRy = 0;
-      wake();
+      startRaf(); // animate back to rest, then auto-stop
     };
 
     const tick = () => {
@@ -98,33 +96,27 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
         node.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
       }
 
-      const near =
-        Math.abs(cRx - tRx) < settleThreshold &&
-        Math.abs(cRy - tRy) < settleThreshold &&
-        Math.abs(cRx) < 0.12 &&
-        Math.abs(cRy) < 0.12;
-
-      if (near) settleFrames += 1;
+      // Stop RAF once we settle (saves battery)
+      const dx = Math.abs(cRx - tRx);
+      const dy = Math.abs(cRy - tRy);
+      if (dx < 0.02 && dy < 0.02) settleFrames += 1;
       else settleFrames = 0;
 
-      if (settleFrames >= settleNeeded) {
-        running = false;
-        raf = 0;
+      if (settleFrames >= 12) {
+        stopRaf();
         return;
       }
 
       raf = requestAnimationFrame(tick);
     };
 
-    root.addEventListener('pointerenter', onEnter);
-    root.addEventListener('pointermove', onMove, { passive: true });
+    root.addEventListener('pointermove', onMove);
     root.addEventListener('pointerleave', onLeave);
 
-    // Start only on interaction (no always-on RAF)
+    // RAF starts on first interaction
 
     return () => {
-      if (raf) cancelAnimationFrame(raf);
-      root.removeEventListener('pointerenter', onEnter);
+      cancelAnimationFrame(raf);
       root.removeEventListener('pointermove', onMove);
       root.removeEventListener('pointerleave', onLeave);
     };

@@ -58,10 +58,10 @@ function Stars({ count = 800 }: { count?: number }) {
     () =>
       new THREE.PointsMaterial({
         color: new THREE.Color("#cfefff"),
-        size: 0.055,
+        size: 0.06,
         sizeAttenuation: true,
         transparent: true,
-        opacity: 0.62,
+        opacity: 0.55,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
       }),
@@ -76,7 +76,7 @@ function GlowDisc({ radius = 2.6 }: { radius?: number }) {
     const m = new THREE.MeshBasicMaterial({
       color: new THREE.Color(0x00f5a0),
       transparent: true,
-      opacity: 0.13,
+      opacity: 0.11,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
@@ -148,6 +148,9 @@ function SVGMark({
             bevelEnabled: false,
             curveSegments: 10,
           });
+
+          // Flip Y so SVG fills align with stroke coordinate handling
+          geom.scale(1, -1, 1);
           geom.computeVertexNormals();
 
           const baseColor = new THREE.Color("#e9eef7");
@@ -155,10 +158,10 @@ function SVGMark({
 
           const material = new THREE.MeshStandardMaterial({
             color: baseColor,
-            metalness: 0.62,
-            roughness: 0.22,
+            metalness: 0.55,
+            roughness: 0.25,
             emissive,
-            emissiveIntensity: 0.28,
+            emissiveIntensity: 0.18,
             transparent: true,
             opacity: clamp(fillOpacity, 0, 1),
             side: THREE.DoubleSide,
@@ -220,28 +223,41 @@ function SVGMark({
     const box = new THREE.Box3().setFromObject(tmpGroup);
     const size = new THREE.Vector3();
     box.getSize(size);
+
+    // Center the mark at origin (many SVGs are not centered, so they'd render off-camera)
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+
+    for (const m of fillMeshes) {
+      m.geom.translate(-center.x, -center.y, -center.z);
+    }
+    for (const o of strokeObjects) {
+      const line = o as THREE.Line;
+      const g = line.geometry as THREE.BufferGeometry;
+      if ((g as any).translate) (g as any).translate(-center.x, -center.y, -center.z);
+    }
+
     const maxDim = Math.max(size.x, size.y, size.z);
     const boundsScale = maxDim > 0 ? 4.35 / maxDim : 1;
 
     return { fillMeshes, strokeObjects, boundsScale };
   }, [parsed, depth]);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!group.current) return;
 
-    const t = state.clock.getElapsedTime();
+    // subtle “alive” motion
+    if (animate) {
+      group.current.rotation.y += delta * 0.18;
+      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -0.1, 0.05);
+      group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, 0.05, 0.05);
+    }
 
-    // stable motion (no drift): set absolute rotations instead of incremental adds
+    // gentle parallax to cursor (desktop only) to add depth
     const px = clamp(state.pointer.x, -0.6, 0.6);
     const py = clamp(state.pointer.y, -0.6, 0.6);
-
-    const baseY = animate ? t * 0.12 : 0;
-    const baseX = -0.12;
-    const baseZ = 0.045;
-
-    group.current.rotation.y = baseY + px * 0.14;
-    group.current.rotation.x = baseX + -py * 0.10;
-    group.current.rotation.z = baseZ;
+    group.current.rotation.y += px * 0.002;
+    group.current.rotation.x += -py * 0.002;
   });
 
   // SVG failed or empty => fallback always visible
@@ -268,7 +284,7 @@ function SVGMark({
       ref={group}
       frustumCulled={false}
       scale={[boundsScale, boundsScale, boundsScale]}
-      position={[0, -0.02, 0]}
+      position={[0, -0.06, 0]}
     >
       <GlowDisc radius={2.45} />
 
@@ -324,33 +340,26 @@ export default function Hero3D({
       <Canvas
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true, powerPreference: "default" }}
-        camera={{ position: [0, 0.18, 8.6], fov: 30, near: 0.1, far: 140 }}
+        camera={{ position: [0, 0.18, 7.2], fov: 32, near: 0.1, far: 120 }}
+        onCreated={({ gl }) => {
+          // Ensure true transparency behind the canvas (so the hero background shows through)
+          try {
+            gl.setClearColor(0x000000, 0);
+          } catch {}
+        }}
       >
-        <color attach="background" args={["transparent"]} />
-
         <Stars count={900} />
 
         {/* lighting tuned for depth */}
-        <ambientLight intensity={0.48} />
-        <hemisphereLight
-          args={[new THREE.Color("#cfefff"), new THREE.Color("#001018"), 0.72]}
-        />
-        <directionalLight position={[7, 8, 12]} intensity={1.35} />
-        <directionalLight position={[-9, -3, -10]} intensity={0.6} />
-        <pointLight position={[1.4, 2.4, 7]} intensity={0.7} color={new THREE.Color("#00f5a0")} />
+        <ambientLight intensity={0.55} />
+        <hemisphereLight args={[new THREE.Color("#cfefff"), new THREE.Color("#001018"), 0.65]} />
+        <directionalLight position={[6, 7, 10]} intensity={1.2} />
+        <directionalLight position={[-7, -2, -8]} intensity={0.55} />
+        <pointLight position={[0, 2.2, 6]} intensity={0.55} color={new THREE.Color("#00f5a0")} />
 
-        <spotLight
-          position={[0, 6.5, 9]}
-          angle={0.35}
-          penumbra={0.9}
-          intensity={0.55}
-          color={new THREE.Color("#cfefff")}
-          castShadow={false}
-        />
+        <fog attach="fog" args={["#000000", 12, 26]} />
 
-        <fog attach="fog" args={["#000000", 11, 28]} />
-
-        <group scale={[scale, scale, scale]} position={[2.15, 0.35, 0]} frustumCulled={false}>
+        <group scale={[scale, scale, scale]} frustumCulled={false}>
           <SVGMark parsed={parsed} depth={depth} animate={animate} />
         </group>
       </Canvas>
