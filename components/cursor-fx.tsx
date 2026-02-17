@@ -4,10 +4,24 @@ import { useEffect, useRef, useState } from "react";
 
 type MagnetTarget = HTMLElement | null;
 
-function isMagnetTarget(el: Element | null): el is HTMLElement {
-  if (!el) return false;
-  if (!(el instanceof HTMLElement)) return false;
-  return el.hasAttribute("data-cursor-magnet");
+function getMagnetTarget(el: Element | null): HTMLElement | null {
+  if (!el) return null;
+
+  const direct = el instanceof HTMLElement && el.hasAttribute("data-cursor-magnet") ? el : null;
+  const closest =
+    (el as any)?.closest?.("[data-cursor-magnet]") instanceof HTMLElement
+      ? ((el as any).closest("[data-cursor-magnet]") as HTMLElement)
+      : null;
+
+  const magnet = direct ?? closest;
+
+  // Optional: also allow primary buttons to magnet even if attribute is missing
+  if (!magnet && el instanceof HTMLElement) {
+    const btn = el.closest?.("a.btn,button.btn") as HTMLElement | null;
+    if (btn && btn.classList.contains("btn-primary")) return btn;
+  }
+
+  return magnet;
 }
 
 export default function CursorFX() {
@@ -18,13 +32,11 @@ export default function CursorFX() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Disable completely on mobile / touch / reduced-motion.
-    // This prevents the "phantom" ring that can appear centered on mobile.
+    // Disable on touch / reduced-motion
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
     const fineHover = window.matchMedia("(pointer: fine) and (hover: hover)").matches;
 
-    if (prefersReduced || coarse || !fineHover) {
+    if (prefersReduced || !fineHover) {
       setEnabled(false);
       return;
     }
@@ -36,41 +48,22 @@ export default function CursorFX() {
     if (!dot || !ring) return;
 
     let raf = 0;
+    let hasMoved = false;
+
     let x = window.innerWidth / 2;
     let y = window.innerHeight / 2;
-    let rx = x;
-    let ry = y;
+
+    // We render BOTH dot and ring at the same smoothed coordinates
+    // so the dot stays perfectly centered.
+    let px = x;
+    let py = y;
 
     let activeMagnet: MagnetTarget = null;
     let magnetRect: DOMRect | null = null;
 
-    // Slightly larger ring on hover
-    let hoverScale = 1;
-    let hoverScaleCurrent = 1;
-
-    const isTextInput = (el: EventTarget | null) => {
-      const t = el as HTMLElement | null;
-      if (!t) return false;
-      if (t.isContentEditable) return true;
-      const tag = t.tagName?.toLowerCase();
-      if (tag === "input" || tag === "textarea" || tag === "select") return true;
-      return !!t.closest("input, textarea, select, [contenteditable='true']");
-    };
-
-    const onFocusIn = (e: FocusEvent) => {
-      if (isTextInput(e.target)) document.documentElement.classList.add("cursor-hidden");
-    };
-
-    const onFocusOut = () => {
-      document.documentElement.classList.remove("cursor-hidden");
-    };
-
-    const onSelectionChange = () => {
-      const sel = window.getSelection();
-      const hasSelection = !!sel && !sel.isCollapsed && String(sel.toString() || "").length > 0;
-      if (hasSelection) document.documentElement.classList.add("cursor-hidden");
-      else document.documentElement.classList.remove("cursor-hidden");
-    };
+    // scale for "hover/magnet"
+    let targetScale = 1;
+    let scale = 1;
 
     const setMagnet = (target: MagnetTarget) => {
       activeMagnet = target;
@@ -78,39 +71,45 @@ export default function CursorFX() {
     };
 
     const onMove = (e: PointerEvent) => {
+      hasMoved = true;
       x = e.clientX;
       y = e.clientY;
 
-      // Magnet logic: if hovering a magnet element, pull ring toward its center a bit
       const hovered = document.elementFromPoint(e.clientX, e.clientY);
-      const magnet = isMagnetTarget(hovered) ? hovered : (hovered?.closest?.("[data-cursor-magnet]") as HTMLElement | null);
+      const magnet = getMagnetTarget(hovered);
 
       if (magnet && magnet !== activeMagnet) setMagnet(magnet);
       if (!magnet && activeMagnet) setMagnet(null);
 
-      hoverScale = magnet ? 1.22 : 1;
+      // stronger but controlled scale so it’s noticeable
+      targetScale = magnet ? 1.18 : 1;
+
+      // show once we move
+      if (ring.style.opacity !== "1") {
+        ring.style.opacity = "1";
+        dot.style.opacity = "1";
+      }
     };
 
     const onDown = () => {
-      ring.style.opacity = "0.85";
-      dot.style.opacity = "0.9";
-      ring.style.filter = "blur(0px)";
+      ring.style.opacity = "0.9";
+      dot.style.opacity = "0.95";
     };
 
     const onUp = () => {
       ring.style.opacity = "1";
       dot.style.opacity = "1";
-      ring.style.filter = "";
     };
 
-    const onOver = () => {
-      ring.style.opacity = "1";
-      dot.style.opacity = "1";
-    };
-
-    const onOut = () => {
+    const onPointerLeave = () => {
       ring.style.opacity = "0";
       dot.style.opacity = "0";
+    };
+
+    const onPointerEnter = () => {
+      if (!hasMoved) return;
+      ring.style.opacity = "1";
+      dot.style.opacity = "1";
     };
 
     const onScrollOrResize = () => {
@@ -118,65 +117,60 @@ export default function CursorFX() {
     };
 
     const tick = () => {
-      // If magnet is active, pull ring toward target center (subtle)
+      // fast follow = no “laggy weirdness”
+      const follow = 0.26;
+
+      let tx = x;
+      let ty = y;
+
+      // magnet pulls cursor slightly toward target center
       if (activeMagnet && magnetRect) {
         const cx = magnetRect.left + magnetRect.width / 2;
         const cy = magnetRect.top + magnetRect.height / 2;
 
-        const pull = 0.18;
-        const tx = x + (cx - x) * pull;
-        const ty = y + (cy - y) * pull;
-
-        rx += (tx - rx) * 0.14;
-        ry += (ty - ry) * 0.14;
-      } else {
-        rx += (x - rx) * 0.14;
-        ry += (y - ry) * 0.14;
+        const pull = 0.22; // noticeable but controlled
+        tx = x + (cx - x) * pull;
+        ty = y + (cy - y) * pull;
       }
 
-      // Smooth hover scale
-      hoverScaleCurrent += (hoverScale - hoverScaleCurrent) * 0.12;
-      ring.style.width = `${46 * hoverScaleCurrent}px`;
-      ring.style.height = `${46 * hoverScaleCurrent}px`;
+      px += (tx - px) * follow;
+      py += (ty - py) * follow;
 
-      // Perfect centering: apply translate(-50%, -50%) so it centers on pointer
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
-      dot.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+      // smooth scale
+      scale += (targetScale - scale) * 0.18;
+
+      // IMPORTANT: dot and ring use same px/py => centered
+      ring.style.transform = `translate3d(${px}px, ${py}px, 0) translate(-50%, -50%) scale(${scale})`;
+      dot.style.transform = `translate3d(${px}px, ${py}px, 0) translate(-50%, -50%)`;
 
       raf = window.requestAnimationFrame(tick);
     };
 
     raf = window.requestAnimationFrame(tick);
 
-    // Use pointer events for best cross-device handling (desktop only here)
+    // start hidden to avoid weird “sitting cursor”
+    ring.style.opacity = "0";
+    dot.style.opacity = "0";
+
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onDown, { passive: true });
     window.addEventListener("pointerup", onUp, { passive: true });
-    window.addEventListener("mouseover", onOver, { passive: true });
-    window.addEventListener("mouseout", onOut, { passive: true });
     window.addEventListener("scroll", onScrollOrResize, { passive: true });
     window.addEventListener("resize", onScrollOrResize, { passive: true });
-    window.addEventListener("focusin", onFocusIn);
-    window.addEventListener("focusout", onFocusOut);
-    document.addEventListener("selectionchange", onSelectionChange);
 
-    // Start visible once we have interaction
-    ring.style.opacity = "1";
-    dot.style.opacity = "1";
+    // window boundary fade (no global mouseover/mouseout flicker)
+    document.addEventListener("pointerleave", onPointerLeave, { passive: true } as any);
+    document.addEventListener("pointerenter", onPointerEnter, { passive: true } as any);
 
     return () => {
       window.cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("mouseover", onOver);
-      window.removeEventListener("mouseout", onOut);
       window.removeEventListener("scroll", onScrollOrResize);
       window.removeEventListener("resize", onScrollOrResize);
-      window.removeEventListener("focusin", onFocusIn);
-      window.removeEventListener("focusout", onFocusOut);
-      document.removeEventListener("selectionchange", onSelectionChange);
-      document.documentElement.classList.remove("cursor-hidden");
+      document.removeEventListener("pointerleave", onPointerLeave as any);
+      document.removeEventListener("pointerenter", onPointerEnter as any);
     };
   }, []);
 

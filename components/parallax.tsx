@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 type ParallaxProps = {
   children: React.ReactNode;
@@ -8,6 +8,9 @@ type ParallaxProps = {
 
   /** Max rotation strength. Clamped internally to avoid toy-feel. */
   strength?: number;
+
+  /** Subtle hover scale */
+  hoverScale?: number;
 };
 
 function clamp(n: number, min: number, max: number) {
@@ -18,22 +21,27 @@ function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
-export default function Parallax({ children, className = '', strength = 10 }: ParallaxProps) {
+export default function Parallax({
+  children,
+  className = "",
+  strength = 10,
+  hoverScale = 1.015,
+}: ParallaxProps) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
 
-    const inner = root.querySelector<HTMLElement>('.parallax-inner');
+    const inner = root.querySelector<HTMLElement>(".parallax-inner");
     if (!inner) return;
 
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const lowPower = document.documentElement.classList.contains('low-power');
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const lowPower = document.documentElement.classList.contains("low-power");
     if (prefersReduced || lowPower) return;
 
     const maxDeg = clamp(strength, 4, 10);
-    const maxTranslate = clamp(8 + maxDeg * 1.0, 10, 18);
+    const maxTranslate = clamp(10 + maxDeg * 0.9, 10, 18);
 
     let raf = 0;
     let running = false;
@@ -45,8 +53,11 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
     let cRx = 0;
     let cRy = 0;
 
+    let tScale = 1;
+    let cScale = 1;
+
     // depth layers: anything inside with data-depth="0.2..1"
-    const layers = Array.from(root.querySelectorAll<HTMLElement>('[data-depth]'));
+    const layers = Array.from(root.querySelectorAll<HTMLElement>("[data-depth]"));
 
     const startRaf = () => {
       if (running) return;
@@ -61,6 +72,11 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
       raf = 0;
     };
 
+    const onEnter = () => {
+      tScale = hoverScale;
+      startRaf();
+    };
+
     const onMove = (ev: PointerEvent) => {
       const rect = root.getBoundingClientRect();
       const nx = (ev.clientX - rect.left) / rect.width; // 0..1
@@ -71,35 +87,39 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
       tRx = clamp(py * -maxDeg, -maxDeg, maxDeg);
       tRy = clamp(px * maxDeg, -maxDeg, maxDeg);
 
-      // only animate when needed
       startRaf();
     };
 
     const onLeave = () => {
       tRx = 0;
       tRy = 0;
-      startRaf(); // animate back to rest, then auto-stop
+      tScale = 1;
+      startRaf();
     };
 
     const tick = () => {
       cRx = lerp(cRx, tRx, 0.12);
       cRy = lerp(cRy, tRy, 0.12);
+      cScale = lerp(cScale, tScale, 0.14);
 
-      inner.style.setProperty('--rx', `${cRx.toFixed(2)}deg`);
-      inner.style.setProperty('--ry', `${cRy.toFixed(2)}deg`);
+      // apply a single stable transform stack (guaranteed hover effect)
+      inner.style.transform = `perspective(950px) rotateX(${cRx.toFixed(
+        2
+      )}deg) rotateY(${cRy.toFixed(2)}deg) translateZ(0) scale(${cScale.toFixed(3)})`;
 
       // depth translate: closer elements move more
       for (const node of layers) {
-        const d = clamp(Number(node.dataset.depth ?? '0.6'), 0.15, 1);
+        const d = clamp(Number(node.dataset.depth ?? "0.6"), 0.15, 1);
         const tx = (cRy / maxDeg) * (maxTranslate * d);
         const ty = (cRx / maxDeg) * (maxTranslate * d);
         node.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
       }
 
       // Stop RAF once we settle (saves battery)
-      const dx = Math.abs(cRx - tRx);
-      const dy = Math.abs(cRy - tRy);
-      if (dx < 0.02 && dy < 0.02) settleFrames += 1;
+      const dx = Math.abs(cRx - tRx) + Math.abs(cRy - tRy);
+      const ds = Math.abs(cScale - tScale);
+
+      if (dx < 0.04 && ds < 0.006) settleFrames += 1;
       else settleFrames = 0;
 
       if (settleFrames >= 12) {
@@ -110,17 +130,17 @@ export default function Parallax({ children, className = '', strength = 10 }: Pa
       raf = requestAnimationFrame(tick);
     };
 
-    root.addEventListener('pointermove', onMove);
-    root.addEventListener('pointerleave', onLeave);
-
-    // RAF starts on first interaction
+    root.addEventListener("pointerenter", onEnter);
+    root.addEventListener("pointermove", onMove);
+    root.addEventListener("pointerleave", onLeave);
 
     return () => {
       cancelAnimationFrame(raf);
-      root.removeEventListener('pointermove', onMove);
-      root.removeEventListener('pointerleave', onLeave);
+      root.removeEventListener("pointerenter", onEnter);
+      root.removeEventListener("pointermove", onMove);
+      root.removeEventListener("pointerleave", onLeave);
     };
-  }, [strength]);
+  }, [strength, hoverScale]);
 
   return (
     <div ref={ref} className={`parallax ${className}`.trim()}>
