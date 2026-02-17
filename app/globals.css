@@ -11,12 +11,18 @@
 
   --radius-lg: 1.5rem;
   --radius-md: 1rem;
-  --radius-sm: 0.5rem;
+  --radius-sm: 0.75rem; /* 12px */
 
   --container: 1080px;
 
-  --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 0 1px rgba(0, 245, 160, 0.12) inset, 0 0 24px rgba(0, 245, 160, 0.10);
+  --shadow-1: 0 10px 22px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 28px 70px rgba(0, 0, 0, 0.58);
+
+  --shadow-soft: var(--shadow-2);
+  --shadow-glow: 0 0 0 1px rgba(0, 245, 160, 0.10) inset, 0 0 18px rgba(0, 245, 160, 0.08);
+
+  /* Accent usage rule: teal only for primary CTAs and interactive state */
 
   /* extra */
   --border: rgba(255,255,255,0.10);
@@ -131,7 +137,7 @@ a {
 }
 
 .brand-mark {
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   padding: 0.35rem;
   background:
     radial-gradient(circle at 30% 20%, rgba(0, 245, 160, 0.25), transparent 52%),
@@ -198,7 +204,7 @@ a {
 
 .nav-cta {
   padding: 0.5rem 0.95rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(0, 245, 160, 0.25);
   background: rgba(0, 245, 160, 0.06);
   box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.10) inset;
@@ -221,7 +227,7 @@ a {
   user-select: none;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(255,255,255,0.04);
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   padding: 0.55rem 0.65rem;
   display: inline-flex;
   align-items: center;
@@ -313,7 +319,7 @@ a {
   gap: 0.5rem;
 
   padding: 0.58rem 1.2rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
   background: rgba(255, 255, 255, 0.03);
 
@@ -321,13 +327,13 @@ a {
   line-height: 1;
   color: rgba(255, 255, 255, 0.94);
 
-  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease,
-    border-color 0.2s ease;
+  transition: transform 0.18s ease, box-shadow 0.22s ease, background 0.22s ease,
+    border-color 0.22s ease;
 }
 
 .btn:hover {
   background: rgba(255, 255, 255, 0.06);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .btn:active {
@@ -510,7 +516,7 @@ a {
 
 .hero-strip-item {
   padding: 0.35rem 0.6rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(255, 255, 255, 0.10);
   background: rgba(255, 255, 255, 0.03);
 }
@@ -518,7 +524,7 @@ a {
 .hero-strip-dot {
   width: 6px;
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   background: rgba(0, 245, 160, 0.55);
   box-shadow: 0 0 16px rgba(0, 245, 160, 0.18);
 }
@@ -580,7 +586,7 @@ a {
   text-transform: uppercase;
 
   padding: 0.35rem 0.6rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(0, 245, 160, 0.30);
   background: rgba(0, 245, 160, 0.08);
   color: rgba(0, 245, 160, 0.95);
@@ -818,7 +824,7 @@ a {
 
 .ticker-wrap {
   margin-top: 1rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(0,245,160,0.14);
   background: rgba(11,15,20,0.55);
   overflow: hidden;
@@ -851,7 +857,7 @@ a {
 .tick .dot {
   width: 6px;
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   background: rgba(0,245,160,0.75);
   box-shadow: 0 0 16px rgba(0,245,160,0.18);
 }
@@ -1087,7 +1093,7 @@ a {
   display: inline-flex;
   align-items: center;
   padding: 0.38rem 0.6rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.03);
   font-size: 0.82rem;
@@ -1154,13 +1160,13 @@ a {
 .footer-meta-dot {
   width: 4px;
   height: 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   background: rgba(255,255,255,0.28);
 }
 
 .footer-cta {
   padding: 0.55rem 0.95rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(0, 245, 160, 0.25);
   background: rgba(0, 245, 160, 0.06);
   box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.10) inset;
@@ -1200,6 +1206,63 @@ a {
   pointer-events: none;
 }
 
+/* Subtle vignette ABOVE 3D but BELOW hero UI */
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 700px at 55% 45%, rgba(0, 255, 200, 0.10), transparent 60%),
+    radial-gradient(900px 600px at 25% 35%, rgba(0, 255, 200, 0.06), transparent 55%),
+    radial-gradient(800px 500px at 75% 60%, rgba(0, 0, 0, 0.65), transparent 58%),
+    radial-gradient(1200px 700px at 50% 50%, transparent 35%, rgba(0, 0, 0, 0.88) 100%);
+  mix-blend-mode: normal;
+}
+
+/* Hero content ABOVE vignette */
+.hero > .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Magnetic cursor (desktop only via JS gating). */
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  transform: translate3d(-9999px, -9999px, 0);
+  opacity: 1;
+  will-change: transform, opacity;
+}
+
+.cursor-ring {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 255, 200, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(0, 255, 200, 0.12) inset,
+    0 0 28px rgba(0, 255, 200, 0.10);
+  backdrop-filter: blur(2px);
+}
+
+.cursor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-md);
+  background: rgba(0, 255, 200, 0.85);
+  box-shadow: 0 0 18px rgba(0, 255, 200, 0.35);
+}
+
+html.cursor-hidden .cursor-ring,
+html.cursor-hidden .cursor-dot {
+  opacity: 0 !important;
+}
+
 /* Make sure the hero content sits above the visual layer */
 .hero > .container {
   position: relative;
@@ -1230,7 +1293,7 @@ a {
   height: 42px;
   margin-left: -21px;
   margin-top: -21px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(0, 245, 160, 0.28);
   box-shadow:
     0 0 0 1px rgba(0, 245, 160, 0.10) inset,
@@ -1246,7 +1309,7 @@ a {
   height: 7px;
   margin-left: -3.5px;
   margin-top: -3.5px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   background: rgba(0, 245, 160, 0.95);
   box-shadow: 0 0 16px rgba(0, 245, 160, 0.18);
   opacity: 0.85;
@@ -1286,7 +1349,7 @@ a {
   position: absolute;
   width: 10px;
   height: 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   transform: translate(-50%, -50%);
   background: radial-gradient(circle, rgba(0, 245, 160, 0.22), rgba(0, 245, 160, 0.0) 65%);
   animation: rippleOut 720ms ease-out forwards;
@@ -1301,5 +1364,396 @@ a {
   to {
     opacity: 0;
     transform: translate(-50%, -50%) scale(20);
+  }
+}
+/* ========================================================================== */
+/* Cinematic pass overrides (kept at file end to win specificity)              */
+/* ========================================================================== */
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-visual > canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 650px at 58% 45%, rgba(0, 255, 204, 0.06), rgba(0,0,0,0) 60%),
+    radial-gradient(900px 520px at 40% 40%, rgba(0, 255, 204, 0.035), rgba(0,0,0,0) 62%),
+    radial-gradient(1200px 900px at 50% 50%, rgba(0,0,0,0), rgba(0,0,0,0.62) 70%),
+    linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.65));
+  mix-blend-mode: normal;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Cursor FX: perfectly centered ring+dot, hidden on touch devices */
+.has-cursor-fx body {
+  cursor: none;
+}
+
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+  will-change: left, top, transform, opacity;
+}
+
+.cursor-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  border: 1px solid rgba(23, 229, 194, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.25) inset,
+    0 0 22px rgba(0, 255, 204, 0.10);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: transform 180ms ease, opacity 120ms ease, border-color 180ms ease, box-shadow 220ms ease;
+}
+
+.cursor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: rgba(23, 229, 194, 0.95);
+  box-shadow: 0 0 14px rgba(0, 255, 204, 0.35);
+  opacity: 0;
+  transition: transform 180ms ease, opacity 120ms ease;
+}
+
+/* Hover scaling */
+.cursor-hover .cursor-ring {
+  transform: translate(-50%, -50%) scale(1.16);
+  border-color: rgba(23, 229, 194, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.30) inset,
+    0 0 28px rgba(0, 255, 204, 0.14);
+}
+
+.cursor-hover .cursor-dot {
+  transform: translate(-50%, -50%) scale(1.10);
+}
+
+/* Click feedback */
+.cursor-down .cursor-ring {
+  transform: translate(-50%, -50%) scale(0.92);
+  opacity: 0.95;
+}
+
+/* Hard disable on touch */
+@media (any-pointer: coarse), (pointer: coarse) {
+  .cursor-ring,
+  .cursor-dot {
+    display: none !important;
+  }
+  .has-cursor-fx body {
+    cursor: auto;
+  }
+}
+/* === HERO 3D LAYERING (Cinematic Pass) === */
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-visual canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.hero-visual__fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 700px at 50% 45%, rgba(0, 255, 179, 0.06), rgba(0, 0, 0, 0) 60%),
+    radial-gradient(900px 520px at 18% 42%, rgba(0, 255, 179, 0.04), rgba(0, 0, 0, 0) 62%),
+    radial-gradient(1100px 700px at 80% 55%, rgba(0, 255, 179, 0.03), rgba(0, 0, 0, 0) 60%),
+    radial-gradient(1200px 900px at 50% 60%, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.55) 85%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* CursorFX: guarantee no phantom ring on mobile/coarse pointers */
+@media (pointer: coarse), (hover: none) {
+  .cursor-ring,
+  .cursor-dot {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+  html.has-cursor-fx {
+    cursor: auto;
+  }
+}
+/* ===== Hero 3D layering (must always stay behind UI) ===== */
+.hero-visual{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+.hero-vignette{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    radial-gradient(1200px 520px at 35% 40%, rgba(0,245,160,0.08), rgba(0,0,0,0) 62%),
+    radial-gradient(900px 420px at 70% 55%, rgba(0,245,160,0.05), rgba(0,0,0,0) 65%),
+    linear-gradient(to bottom, rgba(0,0,0,0.65), rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.75));
+}
+.hero-content{
+  position:relative;
+  z-index:2;
+}
+
+
+/* =========================================================
+   Mission Briefing Sections (Phase 0 foundation)
+   - Narrative transitions, disciplined system, no randomness.
+========================================================= */
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.mb-section {
+  position: relative;
+  padding: 3.5rem 0;
+}
+
+.mb-section::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent);
+  opacity: 0.65;
+}
+
+.mb-head {
+  margin-bottom: 1.4rem;
+}
+
+.mb-head--row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.2rem;
+}
+
+.mb-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.mb-title {
+  margin: 0.45rem 0 0.6rem;
+  font-size: clamp(1.55rem, 2.2vw, 2rem);
+  font-weight: 780;
+  letter-spacing: 0.01em;
+}
+
+.mb-sub {
+  margin: 0;
+  color: var(--muted);
+  max-width: 56rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.mb-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.mb-grid--four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mb-split {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+/* Card base (re-using existing card styles if present, but ensuring consistency) */
+.card {
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.1rem;
+  box-shadow: none;
+  transition: transform 0.2s ease, border-color 0.22s ease, background 0.22s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.045);
+}
+
+.card-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.58);
+  margin-bottom: 0.55rem;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.45rem;
+}
+
+.card-text {
+  margin: 0;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+.mb-head-cta {
+  flex-shrink: 0;
+}
+
+.mb-section--cta {
+  padding-bottom: 4.25rem;
+}
+
+.cta-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 245, 160, 0.10), transparent 55%),
+    radial-gradient(circle at 80% 60%, rgba(0, 217, 255, 0.06), transparent 60%),
+    rgba(255,255,255,0.03);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem 1.35rem;
+}
+
+.cta-left {
+  max-width: 46rem;
+}
+
+.cta-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.62);
+  margin-bottom: 0.35rem;
+}
+
+.cta-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.55rem;
+  font-weight: 820;
+}
+
+.cta-text {
+  margin: 0;
+  color: rgba(255,255,255,0.76);
+  line-height: 1.6;
+}
+
+.cta-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .mb-grid,
+  .mb-grid--four,
+  .mb-split {
+    grid-template-columns: 1fr;
+  }
+
+  .mb-head--row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cta-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cta-right {
+    justify-content: flex-start;
   }
 }

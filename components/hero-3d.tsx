@@ -1,401 +1,323 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
 
 type Hero3DProps = {
-  /** URL to an SVG in /public, e.g. "/srt-logo.svg" */
+  /** URL to an SVG (public/) */
+  src?: string;
+  /** Alias used by the loader */
   svgUrl?: string;
   className?: string;
-  lowPower?: boolean;
-  /** Force-disable animation (used for reduced-motion or low-power fallbacks) */
-  staticOnly?: boolean;
+  /** overall scale of the logo group */
+  scale?: number;
+  /** extrusion depth */
+  depth?: number;
+  /** enable motion */
+  animate?: boolean;
 };
 
-// --- Utils ---------------------------------------------------------------
-
 function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
+  return Math.min(max, Math.max(min, n));
 }
 
-function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia?.("(prefers-reduced-motion: reduce)");
-    if (!mq) return;
-    const onChange = () => setReduced(!!mq.matches);
-    onChange();
-    mq.addEventListener?.("change", onChange);
-    return () => mq.removeEventListener?.("change", onChange);
-  }, []);
-  return reduced;
+function damp(current: number, target: number, lambda: number, dt: number) {
+  return THREE.MathUtils.damp(current, target, lambda, dt);
 }
 
-// Convert an SVG (including embedded raster images) into a luminance alpha-map.
-// This avoids the "big square" problem when the SVG contains a full-rect bitmap.
-function useSVGMaskTexture(svgUrl: string) {
-  const [alpha, setAlpha] = useState<THREE.Texture | null>(null);
-  const [glow, setGlow] = useState<THREE.Texture | null>(null);
+function ParticleField({
+  count = 900,
+  radius = 10,
+  depth = 8,
+  opacity = 0.18,
+}: {
+  count?: number;
+  radius?: number;
+  depth?: number;
+  opacity?: number;
+}) {
+  const ref = useRef<THREE.Points>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    const img = new Image();
-    img.crossOrigin = "anonymous";
+  const { positions, speeds } = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    const speeds = new Float32Array(count);
 
-    img.onload = () => {
-      if (cancelled) return;
-      const w = img.naturalWidth || 1024;
-      const h = img.naturalHeight || 1024;
-
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      if (!ctx) return;
-
-      // Draw
-      ctx.clearRect(0, 0, w, h);
-      ctx.drawImage(img, 0, 0, w, h);
-
-      // Post-process to build an alpha-map from luminance.
-      // This makes the logo visible as a "filled" mark while preserving soft edges.
-      const imgData = ctx.getImageData(0, 0, w, h);
-      const d = imgData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const r = d[i];
-        const g = d[i + 1];
-        const b = d[i + 2];
-        const a = d[i + 3];
-
-        // Luminance (0-255). Respect existing alpha.
-        const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) * (a / 255);
-
-        // Threshold to kill background haze.
-        const outA = lum < 12 ? 0 : clamp(lum * 1.15, 0, 255);
-
-        // White source, alpha carries the mask.
-        d[i] = 255;
-        d[i + 1] = 255;
-        d[i + 2] = 255;
-        d[i + 3] = outA;
-      }
-      ctx.putImageData(imgData, 0, 0);
-
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.wrapS = THREE.ClampToEdgeWrapping;
-      tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-      tex.generateMipmaps = true;
-      tex.needsUpdate = true;
-
-      // Build a slightly expanded glow texture.
-      const glowCanvas = document.createElement("canvas");
-      glowCanvas.width = w;
-      glowCanvas.height = h;
-      const gctx = glowCanvas.getContext("2d", { willReadFrequently: true });
-      if (!gctx) return;
-      gctx.clearRect(0, 0, w, h);
-      gctx.filter = "blur(2.2px)";
-      gctx.drawImage(canvas, 0, 0);
-      gctx.filter = "blur(5px)";
-      gctx.globalAlpha = 0.55;
-      gctx.drawImage(canvas, 0, 0);
-
-      const glowTex = new THREE.CanvasTexture(glowCanvas);
-      glowTex.colorSpace = THREE.SRGBColorSpace;
-      glowTex.wrapS = THREE.ClampToEdgeWrapping;
-      glowTex.wrapT = THREE.ClampToEdgeWrapping;
-      glowTex.minFilter = THREE.LinearMipmapLinearFilter;
-      glowTex.magFilter = THREE.LinearFilter;
-      glowTex.generateMipmaps = true;
-      glowTex.needsUpdate = true;
-
-      setAlpha(tex);
-      setGlow(glowTex);
-    };
-
-    // Load SVG via data URL to ensure consistent sizing across browsers.
-    fetch(svgUrl)
-      .then((r) => r.text())
-      .then((svgText) => {
-        if (cancelled) return;
-        const encoded = encodeURIComponent(svgText)
-          .replace(/%0A/g, "")
-          .replace(/%20/g, " ");
-        img.src = `data:image/svg+xml;charset=utf-8,${encoded}`;
-      })
-      .catch(() => {
-        // Fail silently; the scene will still render stars.
-      });
-
-    return () => {
-      cancelled = true;
-      setAlpha(null);
-      setGlow(null);
-    };
-  }, [svgUrl]);
-
-  return { alpha, glow };
-}
-
-// --- Scene parts ---------------------------------------------------------
-
-function StarsField({ density = 420, radius = 18 }: { density?: number; radius?: number }) {
-  const positions = useMemo(() => {
-    const arr = new Float32Array(density * 3);
-    for (let i = 0; i < density; i++) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = 2 * Math.PI * u;
-      const phi = Math.acos(2 * v - 1);
-      const rr = radius * (0.35 + 0.65 * Math.pow(Math.random(), 0.7));
-      const x = rr * Math.sin(phi) * Math.cos(theta);
-      const y = rr * Math.sin(phi) * Math.sin(theta);
-      const z = rr * Math.cos(phi);
-      arr[i * 3 + 0] = x;
-      arr[i * 3 + 1] = y;
-      arr[i * 3 + 2] = z;
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+      const r = Math.random() * radius;
+      const t = Math.random() * Math.PI * 2;
+      positions[i3 + 0] = Math.cos(t) * r;
+      positions[i3 + 1] = (Math.random() - 0.5) * radius * 0.7;
+      positions[i3 + 2] = (Math.random() - 0.5) * depth;
+      speeds[i] = 0.15 + Math.random() * 0.35;
     }
-    return arr;
-  }, [density, radius]);
 
-  const points = useRef<THREE.Points>(null);
+    return { positions, speeds };
+  }, [count, radius, depth]);
 
-  useFrame((state) => {
-    if (!points.current) return;
-    const t = state.clock.elapsedTime;
-    points.current.rotation.y = t * 0.02;
-    points.current.rotation.x = Math.sin(t * 0.08) * 0.015;
+  useFrame((_, dt) => {
+    const pts = ref.current;
+    if (!pts) return;
+
+    const attr = pts.geometry.getAttribute("position") as THREE.BufferAttribute;
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+      let z = attr.array[i3 + 2] as number;
+      z += dt * speeds[i];
+      if (z > depth / 2) z = -depth / 2;
+      attr.array[i3 + 2] = z;
+    }
+    attr.needsUpdate = true;
   });
 
   return (
-    <points ref={points} frustumCulled={false} renderOrder={-30}>
+    <points ref={ref} frustumCulled={false} renderOrder={0}>
       <bufferGeometry>
-        {/* IMPORTANT: use args to satisfy TS typings */}
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} count={positions.length / 3} />
       </bufferGeometry>
       <pointsMaterial
         size={0.012}
         transparent
-        opacity={0.55}
+        opacity={opacity}
         depthWrite={false}
-        color={new THREE.Color("#d7fff3")}
+        color={new THREE.Color("#7fffd4")}
+        sizeAttenuation
       />
     </points>
   );
 }
 
-function Dust({ count = 520, radius = 12 }: { count?: number; radius?: number }) {
-  const positions = useMemo(() => {
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      // thin volumetric layer
-      const x = (Math.random() - 0.5) * radius * 2;
-      const y = (Math.random() - 0.5) * radius * 0.9;
-      const z = -3 - Math.random() * 14;
-      arr[i * 3 + 0] = x;
-      arr[i * 3 + 1] = y;
-      arr[i * 3 + 2] = z;
-    }
-    return arr;
-  }, [count, radius]);
-
-  const ref = useRef<THREE.Points>(null);
-
-  useFrame((state) => {
-    if (!ref.current) return;
-    const t = state.clock.elapsedTime;
-    ref.current.rotation.y = t * 0.01;
-  });
-
-  return (
-    <points ref={ref} frustumCulled={false} renderOrder={-25}>
-      <bufferGeometry>
-        {/* IMPORTANT: use args to satisfy TS typings */}
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.018}
-        transparent
-        opacity={0.12}
-        depthWrite={false}
-        color={new THREE.Color("#66ffd1")}
-      />
-    </points>
-  );
-}
-
-function SVGAtmosphereMark({ svgUrl }: { svgUrl: string }) {
-  const group = useRef<THREE.Group>(null);
-  const { alpha, glow } = useSVGMaskTexture(svgUrl);
-
-  const [target, setTarget] = useState({ x: 0, y: 0 });
-  const [current, setCurrent] = useState({ x: 0, y: 0 });
+function useSvgMeshes(src: string, extrusionDepth: number) {
+  const [group, setGroup] = useState<THREE.Group | null>(null);
 
   useEffect(() => {
-    const onMove = (e: PointerEvent) => {
-      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
-      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
-      setTarget({ x: nx, y: ny });
+    let alive = true;
+
+    async function run() {
+      const loader = new SVGLoader();
+
+      const data = await new Promise<ReturnType<SVGLoader["parse"]>>((resolve, reject) => {
+        fetch(src)
+          .then((r) => r.text())
+          .then((txt) => resolve(loader.parse(txt)))
+          .catch(reject);
+      });
+
+      if (!alive) return;
+
+      const g = new THREE.Group();
+      const paths = data.paths || [];
+
+      // Material choices are tuned so the logo is readable but still “in atmosphere”.
+      const baseMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color("#0b1417"),
+        metalness: 0.12,
+        roughness: 0.78,
+        emissive: new THREE.Color("#0c2a2e"),
+        emissiveIntensity: 0.12,
+        transparent: true,
+        opacity: 0.88,
+      });
+
+      const rimMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color("#0a0f12"),
+        metalness: 0.25,
+        roughness: 0.35,
+        emissive: new THREE.Color("#00c7a0"),
+        emissiveIntensity: 0.22,
+        transparent: true,
+        opacity: 0.35,
+      });
+
+      const edgeMat = new THREE.LineBasicMaterial({
+        color: new THREE.Color("#3bffd9"),
+        transparent: true,
+        opacity: 0.28,
+      });
+
+      for (const p of paths) {
+        const shapes = SVGLoader.createShapes(p);
+
+        if (shapes && shapes.length) {
+          for (const s of shapes) {
+            const geom = new THREE.ExtrudeGeometry(s, {
+              depth: extrusionDepth,
+              bevelEnabled: true,
+              bevelThickness: extrusionDepth * 0.18,
+              bevelSize: extrusionDepth * 0.12,
+              bevelSegments: 2,
+              curveSegments: 8,
+            });
+
+            const m = new THREE.Mesh(geom, baseMat);
+            g.add(m);
+
+            const m2 = new THREE.Mesh(geom, rimMat);
+            m2.scale.setScalar(1.006);
+            m2.position.z += extrusionDepth * 0.02;
+            g.add(m2);
+
+            const edges = new THREE.EdgesGeometry(geom, 20);
+            const ls = new THREE.LineSegments(edges, edgeMat);
+            ls.renderOrder = 1;
+            g.add(ls);
+          }
+          continue;
+        }
+
+        // Stroke-only fallback: tube along points (prevents “outline-only invisibility”)
+        const pts = (p as any).getPoints ? (p as any).getPoints(240) : [];
+        if (!Array.isArray(pts) || pts.length < 2) continue;
+
+        const curve = new THREE.CatmullRomCurve3(pts.map((v: any) => new THREE.Vector3(v.x, v.y, 0)));
+
+        const tube = new THREE.TubeGeometry(curve, 160, extrusionDepth * 0.12, 10, false);
+        const strokeMat = new THREE.MeshStandardMaterial({
+          color: new THREE.Color("#0b1417"),
+          metalness: 0.2,
+          roughness: 0.6,
+          emissive: new THREE.Color("#00c7a0"),
+          emissiveIntensity: 0.45,
+          transparent: true,
+          opacity: 0.72,
+        });
+
+        g.add(new THREE.Mesh(tube, strokeMat));
+      }
+
+      // Center group
+      const box = new THREE.Box3().setFromObject(g);
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+      box.getSize(size);
+      box.getCenter(center);
+      g.position.x -= center.x;
+      g.position.y -= center.y;
+      g.position.z -= center.z;
+
+      // Normalize roughly by width
+      const w = Math.max(size.x, 1e-6);
+      const target = 3.2;
+      const s = target / w;
+      g.scale.setScalar(s);
+
+      // Flip Y (SVG is Y-down)
+      g.scale.y *= -1;
+
+      // Start slightly tilted to avoid face-on “giant mask”
+      g.rotation.x = -0.18;
+      g.rotation.y = 0.22;
+
+      setGroup(g);
+    }
+
+    run();
+
+    return () => {
+      alive = false;
     };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onMove);
-  }, []);
+  }, [src, extrusionDepth]);
 
-  useFrame((state) => {
-    const g = group.current;
-    if (!g) return;
+  return group;
+}
 
-    // Ease cursor influence.
-    setCurrent((c) => {
-      const nx = c.x + (target.x - c.x) * 0.04;
-      const ny = c.y + (target.y - c.y) * 0.04;
-      return { x: nx, y: ny };
-    });
+function LogoRig({
+  src,
+  scale,
+  depth,
+  animate,
+}: {
+  src: string;
+  scale: number;
+  depth: number;
+  animate: boolean;
+}) {
+  const g = useSvgMeshes(src, depth);
+  const ref = useRef<THREE.Group>(null);
+  const { mouse } = useThree();
 
-    // Breathing motion
-    const t = state.clock.elapsedTime;
-    const bob = Math.sin(t * 0.35) * 0.035;
+  useFrame((state, dt) => {
+    const rig = ref.current;
+    if (!rig) return;
 
-    // Clamp rotation so it never becomes a face-on “giant silhouette”.
-    const rx = clamp(current.y * 0.18 + Math.sin(t * 0.15) * 0.05, -0.22, 0.22);
-    const ry = clamp(current.x * 0.28 + Math.cos(t * 0.12) * 0.06, -0.32, 0.32);
+    const t = state.clock.getElapsedTime();
+    const idleY = Math.sin(t * 0.12) * 0.05;
+    const idleX = Math.cos(t * 0.1) * 0.04;
 
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, rx, 4.2, state.clock.getDelta());
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, ry, 4.2, state.clock.getDelta());
-    g.position.y = THREE.MathUtils.damp(g.position.y, bob, 3.2, state.clock.getDelta());
+    const mx = clamp(mouse.x, -0.65, 0.65);
+    const my = clamp(mouse.y, -0.55, 0.55);
+
+    const targetRy = 0.28 + (animate ? mx * 0.28 : 0);
+    const targetRx = -0.16 + (animate ? -my * 0.18 : 0);
+
+    rig.rotation.y = damp(rig.rotation.y, targetRy, 6.5, dt);
+    rig.rotation.x = damp(rig.rotation.x, targetRx, 6.5, dt);
+
+    // Clamp rotation to kill the “giant silhouette” moment
+    rig.rotation.y = clamp(rig.rotation.y, -0.25, 0.65);
+    rig.rotation.x = clamp(rig.rotation.x, -0.45, 0.15);
+
+    rig.position.y = damp(rig.position.y, idleY, 3.5, dt);
+    rig.position.x = damp(rig.position.x, idleX, 3.5, dt);
   });
 
-  const w = 3.1;
-  const h = 3.1;
+  if (!g) return null;
 
   return (
-    <group ref={group} position={[0.65, 0.12, -7.8]} scale={[1.05, 1.05, 1.05]}>
-      {/* Core mark */}
-      <mesh>
-        <planeGeometry args={[w, h, 1, 1]} />
-        <meshStandardMaterial
-          color={"#eaf6ff"}
-          transparent
-          opacity={0.22}
-          alphaMap={alpha ?? undefined}
-          alphaTest={0.08}
-          emissive={"#64ffd1"}
-          emissiveIntensity={0.08}
-          roughness={0.78}
-          metalness={0.05}
-          depthWrite={false}
-        />
-      </mesh>
-
-      {/* Glow pass */}
-      <mesh position={[0, 0, -0.02]}>
-        <planeGeometry args={[w * 1.02, h * 1.02, 1, 1]} />
-        <meshBasicMaterial
-          color={"#66ffd1"}
-          transparent
-          opacity={0.16}
-          alphaMap={glow ?? undefined}
-          alphaTest={0.02}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-
-      {/* Rim highlight */}
-      <mesh position={[0, 0, 0.03]}>
-        <planeGeometry args={[w * 1.01, h * 1.01, 1, 1]} />
-        <meshBasicMaterial
-          color={"#bfffe9"}
-          transparent
-          opacity={0.10}
-          alphaMap={glow ?? undefined}
-          alphaTest={0.03}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
+    <group ref={ref} scale={scale} renderOrder={0}>
+      <primitive object={g} />
     </group>
   );
 }
 
-function CameraRig({ staticOnly }: { staticOnly: boolean }) {
-  const { camera } = useThree();
-  const base = useMemo(() => new THREE.Vector3(0, 0.15, 10.8), []);
-  const target = useMemo(() => new THREE.Vector3(0, 0.05, 0), []);
-
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    if (staticOnly) return;
-    const onMove = (e: PointerEvent) => {
-      setPointer({
-        x: (e.clientX / window.innerWidth - 0.5) * 2,
-        y: (e.clientY / window.innerHeight - 0.5) * 2,
-      });
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onMove);
-  }, [staticOnly]);
-
-  useFrame((_state, dt) => {
-    const tx = base.x + pointer.x * 0.25;
-    const ty = base.y + pointer.y * 0.18;
-    const tz = base.z;
-
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, tx, 2.4, dt);
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, ty, 2.4, dt);
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, tz, 2.4, dt);
-    camera.lookAt(target);
-  });
-
-  return null;
-}
-
-function Scene({ svgUrl, staticOnly }: { svgUrl?: string; staticOnly: boolean }) {
+function Scene({
+  src,
+  scale,
+  depth,
+  animate,
+}: {
+  src: string;
+  scale: number;
+  depth: number;
+  animate: boolean;
+}) {
   return (
     <>
-      <fog attach="fog" args={["#020507", 8.5, 18]} />
+      <color attach="background" args={["#030507"]} />
+      <fog attach="fog" args={["#020507", 8.5, 18.5]} />
 
-      <ambientLight intensity={0.22} />
-      <directionalLight position={[6, 5, 7]} intensity={0.45} color={"#dff7ff"} />
-      <directionalLight position={[-6, -2, 5]} intensity={0.18} color={"#6dffd4"} />
-      <pointLight position={[0, 2.5, 6]} intensity={0.32} color={"#66ffd1"} distance={18} />
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.7} />
+      <pointLight position={[-2.5, 1.5, 2.5]} intensity={0.35} />
 
-      <StarsField />
-      <Dust />
+      {/* Barely visible particle drift behind everything */}
+      <ParticleField count={700} radius={10} depth={10} opacity={0.07} />
 
-      {svgUrl ? <SVGAtmosphereMark svgUrl={svgUrl} /> : null}
-      <CameraRig staticOnly={staticOnly} />
+      <LogoRig src={src} scale={scale} depth={depth} animate={animate} />
     </>
   );
 }
 
 export default function Hero3D({
-  svgUrl = "/srt-logo.svg",
+  src,
+  svgUrl,
   className,
-  lowPower,
-  staticOnly,
+  scale = 1,
+  depth = 0.22,
+  animate = true,
 }: Hero3DProps) {
-  const reduced = useReducedMotion();
-  const disableAnim = !!staticOnly || !!lowPower || reduced;
+  const resolvedSrc = svgUrl ?? src ?? "/srt-logo.svg";
 
   return (
-    <div className={className} aria-hidden>
+    <div className={className} aria-hidden="true">
       <Canvas
-        dpr={disableAnim ? 1 : [1, 1.5]}
-        camera={{ position: [0, 0.15, 10.8], fov: 50, near: 0.1, far: 40 }}
-        gl={{
-          antialias: !disableAnim,
-          alpha: true,
-          powerPreference: "default",
-        }}
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        camera={{ position: [0, 0, 8.4], fov: 40, near: 0.1, far: 50 }}
       >
-        <color attach="background" args={["#000000"]} />
-        <Scene svgUrl={svgUrl} staticOnly={disableAnim} />
+        <Scene src={resolvedSrc} scale={scale} depth={depth} animate={animate} />
       </Canvas>
     </div>
   );

@@ -9,12 +9,12 @@ import CursorFX from '@/components/cursor-fx';
 export const metadata: Metadata = {
   title: 'Savvy Rilla Technologies',
   description:
-    'Savvy Rilla Technologies is a digital infrastructure and systems engineering company building secure, scalable platforms for institutions and enterprises across Africa.',
+    'Savvy Rilla Technologies is a digital infrastructure and systems engineering company building secure, scalable enterprise systems for institutional environments in South Sudan — operational since 2023.',
   metadataBase: new URL('https://savvyrilla.tech'),
   openGraph: {
     title: 'Savvy Rilla Technologies',
     description:
-      'Powering secure digital infrastructure across Africa. Platforms, enterprise engineering, and managed technology services.',
+      'Secure enterprise software engineered for South Sudan. Platforms, enterprise engineering, and managed technology services — operational since 2023.',
     url: 'https://savvyrilla.tech',
     siteName: 'Savvy Rilla Technologies',
     images: [
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
         url: '/og-savvy.png',
         width: 1200,
         height: 630,
-        alt: 'Savvy Rilla Technologies – Powering secure digital infrastructure across Africa.',
+        alt: 'Savvy Rilla Technologies – Secure enterprise software engineered for South Sudan (Operational since 2023).',
       },
     ],
     type: 'website',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Savvy Rilla Technologies',
     description:
-      'Powering secure digital infrastructure across Africa. Platforms, enterprise engineering, and managed technology services.',
+      'Secure enterprise software engineered for South Sudan. Platforms, enterprise engineering, and managed technology services — operational since 2023.',
     images: ['/og-savvy.png'],
   },
 };
@@ -121,14 +121,14 @@ function Footer() {
               <div>
                 <div className="footer-brand-title">Savvy Rilla Technologies</div>
                 <div className="footer-brand-subtitle">
-                  Digital Infrastructure · Systems Engineering
+                  Digital Infrastructure · Systems Engineering · Operational since 2023
                 </div>
               </div>
             </div>
 
             <p className="footer-blurb">
               We design, build, and operate secure technology platforms for financial institutions,
-              governments, and organisations — engineered for real-world African constraints.
+              governments, and organisations — engineered for real-world South Sudan constraints.
             </p>
 
             <div className="footer-badges" aria-label="Capabilities">
@@ -148,7 +148,7 @@ function Footer() {
               <div className="infra-block">
                 <div className="infra-title">Operational Coverage</div>
                 <div className="infra-text">
-                  East Africa focus • Multi-region cloud deployments • Remote support
+                  South Sudan focus • Cloud-ready deployments • Remote support
                 </div>
               </div>
 

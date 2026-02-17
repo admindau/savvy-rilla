@@ -2,148 +2,198 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/**
- * Cinematic cursor FX (desktop only).
- * - Completely disabled on coarse pointers (mobile/touch) and reduced-motion.
- * - Dot is always centered inside ring (both use identical translate3d coords).
- * - Hides on text selection + input/textarea/contenteditable.
- */
+type MagnetTarget = HTMLElement | null;
+
+function isMagnetTarget(el: Element | null): el is HTMLElement {
+  if (!el) return false;
+  if (!(el instanceof HTMLElement)) return false;
+  return el.hasAttribute("data-cursor-magnet");
+}
+
 export default function CursorFX() {
   const dotRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
-
-  const [mounted, setMounted] = useState(false);
   const [enabled, setEnabled] = useState(false);
 
-  // Decide enablement once on mount.
   useEffect(() => {
-    setMounted(true);
+    if (typeof window === "undefined") return;
 
-    const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    const coarse = window.matchMedia?.("(pointer: coarse)")?.matches;
+    // Disable completely on mobile / touch / reduced-motion.
+    // This prevents the "phantom" ring that can appear centered on mobile.
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const fineHover = window.matchMedia("(pointer: fine) and (hover: hover)").matches;
 
-    if (prefersReduced || coarse) {
-      document.documentElement.classList.remove("has-cursor-fx");
+    if (prefersReduced || coarse || !fineHover) {
       setEnabled(false);
       return;
     }
 
-    document.documentElement.classList.add("has-cursor-fx");
     setEnabled(true);
-  }, []);
-
-  // Attach listeners only when enabled.
-  useEffect(() => {
-    if (!enabled) return;
 
     const dot = dotRef.current;
     const ring = ringRef.current;
     if (!dot || !ring) return;
 
     let raf = 0;
-    const state = {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      tx: window.innerWidth / 2,
-      ty: window.innerHeight / 2,
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+    let rx = x;
+    let ry = y;
+
+    let activeMagnet: MagnetTarget = null;
+    let magnetRect: DOMRect | null = null;
+
+    // Slightly larger ring on hover
+    let hoverScale = 1;
+    let hoverScaleCurrent = 1;
+
+    const isTextInput = (el: EventTarget | null) => {
+      const t = el as HTMLElement | null;
+      if (!t) return false;
+      if (t.isContentEditable) return true;
+      const tag = t.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return true;
+      return !!t.closest("input, textarea, select, [contenteditable='true']");
     };
 
-    const setPos = (el: HTMLElement, x: number, y: number) => {
-      // Keep both elements in exact sync (no translate(-50%,-50%) surprises).
-      el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    const onFocusIn = (e: FocusEvent) => {
+      if (isTextInput(e.target)) document.documentElement.classList.add("cursor-hidden");
     };
 
-    const tick = () => {
-      state.x += (state.tx - state.x) * 0.16;
-      state.y += (state.ty - state.y) * 0.16;
-      setPos(dot, state.tx, state.ty);
-      setPos(ring, state.x, state.y);
-      raf = window.requestAnimationFrame(tick);
+    const onFocusOut = () => {
+      document.documentElement.classList.remove("cursor-hidden");
     };
 
-    const onMove = (e: MouseEvent) => {
-      state.tx = e.clientX;
-      state.ty = e.clientY;
-      document.documentElement.classList.add("cursor-active");
+    const onSelectionChange = () => {
+      const sel = window.getSelection();
+      const hasSelection = !!sel && !sel.isCollapsed && String(sel.toString() || "").length > 0;
+      if (hasSelection) document.documentElement.classList.add("cursor-hidden");
+      else document.documentElement.classList.remove("cursor-hidden");
     };
 
-    const onDown = () => document.documentElement.classList.add("cursor-down");
-    const onUp = () => document.documentElement.classList.remove("cursor-down");
-
-    const isInteractive = (el: Element | null) => {
-      if (!el) return false;
-      return (
-        el.closest(
-          "a, button, [role='button'], input, textarea, select, summary, [data-cursor='hover']"
-        ) !== null
-      );
+    const setMagnet = (target: MagnetTarget) => {
+      activeMagnet = target;
+      magnetRect = target ? target.getBoundingClientRect() : null;
     };
 
-    const isTexty = (el: Element | null) => {
-      if (!el) return false;
-      return el.closest("input, textarea, [contenteditable='true'], [data-cursor='text']") !== null;
+    const onMove = (e: PointerEvent) => {
+      x = e.clientX;
+      y = e.clientY;
+
+      // Magnet logic: if hovering a magnet element, pull ring toward its center a bit
+      const hovered = document.elementFromPoint(e.clientX, e.clientY);
+      const magnet = isMagnetTarget(hovered) ? hovered : (hovered?.closest?.("[data-cursor-magnet]") as HTMLElement | null);
+
+      if (magnet && magnet !== activeMagnet) setMagnet(magnet);
+      if (!magnet && activeMagnet) setMagnet(null);
+
+      hoverScale = magnet ? 1.22 : 1;
     };
 
-    const onOver = (e: MouseEvent) => {
-      const t = e.target as Element;
-      if (isInteractive(t)) document.documentElement.classList.add("cursor-hover");
-      if (isTexty(t)) document.documentElement.classList.add("cursor-text");
+    const onDown = () => {
+      ring.style.opacity = "0.85";
+      dot.style.opacity = "0.9";
+      ring.style.filter = "blur(0px)";
+    };
+
+    const onUp = () => {
+      ring.style.opacity = "1";
+      dot.style.opacity = "1";
+      ring.style.filter = "";
+    };
+
+    const onOver = () => {
+      ring.style.opacity = "1";
+      dot.style.opacity = "1";
     };
 
     const onOut = () => {
-      document.documentElement.classList.remove("cursor-hover");
-      document.documentElement.classList.remove("cursor-text");
-    };
-
-    const onSelect = () => {
-      const sel = window.getSelection();
-      const hasSelection = sel && sel.toString().length > 0;
-      document.documentElement.classList.toggle("cursor-selecting", !!hasSelection);
+      ring.style.opacity = "0";
+      dot.style.opacity = "0";
     };
 
     const onScrollOrResize = () => {
-      // Prevent ring drift on certain browsers.
-      setPos(ring, state.x, state.y);
+      if (activeMagnet) magnetRect = activeMagnet.getBoundingClientRect();
     };
 
-    window.addEventListener("mousemove", onMove, { passive: true });
-    window.addEventListener("mousedown", onDown, { passive: true });
-    window.addEventListener("mouseup", onUp, { passive: true });
+    const tick = () => {
+      // If magnet is active, pull ring toward target center (subtle)
+      if (activeMagnet && magnetRect) {
+        const cx = magnetRect.left + magnetRect.width / 2;
+        const cy = magnetRect.top + magnetRect.height / 2;
+
+        const pull = 0.18;
+        const tx = x + (cx - x) * pull;
+        const ty = y + (cy - y) * pull;
+
+        rx += (tx - rx) * 0.14;
+        ry += (ty - ry) * 0.14;
+      } else {
+        rx += (x - rx) * 0.14;
+        ry += (y - ry) * 0.14;
+      }
+
+      // Smooth hover scale
+      hoverScaleCurrent += (hoverScale - hoverScaleCurrent) * 0.12;
+      ring.style.width = `${46 * hoverScaleCurrent}px`;
+      ring.style.height = `${46 * hoverScaleCurrent}px`;
+
+      // Perfect centering: apply translate(-50%, -50%) so it centers on pointer
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
+      dot.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+
+      raf = window.requestAnimationFrame(tick);
+    };
+
+    raf = window.requestAnimationFrame(tick);
+
+    // Use pointer events for best cross-device handling (desktop only here)
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("pointerup", onUp, { passive: true });
     window.addEventListener("mouseover", onOver, { passive: true });
     window.addEventListener("mouseout", onOut, { passive: true });
     window.addEventListener("scroll", onScrollOrResize, { passive: true });
     window.addEventListener("resize", onScrollOrResize, { passive: true });
-    document.addEventListener("selectionchange", onSelect);
+    window.addEventListener("focusin", onFocusIn);
+    window.addEventListener("focusout", onFocusOut);
+    document.addEventListener("selectionchange", onSelectionChange);
 
-    tick();
+    // Start visible once we have interaction
+    ring.style.opacity = "1";
+    dot.style.opacity = "1";
 
     return () => {
-      document.documentElement.classList.remove("has-cursor-fx");
-      document.documentElement.classList.remove("cursor-active");
-      document.documentElement.classList.remove("cursor-down");
-      document.documentElement.classList.remove("cursor-hover");
-      document.documentElement.classList.remove("cursor-text");
-      document.documentElement.classList.remove("cursor-selecting");
-
       window.cancelAnimationFrame(raf);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mousedown", onDown);
-      window.removeEventListener("mouseup", onUp);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
       window.removeEventListener("mouseover", onOver);
       window.removeEventListener("mouseout", onOut);
       window.removeEventListener("scroll", onScrollOrResize);
       window.removeEventListener("resize", onScrollOrResize);
-      document.removeEventListener("selectionchange", onSelect);
+      window.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("focusout", onFocusOut);
+      document.removeEventListener("selectionchange", onSelectionChange);
+      document.documentElement.classList.remove("cursor-hidden");
     };
-  }, [enabled]);
-
-  // Critical: never render the cursor on mobile/coarse pointers.
-  if (!mounted || !enabled) return null;
+  }, []);
 
   return (
     <>
-      <div ref={ringRef} className="cursor-ring" aria-hidden="true" />
-      <div ref={dotRef} className="cursor-dot" aria-hidden="true" />
+      <div
+        ref={ringRef}
+        className="cursor-ring"
+        aria-hidden="true"
+        style={enabled ? undefined : { opacity: 0, transform: "translate3d(-9999px,-9999px,0)" }}
+      />
+      <div
+        ref={dotRef}
+        className="cursor-dot"
+        aria-hidden="true"
+        style={enabled ? undefined : { opacity: 0, transform: "translate3d(-9999px,-9999px,0)" }}
+      />
     </>
   );
 }
