@@ -4,112 +4,97 @@ import Hero3DLoader from "@/components/hero-3d-loader";
 import Parallax from "@/components/parallax";
 import Reveal from "@/components/reveal";
 
-export default function Page() {
+export default function HomePage() {
   return (
-    <main className="page">
-      {/* HERO */}
-      <section className="hero">
+    <main>
+      {/* HERO — enterprise-first: message dominates, visuals atmospheric */}
+      <section className="hero hero--matrix">
         <div className="hero-bg" aria-hidden="true">
-          <div className="hero-stars" />
           <Hero3DLoader className="hero-visual" svgUrl="/srt-logo.svg" />
-          <div className="hero-vignette" />
+          <div className="hero-vignette" aria-hidden="true" />
         </div>
 
-        <div className="container hero-container">
+        <div className="container">
           <div className="hero-grid">
             <div className="hero-left">
-              <Reveal className="hero-kicker" delay={0.06}>
+              <Reveal className="hero-kicker" delay={0.02}>
                 SAVVY RILLA TECHNOLOGIES
               </Reveal>
 
-              <Reveal delay={0.1}>
-                <h1 className="hero-title">
-                  SECURE
-                  <br />
-                  ENTERPRISE
-                  <br />
-                  SOFTWARE
-                  <br />
-                  FOR SOUTH SUDAN.
-                </h1>
+              <Reveal as="h1" className="hero-main-title hero-main-title--provider" delay={0.05}>
+                SECURE
+                <br />
+                ENTERPRISE
+                <br />
+                SOFTWARE
+                <br />
+                FOR SOUTH SUDAN.
               </Reveal>
 
-              <Reveal className="hero-subtitle" delay={0.12}>
-                We build institutional-grade systems for organizations in South Sudan — engineered for stability,
-                security, and real operational constraints.
+              <Reveal className="hero-text" delay={0.08}>
+                We design, build, and operate institutional-grade systems for organisations in South Sudan — engineered
+                for stability, security, and real operational constraints.
               </Reveal>
 
-              <Reveal className="hero-actions" delay={0.14}>
-                <div className="hero-action-row">
-                  <Link className="btn btn-primary" href="/platforms" data-cursor-magnet>
-                    Explore platforms
-                  </Link>
-                  <Link className="btn btn-secondary" href="/contact" data-cursor-magnet>
-                    Request consultation
-                  </Link>
-                </div>
+              <Reveal className="hero-actions" delay={0.12}>
+                <Link className="btn btn-primary" href="/platforms" data-cursor-magnet>
+                  Explore platforms
+                </Link>
+                <Link className="btn btn-ghost" href="/contact" data-cursor-magnet>
+                  Request consultation
+                </Link>
+              </Reveal>
 
-                <div className="hero-trust-strip">
-                  <span className="pill">Operational since 2023</span>
-                  <span className="pill">Built &amp; deployed in South Sudan</span>
-                  <span className="pill">Security-first architecture</span>
-                </div>
+              <Reveal className="hero-strip" delay={0.14}>
+                <span className="hero-strip-item">Operational since 2023</span>
+                <span className="hero-strip-dot" aria-hidden="true" />
+                <span className="hero-strip-item">Built &amp; deployed in South Sudan</span>
+                <span className="hero-strip-dot" aria-hidden="true" />
+                <span className="hero-strip-item">Security-first architecture</span>
               </Reveal>
             </div>
 
             <div className="hero-right">
-              <Reveal className="ops-card" delay={0.12}>
-                <div className="ops-head">
-                  <div>
-                    <div className="ops-title">Operational Overview</div>
-                    <div className="ops-sub">LIVE SYSTEMS SNAPSHOT</div>
+              <Reveal className="hero-panel" delay={0.1}>
+                <div className="hero-panel-head">
+                  <div className="hero-panel-brand">
+                    <div>
+                      <p className="hero-panel-title">Operational Overview</p>
+                      <p className="hero-panel-subtitle">LIVE SYSTEMS SNAPSHOT</p>
+                    </div>
                   </div>
-                  <div className="ops-badge">ACTIVE</div>
+                  <span className="hero-panel-badge">ACTIVE</span>
                 </div>
 
-                <div className="ops-grid">
-                  <div className="ops-metric">
-                    <div className="ops-label">ACTIVE PLATFORMS</div>
-                    <div className="ops-value">3</div>
+                <div className="metrics hero-metrics">
+                  <div className="metric">
+                    <div className="metric-label">Active platforms</div>
+                    <div className="metric-value">3</div>
                   </div>
-                  <div className="ops-metric">
-                    <div className="ops-label">SYSTEMS DEPLOYED</div>
-                    <div className="ops-value">12+</div>
+                  <div className="metric">
+                    <div className="metric-label">Systems deployed</div>
+                    <div className="metric-value">12+</div>
                   </div>
-                  <div className="ops-metric">
-                    <div className="ops-label">AVG RESPONSE TIME</div>
-                    <div className="ops-value">&lt;200ms</div>
+                  <div className="metric">
+                    <div className="metric-label">Avg response time</div>
+                    <div className="metric-value">&lt;200ms</div>
                   </div>
-                  <div className="ops-metric">
-                    <div className="ops-label">UPTIME TARGET</div>
-                    <div className="ops-value">99.9%</div>
+                  <div className="metric">
+                    <div className="metric-label">Uptime target</div>
+                    <div className="metric-value">99.9%</div>
                   </div>
                 </div>
 
-                <div className="ops-foot">
+                <p className="card-meta" style={{ marginTop: "0.75rem" }}>
                   Engineering resilient systems for institutions in emerging markets.
-                </div>
+                </p>
               </Reveal>
 
-              {/* DASHBOARD PREVIEW — DEPTH/REACTIVITY RESTORED */}
               <Reveal className="hero-image-card" delay={0.16}>
-                <Parallax className="hero-image-parallax" strength={8} hoverScale={1.02}>
-                  <div
-                    data-cursor-magnet
-                    style={{
-                      position: "relative",
-                      borderRadius: "inherit",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <img
-                      className="hero-image"
-                      src="/dashboard.png"
-                      alt="Gorilla Ledger dashboard preview"
-                      loading="lazy"
-                    />
+                <Parallax strength={8} hoverScale={1.02}>
+                  <div style={{ position: "relative", borderRadius: "inherit", overflow: "hidden" }} data-cursor-magnet>
+                    <img className="hero-image" src="/dashboard.png" alt="Gorilla Ledger dashboard preview" />
 
-                    {/* Foreground gloss */}
                     <div
                       data-depth="0.9"
                       style={{
@@ -121,8 +106,6 @@ export default function Page() {
                           "radial-gradient(60% 60% at 30% 20%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%)",
                       }}
                     />
-
-                    {/* Mid-layer grid */}
                     <div
                       data-depth="0.35"
                       style={{
@@ -145,278 +128,249 @@ export default function Page() {
       </section>
 
       {/* VISION + POSITIONING */}
-      <section className="section section-briefing">
+      <section className="section">
         <div className="container">
-          <Reveal className="section-kicker">VISION &amp; POSITIONING</Reveal>
-          <Reveal>
+          <div className="section-header">
             <h2 className="section-title">Built for institutions. Designed for continuity.</h2>
-          </Reveal>
-          <Reveal className="section-text" delay={0.08}>
-            Savvy Rilla Technologies is a product company that also delivers custom enterprise builds — engineering
-            systems that remain stable under real operational constraints in South Sudan.
-          </Reveal>
+            <p className="section-text" style={{ marginTop: "0.5rem" }}>
+              A product company and systems engineering partner — delivering secure enterprise software for South Sudan.
+              Built to be maintainable, auditable, and stable.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* PLATFORMS — WHAT WE BUILD */}
-      <section className="section">
+      <section className="section section--subtle">
         <div className="container">
-          <Reveal className="section-kicker">PLATFORMS</Reveal>
-          <Reveal>
-            <h2 className="section-title">What we build</h2>
-          </Reveal>
+          <div className="section-header">
+            <h2 className="section-title">Platforms</h2>
+            <p className="section-text" style={{ marginTop: "0.5rem" }}>
+              Core platform capabilities — delivered as products, or as custom systems built to enterprise standards.
+            </p>
+          </div>
 
-          <div className="grid cards-3">
-            <Reveal className="card" delay={0.04}>
-              <div className="card-title">Workflow &amp; Operations Systems</div>
-              <div className="card-text">
+          <div className="cards-grid">
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Operations</p>
+              <h3 className="card-title">Workflow &amp; Operations Systems</h3>
+              <p className="card-text">
                 Digitize processes, approvals, and cross-team execution with auditable workflows.
+              </p>
+              <div className="card-actions">
+                <Link className="btn btn-ghost btn-sm" href="/platforms">
+                  Explore →
+                </Link>
               </div>
-              <Link className="card-link" href="/platforms" data-cursor-magnet>
-                Explore →
-              </Link>
-            </Reveal>
+            </div>
 
-            <Reveal className="card" delay={0.06}>
-              <div className="card-title">Data &amp; Reporting Platforms</div>
-              <div className="card-text">
-                Dashboards, analytics, and decision-grade reporting built for real institutional needs.
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Data</p>
+              <h3 className="card-title">Data &amp; Reporting Platforms</h3>
+              <p className="card-text">
+                Dashboards, analytics, and decision-grade reporting designed for real institutional needs.
+              </p>
+              <div className="card-actions">
+                <Link className="btn btn-ghost btn-sm" href="/platforms">
+                  Explore →
+                </Link>
               </div>
-              <Link className="card-link" href="/platforms" data-cursor-magnet>
-                Explore →
-              </Link>
-            </Reveal>
+            </div>
 
-            <Reveal className="card" delay={0.08}>
-              <div className="card-title">Service Delivery Portals</div>
-              <div className="card-text">
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Delivery</p>
+              <h3 className="card-title">Service Delivery Portals</h3>
+              <p className="card-text">
                 Secure portals for internal teams, partners, and public-facing services.
+              </p>
+              <div className="card-actions">
+                <Link className="btn btn-ghost btn-sm" href="/platforms">
+                  Explore →
+                </Link>
               </div>
-              <Link className="card-link" href="/platforms" data-cursor-magnet>
-                Explore →
-              </Link>
-            </Reveal>
+            </div>
 
-            <Reveal className="card" delay={0.1}>
-              <div className="card-title">Identity &amp; Admin Systems</div>
-              <div className="card-text">
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Governance</p>
+              <h3 className="card-title">Identity &amp; Admin Systems</h3>
+              <p className="card-text">
                 Role-based access, audit trails, and governance-ready controls.
+              </p>
+              <div className="card-actions">
+                <Link className="btn btn-ghost btn-sm" href="/enterprise">
+                  Learn →
+                </Link>
               </div>
-              <Link className="card-link" href="/enterprise" data-cursor-magnet>
-                Learn →
-              </Link>
-            </Reveal>
+            </div>
 
-            <Reveal className="card" delay={0.12}>
-              <div className="card-title">Automation &amp; Integrations</div>
-              <div className="card-text">
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Automation</p>
+              <h3 className="card-title">Integrations &amp; Automation</h3>
+              <p className="card-text">
                 Reduce overhead by connecting systems and automating recurring operations.
+              </p>
+              <div className="card-actions">
+                <Link className="btn btn-ghost btn-sm" href="/infrastructure">
+                  Learn →
+                </Link>
               </div>
-              <Link className="card-link" href="/infrastructure" data-cursor-magnet>
-                Learn →
-              </Link>
-            </Reveal>
+            </div>
 
-            <Reveal className="card" delay={0.14}>
-              <div className="card-title">Enterprise Product Delivery</div>
-              <div className="card-text">
-                Build, ship, maintain — with documentation and long-term reliability in mind.
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Delivery</p>
+              <h3 className="card-title">Enterprise Product Delivery</h3>
+              <p className="card-text">
+                Build, ship, and maintain — with documentation and long-term reliability in mind.
+              </p>
+              <div className="card-actions">
+                <Link className="btn btn-ghost btn-sm" href="/company">
+                  Company →
+                </Link>
               </div>
-              <Link className="card-link" href="/company" data-cursor-magnet>
-                Company →
-              </Link>
-            </Reveal>
+            </div>
           </div>
         </div>
       </section>
 
       {/* INFRASTRUCTURE — HOW IT RUNS */}
-      <section className="section section-muted">
+      <section className="section">
         <div className="container">
-          <Reveal className="section-kicker">INFRASTRUCTURE</Reveal>
-          <Reveal>
-            <h2 className="section-title">How it runs</h2>
-          </Reveal>
-
-          <div className="grid cards-2">
-            <Reveal className="card" delay={0.04}>
-              <div className="card-title">Modular architecture for scale</div>
-              <div className="card-text">
-                Systems designed to expand cleanly without rewrites — services, modules, and APIs.
-              </div>
-            </Reveal>
-
-            <Reveal className="card" delay={0.06}>
-              <div className="card-title">Deployment patterns for constrained environments</div>
-              <div className="card-text">
-                Optimized performance, caching, and stability for real connectivity conditions.
-              </div>
-            </Reveal>
-
-            <Reveal className="card" delay={0.08}>
-              <div className="card-title">Maintainable by default</div>
-              <div className="card-text">
-                Clear structure, documentation, and handover-ready delivery.
-              </div>
-            </Reveal>
-
-            <Reveal className="card" delay={0.1}>
-              <div className="card-title">Performance-aware engineering</div>
-              <div className="card-text">
-                Minimal overhead, controlled client-side effects, and fast UI response.
-              </div>
-            </Reveal>
+          <div className="section-header">
+            <h2 className="section-title">Infrastructure</h2>
+            <p className="section-text" style={{ marginTop: "0.5rem" }}>
+              Operational reliability isn’t an afterthought. We engineer for uptime, observability, and clean change
+              control.
+            </p>
           </div>
 
-          <div className="section-actions">
-            <Link className="btn btn-secondary" href="/infrastructure" data-cursor-magnet>
+          <div className="cards-grid" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Architecture</p>
+              <h3 className="card-title">Modular systems that scale cleanly</h3>
+              <p className="card-text">
+                Designed to expand without rewrites — with stable interfaces and clear ownership boundaries.
+              </p>
+            </div>
+
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Operations</p>
+              <h3 className="card-title">Deployment patterns for constrained environments</h3>
+              <p className="card-text">
+                Performance, caching, and stability tuned for real connectivity and infrastructure realities.
+              </p>
+            </div>
+
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Maintenance</p>
+              <h3 className="card-title">Maintainable by default</h3>
+              <p className="card-text">Clear structure, documentation, and handover-ready delivery.</p>
+            </div>
+
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Performance</p>
+              <h3 className="card-title">Fast UI response, controlled effects</h3>
+              <p className="card-text">Minimal overhead, deliberate motion, and measured client-side behavior.</p>
+            </div>
+          </div>
+
+          <div style={{ marginTop: "1rem" }}>
+            <Link className="btn btn-ghost" href="/infrastructure" data-cursor-magnet>
               Infrastructure overview
             </Link>
           </div>
         </div>
       </section>
 
-      {/* TRUST LAYER — SECURITY + COMPLIANCE */}
+      {/* TRUST LAYER */}
+      <section className="section section--subtle">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Trust layer</h2>
+            <p className="section-text" style={{ marginTop: "0.5rem" }}>
+              Enterprise credibility comes from posture: least-privilege access, auditability, and continuity.
+            </p>
+          </div>
+
+          <div className="cards-grid">
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Security</p>
+              <h3 className="card-title">Least-privilege access</h3>
+              <p className="card-text">Roles and permissions designed for institutional control and clear ownership.</p>
+            </div>
+
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Governance</p>
+              <h3 className="card-title">Audit-friendly patterns</h3>
+              <p className="card-text">Logging and traceability aligned to enterprise expectations.</p>
+            </div>
+
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Operations</p>
+              <h3 className="card-title">Change control mindset</h3>
+              <p className="card-text">Measured releases, stability focus, and operational continuity.</p>
+            </div>
+          </div>
+
+          <div style={{ marginTop: "1rem" }}>
+            <Link className="btn btn-ghost" href="/status" data-cursor-magnet>
+              View status
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* PROOF */}
       <section className="section">
         <div className="container">
-          <Reveal className="section-kicker">TRUST LAYER</Reveal>
-          <Reveal>
-            <h2 className="section-title">Security &amp; governance posture</h2>
-          </Reveal>
-
-          <div className="grid cards-3">
-            <Reveal className="card" delay={0.04}>
-              <div className="card-title">Least-privilege access</div>
-              <div className="card-text">
-                Roles and permissions designed for institutional control and clear ownership.
-              </div>
-            </Reveal>
-
-            <Reveal className="card" delay={0.06}>
-              <div className="card-title">Audit-friendly patterns</div>
-              <div className="card-text">
-                Logging and traceability aligned to enterprise expectations.
-              </div>
-            </Reveal>
-
-            <Reveal className="card" delay={0.08}>
-              <div className="card-title">Change control mindset</div>
-              <div className="card-text">
-                Measured releases, stability focus, and operational continuity.
-              </div>
-            </Reveal>
-          </div>
-
-          <div className="section-actions">
-            <Link className="btn btn-secondary" href="/status" data-cursor-magnet>
-              View system status
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* PROOF — USE CASES / INDUSTRIES */}
-      <section className="section section-muted">
-        <div className="container">
-          <Reveal className="section-kicker">PROOF</Reveal>
-          <Reveal>
+          <div className="section-header">
             <h2 className="section-title">Where this works</h2>
-          </Reveal>
-
-          <div className="grid cards-3">
-            <Reveal className="card" delay={0.04}>
-              <div className="card-title">Public sector &amp; mission-critical programs</div>
-              <div className="card-text">
-                Governance, accountability, and scale — engineered for continuity.
-              </div>
-            </Reveal>
-
-            <Reveal className="card" delay={0.06}>
-              <div className="card-title">NGOs &amp; operations-heavy environments</div>
-              <div className="card-text">
-                Workflows, reporting, coordination, and field-aware execution.
-              </div>
-            </Reveal>
-
-            <Reveal className="card" delay={0.08}>
-              <div className="card-title">Utilities, logistics &amp; service networks</div>
-              <div className="card-text">
-                Access-controlled systems with operational visibility.
-              </div>
-            </Reveal>
+            <p className="section-text" style={{ marginTop: "0.5rem" }}>
+              Systems engineered for continuity — across public service delivery, NGOs, and operations-heavy networks.
+            </p>
           </div>
 
-          <div className="section-actions">
-            <Link className="btn btn-secondary" href="/industries" data-cursor-magnet>
-              View industries
-            </Link>
+          <div className="cards-grid">
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Public sector</p>
+              <h3 className="card-title">Mission-critical programs</h3>
+              <p className="card-text">Governance, accountability, and scale — engineered for continuity.</p>
+            </div>
+
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">NGOs</p>
+              <h3 className="card-title">Operations-heavy environments</h3>
+              <p className="card-text">Workflows, reporting, coordination, and field-aware execution.</p>
+            </div>
+
+            <div className="card" data-cursor-magnet>
+              <p className="card-tag">Services</p>
+              <h3 className="card-title">Utilities, logistics &amp; service networks</h3>
+              <p className="card-text">Access-controlled systems with operational visibility.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ENGAGE — CONSULTATION CTA */}
-      <section className="section section-cta">
+      {/* ENGAGE */}
+      <section className="section section--cta">
         <div className="container">
-          <Reveal className="section-kicker">ENGAGE</Reveal>
-          <Reveal>
+          <div className="section-header">
             <h2 className="section-title">Let’s scope the system you actually need.</h2>
-          </Reveal>
-          <Reveal className="section-text" delay={0.08}>
-            Short discovery call. Clear architecture proposal. Delivery plan aligned to operational reality in South Sudan.
-          </Reveal>
+            <p className="section-text" style={{ marginTop: "0.5rem" }}>
+              Short discovery call. Clear architecture proposal. Delivery plan aligned to operational reality in South Sudan.
+            </p>
+          </div>
 
-          <div className="section-actions">
+          <div className="hero-actions">
             <Link className="btn btn-primary" href="/contact" data-cursor-magnet>
               Request consultation
             </Link>
-            <Link className="btn btn-secondary" href="/platforms" data-cursor-magnet>
+            <Link className="btn btn-ghost" href="/platforms" data-cursor-magnet>
               Explore platforms
             </Link>
           </div>
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="footer">
-        <div className="container footer-inner">
-          <div className="footer-left">
-            <div className="footer-brand">Savvy Rilla Technologies</div>
-            <div className="footer-sub">Secure enterprise systems for South Sudan.</div>
-          </div>
-
-          <div className="footer-links">
-            <Link href="/platforms" data-cursor-magnet>
-              Platforms
-            </Link>
-            <Link href="/enterprise" data-cursor-magnet>
-              Enterprise
-            </Link>
-            <Link href="/infrastructure" data-cursor-magnet>
-              Infrastructure
-            </Link>
-            <Link href="/industries" data-cursor-magnet>
-              Industries
-            </Link>
-            <Link href="/insights" data-cursor-magnet>
-              Insights
-            </Link>
-            <Link href="/company" data-cursor-magnet>
-              Company
-            </Link>
-            <Link href="/contact" data-cursor-magnet>
-              Contact
-            </Link>
-            <Link href="/status" data-cursor-magnet>
-              Status
-            </Link>
-          </div>
-
-          <div className="footer-meta">
-            <div>Operational since 2023</div>
-            <div>© {new Date().getFullYear()} Savvy Rilla Technologies</div>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

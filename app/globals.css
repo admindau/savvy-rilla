@@ -11,18 +11,12 @@
 
   --radius-lg: 1.5rem;
   --radius-md: 1rem;
-  --radius-sm: 0.75rem; /* 12px */
+  --radius-sm: 0.5rem;
 
   --container: 1080px;
 
-  --shadow-1: 0 10px 22px rgba(0, 0, 0, 0.35);
-  --shadow-2: 0 18px 40px rgba(0, 0, 0, 0.45);
-  --shadow-3: 0 28px 70px rgba(0, 0, 0, 0.58);
-
-  --shadow-soft: var(--shadow-2);
-  --shadow-glow: 0 0 0 1px rgba(0, 245, 160, 0.10) inset, 0 0 18px rgba(0, 245, 160, 0.08);
-
-  /* Accent usage rule: teal only for primary CTAs and interactive state */
+  --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 0 1px rgba(0, 245, 160, 0.12) inset, 0 0 24px rgba(0, 245, 160, 0.10);
 
   /* extra */
   --border: rgba(255,255,255,0.10);
@@ -137,7 +131,7 @@ a {
 }
 
 .brand-mark {
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   padding: 0.35rem;
   background:
     radial-gradient(circle at 30% 20%, rgba(0, 245, 160, 0.25), transparent 52%),
@@ -204,7 +198,7 @@ a {
 
 .nav-cta {
   padding: 0.5rem 0.95rem;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   border: 1px solid rgba(0, 245, 160, 0.25);
   background: rgba(0, 245, 160, 0.06);
   box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.10) inset;
@@ -227,7 +221,7 @@ a {
   user-select: none;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(255,255,255,0.04);
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   padding: 0.55rem 0.65rem;
   display: inline-flex;
   align-items: center;
@@ -319,7 +313,7 @@ a {
   gap: 0.5rem;
 
   padding: 0.58rem 1.2rem;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   border: 1px solid var(--border-subtle);
   background: rgba(255, 255, 255, 0.03);
 
@@ -327,13 +321,13 @@ a {
   line-height: 1;
   color: rgba(255, 255, 255, 0.94);
 
-  transition: transform 0.18s ease, box-shadow 0.22s ease, background 0.22s ease,
-    border-color 0.22s ease;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .btn:hover {
   background: rgba(255, 255, 255, 0.06);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .btn:active {
@@ -478,9 +472,9 @@ a {
 }
 
 .hero-main-title {
-  font-size: clamp(2.25rem, 4.1vw, 3.35rem);
+  font-size: clamp(2.1rem, 3.8vw, 3.2rem);
   font-weight: 820;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   margin: 0 0 1rem;
   line-height: 1.05;
@@ -493,7 +487,7 @@ a {
 .hero-text {
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.78);
-  max-width: 44rem;
+  max-width: 42rem;
   margin: 0 0 1.4rem;
 }
 
@@ -516,7 +510,7 @@ a {
 
 .hero-strip-item {
   padding: 0.35rem 0.6rem;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.10);
   background: rgba(255, 255, 255, 0.03);
 }
@@ -524,7 +518,7 @@ a {
 .hero-strip-dot {
   width: 6px;
   height: 6px;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   background: rgba(0, 245, 160, 0.55);
   box-shadow: 0 0 16px rgba(0, 245, 160, 0.18);
 }
@@ -549,7 +543,7 @@ a {
 
 .hero-panel:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-soft), var(--shadow-glow);
 }
 
 .hero-panel-head {
@@ -586,11 +580,11 @@ a {
   text-transform: uppercase;
 
   padding: 0.35rem 0.6rem;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   border: 1px solid rgba(0, 245, 160, 0.30);
   background: rgba(0, 245, 160, 0.08);
   color: rgba(0, 245, 160, 0.95);
-  animation: none;
+  animation: statusPulse 2.4s ease-in-out infinite;
 }
 
 @keyframes statusPulse {
@@ -625,7 +619,7 @@ a {
     'Courier New', monospace;
   font-size: 1.25rem;
   font-weight: 750;
-  color: rgba(0, 245, 160, 0.82);
+  color: rgba(0, 245, 160, 0.92);
 }
 
 .hero-panel-note {
@@ -824,7 +818,7 @@ a {
 
 .ticker-wrap {
   margin-top: 1rem;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   border: 1px solid rgba(0,245,160,0.14);
   background: rgba(11,15,20,0.55);
   overflow: hidden;
@@ -857,7 +851,7 @@ a {
 .tick .dot {
   width: 6px;
   height: 6px;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   background: rgba(0,245,160,0.75);
   box-shadow: 0 0 16px rgba(0,245,160,0.18);
 }
@@ -1093,7 +1087,7 @@ a {
   display: inline-flex;
   align-items: center;
   padding: 0.38rem 0.6rem;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.03);
   font-size: 0.82rem;
@@ -1160,13 +1154,13 @@ a {
 .footer-meta-dot {
   width: 4px;
   height: 4px;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   background: rgba(255,255,255,0.28);
 }
 
 .footer-cta {
   padding: 0.55rem 0.95rem;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   border: 1px solid rgba(0, 245, 160, 0.25);
   background: rgba(0, 245, 160, 0.06);
   box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.10) inset;
@@ -1206,39 +1200,6 @@ a {
   pointer-events: none;
 }
 
-/* 3D loader fallback: keep it atmospheric (never a giant “card”) */
-.hero3d-fallback {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.hero3d-fallback-mark {
-  width: min(520px, 44vw);
-  max-width: 520px;
-  height: auto;
-  max-height: 64vh;
-  opacity: 0.14;
-  filter: saturate(0) contrast(1.05) blur(0.2px);
-  transform: translateX(18%) translateY(-2%);
-  user-select: none;
-}
-
-/* Mobile: reduce presence further so message stays dominant */
-@media (max-width: 900px) {
-  .hero3d-fallback-mark {
-    width: min(420px, 70vw);
-    opacity: 0.10;
-    transform: translateX(0) translateY(-6%);
-  }
-}
-
-
 /* Subtle vignette ABOVE 3D but BELOW hero UI */
 .hero-vignette {
   position: absolute;
@@ -1259,6 +1220,42 @@ a {
   z-index: 2;
 }
 
+/* Magnetic cursor (desktop only via JS gating). */
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  transform: translate3d(-9999px, -9999px, 0);
+  opacity: 1;
+  will-change: transform, opacity;
+}
+
+.cursor-ring {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 255, 200, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(0, 255, 200, 0.12) inset,
+    0 0 28px rgba(0, 255, 200, 0.10);
+  backdrop-filter: blur(2px);
+}
+
+.cursor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(0, 255, 200, 0.85);
+  box-shadow: 0 0 18px rgba(0, 255, 200, 0.35);
+}
+
+html.cursor-hidden .cursor-ring,
+html.cursor-hidden .cursor-dot {
+  opacity: 0 !important;
+}
 
 /* Make sure the hero content sits above the visual layer */
 .hero > .container {
@@ -1266,6 +1263,69 @@ a {
   z-index: 2;
 }
 
+/* =============================
+   CursorFX (missing selectors)
+   ============================= */
+
+.has-cursor-fx {
+  cursor: none;
+}
+
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  pointer-events: none;
+  transform: translate3d(var(--cx, 50vw), var(--cy, 50vh), 0);
+  will-change: transform, opacity;
+}
+
+.cursor-ring {
+  width: 42px;
+  height: 42px;
+  margin-left: -21px;
+  margin-top: -21px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 245, 160, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(0, 245, 160, 0.10) inset,
+    0 0 18px rgba(0, 245, 160, 0.10);
+  backdrop-filter: blur(2px);
+  opacity: 0.75;
+  transition: width 140ms ease, height 140ms ease, margin 140ms ease, opacity 140ms ease,
+    border-color 140ms ease;
+}
+
+.cursor-dot {
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  margin-top: -3.5px;
+  border-radius: 999px;
+  background: rgba(0, 245, 160, 0.95);
+  box-shadow: 0 0 16px rgba(0, 245, 160, 0.18);
+  opacity: 0.85;
+  transition: opacity 140ms ease;
+}
+
+.cursor-hover .cursor-ring {
+  width: 52px;
+  height: 52px;
+  margin-left: -26px;
+  margin-top: -26px;
+  border-color: rgba(0, 245, 160, 0.42);
+  opacity: 0.85;
+}
+
+.cursor-down .cursor-ring {
+  width: 36px;
+  height: 36px;
+  margin-left: -18px;
+  margin-top: -18px;
+  opacity: 0.9;
+}
 
 /* Inputs / text selection: fade custom cursor */
 .cursor-text .cursor-ring,
@@ -1283,7 +1343,7 @@ a {
   position: absolute;
   width: 10px;
   height: 10px;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   transform: translate(-50%, -50%);
   background: radial-gradient(circle, rgba(0, 245, 160, 0.22), rgba(0, 245, 160, 0.0) 65%);
   animation: rippleOut 720ms ease-out forwards;
@@ -1341,14 +1401,74 @@ a {
   z-index: 2;
 }
 
-
-
-/* Click feedback */
-
+/* Cursor FX: perfectly centered ring+dot, hidden on touch devices */
 .has-cursor-fx body {
-  cursor: auto;
+  cursor: none;
 }
 
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+  will-change: left, top, transform, opacity;
+}
+
+.cursor-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  border: 1px solid rgba(23, 229, 194, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.25) inset,
+    0 0 22px rgba(0, 255, 204, 0.10);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: transform 180ms ease, opacity 120ms ease, border-color 180ms ease, box-shadow 220ms ease;
+}
+
+.cursor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: rgba(23, 229, 194, 0.95);
+  box-shadow: 0 0 14px rgba(0, 255, 204, 0.35);
+  opacity: 0;
+  transition: transform 180ms ease, opacity 120ms ease;
+}
+
+/* Hover scaling */
+.cursor-hover .cursor-ring {
+  transform: translate(-50%, -50%) scale(1.16);
+  border-color: rgba(23, 229, 194, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.30) inset,
+    0 0 28px rgba(0, 255, 204, 0.14);
+}
+
+.cursor-hover .cursor-dot {
+  transform: translate(-50%, -50%) scale(1.10);
+}
+
+/* Click feedback */
+.cursor-down .cursor-ring {
+  transform: translate(-50%, -50%) scale(0.92);
+  opacity: 0.95;
+}
+
+/* Hard disable on touch */
+@media (any-pointer: coarse), (pointer: coarse) {
+  .cursor-ring,
+  .cursor-dot {
+    display: none !important;
+  }
+  .has-cursor-fx body {
+    cursor: auto;
+  }
+}
 /* === HERO 3D LAYERING (Cinematic Pass) === */
 .hero {
   position: relative;
@@ -1427,289 +1547,32 @@ a {
 }
 
 
-/* =========================================================
-   Mission Briefing Sections (Phase 0 foundation)
-   - Narrative transitions, disciplined system, no randomness.
-========================================================= */
-
-.hero-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.9rem;
+/* --- Hero 3D graceful fallback (prevents giant SVG layout shifts) --- */
+.hero3d-fallback{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0.22;
+  filter: saturate(0.9) contrast(1.05);
 }
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  height: 32px;
-  padding: 0 0.8rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
+.hero3d-fallback::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background: radial-gradient(circle at 50% 35%, rgba(0,245,160,0.10), rgba(0,0,0,0.82) 70%);
+  opacity:0.65;
 }
-
-.mb-section {
-  position: relative;
-  padding: 3.5rem 0;
+.hero3d-fallback-mark{
+  width:min(560px, 62vw);
+  height:auto;
+  opacity:0.55;
+  filter: blur(0.2px);
+  transform: translateY(-2%);
 }
-
-.mb-section::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 1px;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent);
-  opacity: 0.65;
-}
-
-.mb-head {
-  margin-bottom: 1.4rem;
-}
-
-.mb-head--row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.2rem;
-}
-
-.mb-kicker {
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.62);
-}
-
-.mb-title {
-  margin: 0.45rem 0 0.6rem;
-  font-size: clamp(1.55rem, 2.2vw, 2rem);
-  font-weight: 780;
-  letter-spacing: 0.01em;
-}
-
-.mb-sub {
-  margin: 0;
-  color: var(--muted);
-  max-width: 56rem;
-  line-height: 1.6;
-  font-size: 0.95rem;
-}
-
-.mb-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.mb-grid--four {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.mb-split {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-/* Card base (re-using existing card styles if present, but ensuring consistency) */
-.card {
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.03);
-  border-radius: var(--radius-lg);
-  padding: 1.1rem 1.1rem;
-  box-shadow: none;
-  transition: transform 0.2s ease, border-color 0.22s ease, background 0.22s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.16);
-  background: rgba(255,255,255,0.045);
-}
-
-.card-kicker {
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.58);
-  margin-bottom: 0.55rem;
-}
-
-.card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  margin: 0 0 0.45rem;
-}
-
-.card-text {
-  margin: 0;
-  color: rgba(255,255,255,0.72);
-  line-height: 1.55;
-  font-size: 0.92rem;
-}
-
-.mb-head-cta {
-  flex-shrink: 0;
-}
-
-.mb-section--cta {
-  padding-bottom: 4.25rem;
-}
-
-.cta-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.2rem;
-  border: 1px solid rgba(255,255,255,0.12);
-  background:
-    radial-gradient(circle at 20% 20%, rgba(0, 245, 160, 0.10), transparent 55%),
-    radial-gradient(circle at 80% 60%, rgba(0, 217, 255, 0.06), transparent 60%),
-    rgba(255,255,255,0.03);
-  border-radius: var(--radius-lg);
-  padding: 1.35rem 1.35rem;
-}
-
-.cta-left {
-  max-width: 46rem;
-}
-
-.cta-kicker {
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.62);
-  margin-bottom: 0.35rem;
-}
-
-.cta-title {
-  margin: 0 0 0.5rem;
-  font-size: 1.55rem;
-  font-weight: 820;
-}
-
-.cta-text {
-  margin: 0;
-  color: rgba(255,255,255,0.76);
-  line-height: 1.6;
-}
-
-.cta-right {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-/* Responsive */
-@media (max-width: 980px) {
-  .mb-grid,
-  .mb-grid--four,
-  .mb-split {
-    grid-template-columns: 1fr;
-  }
-
-  .mb-head--row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .cta-card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .cta-right {
-    justify-content: flex-start;
-  }
-}
-
-/* =============================
-   Cursor FX (definitive)
-   - fixed positioning
-   - ring + dot always centered (JS drives translate)
-   - magnet state supported (html.cursor-magnet-on)
-   - hides cleanly when html.cursor-hidden is present
-   ============================= */
-
-.has-cursor-fx,
-.has-cursor-fx body {
-  cursor: none;
-}
-
-/* Base cursor elements */
-.cursor-ring,
-.cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  pointer-events: none;
-  /* JS writes inline transform; keep CSS neutral and avoid fighting */
-  transform: translate3d(-9999px, -9999px, 0);
-  transform-origin: 50% 50%;
-  opacity: 0;
-  will-change: transform, opacity;
-  transition: opacity 140ms ease;
-}
-
-/* Ring */
-.cursor-ring {
-  width: 46px;
-  height: 46px;
-  border-radius: 9999px;
-  border: 1px solid rgba(0, 245, 160, 0.30);
-  box-shadow:
-    0 0 0 1px rgba(0, 245, 160, 0.10) inset,
-    0 0 22px rgba(0, 245, 160, 0.10);
-  backdrop-filter: blur(2px);
-}
-
-/* Dot */
-.cursor-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 9999px;
-  background: rgba(0, 245, 160, 0.90);
-  box-shadow: 0 0 16px rgba(0, 245, 160, 0.32);
-}
-
-/* Magnet state (optional extra signal) */
-html.cursor-magnet-on .cursor-ring {
-  border-color: rgba(0, 245, 160, 0.42);
-  box-shadow:
-    0 0 0 1px rgba(0, 245, 160, 0.14) inset,
-    0 0 30px rgba(0, 245, 160, 0.14);
-}
-
-html.cursor-magnet-on .cursor-dot {
-  background: rgba(0, 245, 160, 0.98);
-  box-shadow: 0 0 22px rgba(0, 245, 160, 0.42);
-}
-
-/* Hide cursor when selecting text / focusing inputs */
-html.cursor-hidden .cursor-ring,
-html.cursor-hidden .cursor-dot {
-  opacity: 0 !important;
-}
-
-/* Safety: never show custom cursor on touch / coarse pointers */
-@media (pointer: coarse), (hover: none) {
-  .has-cursor-fx,
-  .has-cursor-fx body {
-    cursor: auto;
-  }
-
-  .cursor-ring,
-  .cursor-dot {
-    display: none !important;
-  }
+@media (max-width: 900px){
+  .hero3d-fallback-mark{ width:min(520px, 76vw); opacity:0.42; }
 }

@@ -116,7 +116,7 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         metalness: 0.12,
         roughness: 0.78,
         emissive: new THREE.Color("#0c2a2e"),
-        emissiveIntensity: 0.06,
+        emissiveIntensity: 0.25,
         transparent: true,
         opacity: 0.88,
       });
@@ -126,7 +126,7 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         metalness: 0.25,
         roughness: 0.35,
         emissive: new THREE.Color("#00c7a0"),
-        emissiveIntensity: 0.12,
+        emissiveIntensity: 0.65,
         transparent: true,
         opacity: 0.35,
       });
@@ -179,7 +179,7 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
           metalness: 0.2,
           roughness: 0.6,
           emissive: new THREE.Color("#00c7a0"),
-          emissiveIntensity: 0.18,
+          emissiveIntensity: 0.45,
           transparent: true,
           opacity: 0.72,
         });
@@ -285,15 +285,15 @@ function Scene({
 }) {
   return (
     <>
-      <color attach="background" args={["#030507"]} />
-      <fog attach="fog" args={["#020507", 10.0, 21.0]} />
+      <color attach="background" args={["#05090b"]} />
+      <fog attach="fog" args={["#020507", 7.0, 16.5]} />
 
-      <ambientLight intensity={0.45} />
-      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.6} />
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.7} />
       <pointLight position={[-2.5, 1.5, 2.5]} intensity={0.35} />
 
       {/* Barely visible particle drift behind everything */}
-      <ParticleField count={700} radius={10} depth={10} opacity={0.04} />
+      <ParticleField count={900} radius={10} depth={10} opacity={0.12} />
 
       <LogoRig src={src} scale={scale} depth={depth} animate={animate} />
     </>
