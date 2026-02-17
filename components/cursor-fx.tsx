@@ -38,9 +38,15 @@ export default function CursorFX() {
 
     setEnabled(true);
 
+    document.documentElement.classList.add("has-cursor-fx");
+
     const dot = dotRef.current;
     const ring = ringRef.current;
     if (!dot || !ring) return;
+
+    // Defensive: ensure cursor layers never block hover hit-testing
+    dot.style.pointerEvents = "none";
+    ring.style.pointerEvents = "none";
 
     let raf = 0;
     let hasMoved = false;
@@ -65,7 +71,6 @@ export default function CursorFX() {
       magnetEl = el;
       magnetRect = el ? el.getBoundingClientRect() : null;
 
-      // Toggle a global class so your CSS can react to hover/magnet state if needed
       if (el) document.documentElement.classList.add("cursor-magnet-on");
       else document.documentElement.classList.remove("cursor-magnet-on");
     };
@@ -76,7 +81,11 @@ export default function CursorFX() {
       y = e.clientY;
 
       // Determine hovered magnet target
-      const hovered = document.elementFromPoint(e.clientX, e.clientY);
+      let hovered = document.elementFromPoint(e.clientX, e.clientY);
+
+      // Fallback: if elementFromPoint fails (rare), use event target
+      if (!hovered) hovered = e.target as Element | null;
+
       const target = findMagnetTarget(hovered);
 
       if (target && target !== magnetEl) setMagnet(target);
@@ -89,19 +98,19 @@ export default function CursorFX() {
       }
 
       // Obvious but controlled scale on hover
-      targetScale = target ? 1.22 : 1;
+      targetScale = target ? 1.30 : 1;
     };
 
     const onDown = () => {
       ring.style.opacity = "0.9";
       dot.style.opacity = "0.95";
-      targetScale = magnetEl ? 1.26 : 1.08;
+      targetScale = magnetEl ? 1.34 : 1.10;
     };
 
     const onUp = () => {
       ring.style.opacity = "1";
       dot.style.opacity = "1";
-      targetScale = magnetEl ? 1.22 : 1;
+      targetScale = magnetEl ? 1.30 : 1;
     };
 
     const onLeaveWindow = () => {
@@ -122,19 +131,19 @@ export default function CursorFX() {
 
     const tick = () => {
       // Fast follow = less lag
-      const follow = 0.30;
+      const follow = 0.28;
 
       // Default is raw pointer
       let tx = x;
       let ty = y;
 
-      // Magnet: pull slightly toward element center (but keep dot+ring together)
+      // Magnet: pull slightly toward element center
       if (magnetEl && magnetRect) {
         const mx = magnetRect.left + magnetRect.width / 2;
         const my = magnetRect.top + magnetRect.height / 2;
 
         // Pull strength: noticeable but not toy-like
-        const pull = 0.26;
+        const pull = 0.34;
         tx = x + (mx - x) * pull;
         ty = y + (my - y) * pull;
       }
@@ -165,7 +174,6 @@ export default function CursorFX() {
     window.addEventListener("scroll", onScrollOrResize, { passive: true });
     window.addEventListener("resize", onScrollOrResize, { passive: true });
 
-    // Window boundary behavior
     document.addEventListener("pointerleave", onLeaveWindow, { passive: true } as any);
     document.addEventListener("pointerenter", onEnterWindow, { passive: true } as any);
 
@@ -178,7 +186,9 @@ export default function CursorFX() {
       window.removeEventListener("resize", onScrollOrResize);
       document.removeEventListener("pointerleave", onLeaveWindow as any);
       document.removeEventListener("pointerenter", onEnterWindow as any);
+
       document.documentElement.classList.remove("cursor-magnet-on");
+      document.documentElement.classList.remove("has-cursor-fx");
     };
   }, []);
 
@@ -188,13 +198,21 @@ export default function CursorFX() {
         ref={ringRef}
         className="cursor-ring"
         aria-hidden="true"
-        style={enabled ? undefined : { opacity: 0, transform: "translate3d(-9999px,-9999px,0)" }}
+        style={
+          enabled
+            ? undefined
+            : { opacity: 0, transform: "translate3d(-9999px,-9999px,0)" }
+        }
       />
       <div
         ref={dotRef}
         className="cursor-dot"
         aria-hidden="true"
-        style={enabled ? undefined : { opacity: 0, transform: "translate3d(-9999px,-9999px,0)" }}
+        style={
+          enabled
+            ? undefined
+            : { opacity: 0, transform: "translate3d(-9999px,-9999px,0)" }
+        }
       />
     </>
   );

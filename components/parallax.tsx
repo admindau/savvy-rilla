@@ -43,11 +43,13 @@ export default function Parallax({
     const maxDeg = clamp(strength, 4, 10);
     const maxTranslate = clamp(10 + maxDeg * 0.9, 10, 18);
 
+    inner.style.willChange = "transform";
+
     let raf = 0;
     let running = false;
     let settleFrames = 0;
 
-    // targets + currents (smoothed)
+    // targets + currents (Rq: smoothed)
     let tRx = 0;
     let tRy = 0;
     let cRx = 0;
@@ -74,6 +76,7 @@ export default function Parallax({
 
     const onEnter = () => {
       tScale = hoverScale;
+      root.classList.add("parallax-active");
       startRaf();
     };
 
@@ -94,6 +97,7 @@ export default function Parallax({
       tRx = 0;
       tRy = 0;
       tScale = 1;
+      root.classList.remove("parallax-active");
       startRaf();
     };
 
@@ -102,12 +106,10 @@ export default function Parallax({
       cRy = lerp(cRy, tRy, 0.12);
       cScale = lerp(cScale, tScale, 0.14);
 
-      // apply a single stable transform stack (guaranteed hover effect)
       inner.style.transform = `perspective(950px) rotateX(${cRx.toFixed(
         2
       )}deg) rotateY(${cRy.toFixed(2)}deg) translateZ(0) scale(${cScale.toFixed(3)})`;
 
-      // depth translate: closer elements move more
       for (const node of layers) {
         const d = clamp(Number(node.dataset.depth ?? "0.6"), 0.15, 1);
         const tx = (cRy / maxDeg) * (maxTranslate * d);
@@ -115,7 +117,6 @@ export default function Parallax({
         node.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
       }
 
-      // Stop RAF once we settle (saves battery)
       const dx = Math.abs(cRx - tRx) + Math.abs(cRy - tRy);
       const ds = Math.abs(cScale - tScale);
 
@@ -139,6 +140,7 @@ export default function Parallax({
       root.removeEventListener("pointerenter", onEnter);
       root.removeEventListener("pointermove", onMove);
       root.removeEventListener("pointerleave", onLeave);
+      root.classList.remove("parallax-active");
     };
   }, [strength, hoverScale]);
 
