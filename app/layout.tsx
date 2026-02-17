@@ -1,7 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Script from "next/script";
 
 import CursorFX from "@/components/cursor-fx";
 
@@ -18,19 +17,16 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
-  icons: {
-    icon: "/favicon.ico",
-  },
+  icons: { icon: "/favicon.ico" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        {/* Header */}
         <header className="header">
           <div className="container header-inner">
-            <Link className="brand" href="/">
+            <Link className="brand" href="/" aria-label="Savvy Rilla Technologies Home">
               <img className="brand-mark" src="/logo-white.png" alt="Savvy Rilla" />
               <div className="brand-text">
                 <div className="brand-name">SAVVY RILLA</div>
@@ -38,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
             </Link>
 
-            <nav className="nav">
+            <nav className="nav" aria-label="Primary">
               <Link className="nav-link" href="/platforms">
                 Platforms
               </Link>
@@ -69,13 +65,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {children}
 
-        {/* Cursor FX (mounted globally) */}
+        {/* Cursor must live in layout so it works on every page */}
         <CursorFX />
-
-        {/* Optional analytics/scripts (kept as-is) */}
-        <Script id="noop" strategy="afterInteractive">
-          {""}
-        </Script>
       </body>
     </html>
   );
