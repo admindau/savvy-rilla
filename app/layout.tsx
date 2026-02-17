@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Cursor FX (mounted globally) */}
         <CursorFX />
 
-        {/* Optional analytics/scripts remain unchanged */}
+        {/* Optional analytics/scripts (kept as-is) */}
         <Script id="noop" strategy="afterInteractive">
           {""}
         </Script>

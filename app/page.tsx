@@ -34,8 +34,8 @@ export default function Page() {
               </Reveal>
 
               <Reveal className="hero-subtitle" delay={0.12}>
-                We build institutional-grade systems for organizations in South Sudan — engineered for
-                stability, security, and real operational constraints.
+                We build institutional-grade systems for organizations in South Sudan — engineered for stability,
+                security, and real operational constraints.
               </Reveal>
 
               <Reveal className="hero-actions" delay={0.14}>
@@ -104,9 +104,10 @@ export default function Page() {
                       className="hero-image"
                       src="/dashboard.png"
                       alt="Gorilla Ledger dashboard preview"
+                      loading="lazy"
                     />
 
-                    {/* Depth layers */}
+                    {/* Gloss highlight (foreground depth) */}
                     <div
                       data-depth="0.9"
                       style={{
@@ -119,6 +120,7 @@ export default function Page() {
                       }}
                     />
 
+                    {/* Subtle grid (mid depth) */}
                     <div
                       data-depth="0.35"
                       style={{
@@ -126,7 +128,7 @@ export default function Page() {
                         inset: 0,
                         pointerEvents: "none",
                         borderRadius: "inherit",
-                        opacity: 0.25,
+                        opacity: 0.22,
                         backgroundImage:
                           "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
                         backgroundSize: "42px 42px",
@@ -154,9 +156,6 @@ export default function Page() {
           </Reveal>
         </div>
       </section>
-
-      {/* The rest of your sections remain unchanged below this point */}
-      {/* ... */}
     </main>
   );
 }
