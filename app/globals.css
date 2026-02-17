@@ -1206,6 +1206,39 @@ a {
   pointer-events: none;
 }
 
+/* 3D loader fallback: keep it atmospheric (never a giant “card”) */
+.hero3d-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero3d-fallback-mark {
+  width: min(520px, 44vw);
+  max-width: 520px;
+  height: auto;
+  max-height: 64vh;
+  opacity: 0.14;
+  filter: saturate(0) contrast(1.05) blur(0.2px);
+  transform: translateX(18%) translateY(-2%);
+  user-select: none;
+}
+
+/* Mobile: reduce presence further so message stays dominant */
+@media (max-width: 900px) {
+  .hero3d-fallback-mark {
+    width: min(420px, 70vw);
+    opacity: 0.10;
+    transform: translateX(0) translateY(-6%);
+  }
+}
+
+
 /* Subtle vignette ABOVE 3D but BELOW hero UI */
 .hero-vignette {
   position: absolute;

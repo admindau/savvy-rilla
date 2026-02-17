@@ -71,9 +71,12 @@ export default function Hero3DLoader({
   // Keep the scene alive on desktop; still “cinematic” but not battery-killing.
   const animate = !prefersReduced && !coarse;
 
+  // Ensure the visual layer is always positioned correctly even if className isn’t passed.
+  const layerClass = (className ?? "hero-visual").trim();
+
   if (!allow3d) {
     return (
-      <div className={`hero3d-fallback ${className ?? ""}`.trim()} aria-hidden="true">
+      <div className={`hero3d-fallback ${layerClass}`.trim()} aria-hidden="true">
         <img className="hero3d-fallback-mark" src={resolvedSrc} alt="" />
       </div>
     );
@@ -85,7 +88,7 @@ export default function Hero3DLoader({
       scale={scale}
       depth={depth}
       animate={animate}
-      className={className}
+      className={layerClass}
     />
   );
 }
