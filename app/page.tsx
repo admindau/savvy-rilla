@@ -18,11 +18,11 @@ export default function HomePage() {
         <div className="container">
           <div className="hero-grid">
             <div className="hero-left">
-              <Reveal className="hero-eyebrow" delay={0.02}>
+              <Reveal className="hero-kicker" delay={0.02}>
                 SAVVY RILLA TECHNOLOGIES
               </Reveal>
 
-              <Reveal as="h1" className="hero-title" delay={0.05}>
+              <Reveal as="h1" className="hero-main-title" delay={0.05}>
                 SECURE
                 <br />
                 ENTERPRISE
@@ -32,12 +32,12 @@ export default function HomePage() {
                 FOR SOUTH SUDAN.
               </Reveal>
 
-              <Reveal className="hero-sub" delay={0.08}>
-                We design, build, and operate enterprise-grade technology platforms for institutions and enterprises — engineered for stability, security, and real-world South Sudan constraints.
+              <Reveal className="hero-text" delay={0.08}>
+                We build institutional-grade systems for organizations in South Sudan — engineered for stability, security, and real operational constraints.
               </Reveal>
 
               <Reveal className="hero-cta" delay={0.12}>
-                <div className="hero-cta-row">
+                <div className="hero-actions">
                   <Link className="btn btn-primary" href="/platforms" data-cursor-magnet>
                     Explore platforms
                   </Link>
@@ -46,26 +46,27 @@ export default function HomePage() {
                   </Link>
                 </div>
 
-                <div className="hero-tags">
-                  <span className="pill">Secure by architecture</span>
-                  <span className="pill">API-first systems</span>
-                  <span className="pill">Performance tuned</span>
-                  <span className="pill">Operational since 2023</span>
+                <div className="hero-strip">
+                  <span className="hero-strip-item">Operational since 2023</span>
+                  <span className="hero-strip-item">Built &amp; deployed in South Sudan</span>
+                  <span className="hero-strip-item">Security-first architecture</span>
                 </div>
               </Reveal>
             </div>
 
             <div className="hero-right">
               <Reveal className="hero-panel" delay={0.1}>
-                <div className="panel-head">
-                  <div className="panel-title">
-                    <span className="panel-badge">Operational Overview</span>
-                    <span className="panel-sub">Live systems snapshot</span>
+                <div className="hero-panel-head">
+                  <div className="hero-panel-brand">
+                    <div>
+                      <p className="hero-panel-title">Operational Overview</p>
+                      <p className="hero-panel-subtitle">Live systems snapshot</p>
+                    </div>
                   </div>
-                  <span className="chip chip-live">ACTIVE</span>
+                  <span className="hero-panel-badge">ACTIVE</span>
                 </div>
 
-                <div className="panel-grid">
+                <div className="hero-metrics">
                   <div className="metric">
                     <div className="metric-label">Active platforms</div>
                     <div className="metric-value">3</div>
@@ -84,15 +85,13 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="panel-foot">
+                <div className="hero-panel-note">
                   Engineering resilient systems for institutions in emerging markets.
                 </div>
               </Reveal>
 
-              <Reveal className="hero-shot" delay={0.16}>
-                <div className="shot-frame">
-                  <img src="/gorilla-ledger-shot.png" alt="Gorilla Ledger dashboard preview" />
-                </div>
+              <Reveal className="hero-image-card" delay={0.16}>
+                <img className="hero-image" src="/dashboard.png" alt="Gorilla Ledger dashboard preview" />
               </Reveal>
             </div>
           </div>

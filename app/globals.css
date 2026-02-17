@@ -478,9 +478,9 @@ a {
 }
 
 .hero-main-title {
-  font-size: clamp(2.1rem, 3.8vw, 3.2rem);
+  font-size: clamp(2.25rem, 4.1vw, 3.35rem);
   font-weight: 820;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   margin: 0 0 1rem;
   line-height: 1.05;
@@ -493,7 +493,7 @@ a {
 .hero-text {
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.78);
-  max-width: 42rem;
+  max-width: 44rem;
   margin: 0 0 1.4rem;
 }
 
@@ -549,7 +549,7 @@ a {
 
 .hero-panel:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-soft), var(--shadow-glow);
+  box-shadow: var(--shadow-soft);
 }
 
 .hero-panel-head {
@@ -590,7 +590,7 @@ a {
   border: 1px solid rgba(0, 245, 160, 0.30);
   background: rgba(0, 245, 160, 0.08);
   color: rgba(0, 245, 160, 0.95);
-  animation: statusPulse 2.4s ease-in-out infinite;
+  animation: none;
 }
 
 @keyframes statusPulse {
@@ -625,7 +625,7 @@ a {
     'Courier New', monospace;
   font-size: 1.25rem;
   font-weight: 750;
-  color: rgba(0, 245, 160, 0.92);
+  color: rgba(0, 245, 160, 0.82);
 }
 
 .hero-panel-note {
