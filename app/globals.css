@@ -1226,42 +1226,6 @@ a {
   z-index: 2;
 }
 
-/* Magnetic cursor (desktop only via JS gating). */
-.cursor-ring,
-.cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  pointer-events: none;
-  transform: translate3d(-9999px, -9999px, 0);
-  opacity: 1;
-  will-change: transform, opacity;
-}
-
-.cursor-ring {
-  width: 46px;
-  height: 46px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(0, 255, 200, 0.35);
-  box-shadow:
-    0 0 0 1px rgba(0, 255, 200, 0.12) inset,
-    0 0 28px rgba(0, 255, 200, 0.10);
-  backdrop-filter: blur(2px);
-}
-
-.cursor-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-md);
-  background: rgba(0, 255, 200, 0.85);
-  box-shadow: 0 0 18px rgba(0, 255, 200, 0.35);
-}
-
-html.cursor-hidden .cursor-ring,
-html.cursor-hidden .cursor-dot {
-  opacity: 0 !important;
-}
 
 /* Make sure the hero content sits above the visual layer */
 .hero > .container {
@@ -1269,69 +1233,6 @@ html.cursor-hidden .cursor-dot {
   z-index: 2;
 }
 
-/* =============================
-   CursorFX (missing selectors)
-   ============================= */
-
-.has-cursor-fx {
-  cursor: none;
-}
-
-.cursor-ring,
-.cursor-dot {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 9999;
-  pointer-events: none;
-  transform: translate3d(var(--cx, 50vw), var(--cy, 50vh), 0);
-  will-change: transform, opacity;
-}
-
-.cursor-ring {
-  width: 42px;
-  height: 42px;
-  margin-left: -21px;
-  margin-top: -21px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(0, 245, 160, 0.28);
-  box-shadow:
-    0 0 0 1px rgba(0, 245, 160, 0.10) inset,
-    0 0 18px rgba(0, 245, 160, 0.10);
-  backdrop-filter: blur(2px);
-  opacity: 0.75;
-  transition: width 140ms ease, height 140ms ease, margin 140ms ease, opacity 140ms ease,
-    border-color 140ms ease;
-}
-
-.cursor-dot {
-  width: 7px;
-  height: 7px;
-  margin-left: -3.5px;
-  margin-top: -3.5px;
-  border-radius: var(--radius-md);
-  background: rgba(0, 245, 160, 0.95);
-  box-shadow: 0 0 16px rgba(0, 245, 160, 0.18);
-  opacity: 0.85;
-  transition: opacity 140ms ease;
-}
-
-.cursor-hover .cursor-ring {
-  width: 52px;
-  height: 52px;
-  margin-left: -26px;
-  margin-top: -26px;
-  border-color: rgba(0, 245, 160, 0.42);
-  opacity: 0.85;
-}
-
-.cursor-down .cursor-ring {
-  width: 36px;
-  height: 36px;
-  margin-left: -18px;
-  margin-top: -18px;
-  opacity: 0.9;
-}
 
 /* Inputs / text selection: fade custom cursor */
 .cursor-text .cursor-ring,
@@ -1407,74 +1308,14 @@ html.cursor-hidden .cursor-dot {
   z-index: 2;
 }
 
-/* Cursor FX: perfectly centered ring+dot, hidden on touch devices */
-.has-cursor-fx body {
-  cursor: none;
-}
 
-.cursor-ring,
-.cursor-dot {
-  position: fixed;
-  left: 0;
-  top: 0;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 9999;
-  will-change: left, top, transform, opacity;
-}
-
-.cursor-ring {
-  width: 44px;
-  height: 44px;
-  border-radius: 9999px;
-  border: 1px solid rgba(23, 229, 194, 0.35);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.25) inset,
-    0 0 22px rgba(0, 255, 204, 0.10);
-  backdrop-filter: blur(2px);
-  opacity: 0;
-  transition: transform 180ms ease, opacity 120ms ease, border-color 180ms ease, box-shadow 220ms ease;
-}
-
-.cursor-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 9999px;
-  background: rgba(23, 229, 194, 0.95);
-  box-shadow: 0 0 14px rgba(0, 255, 204, 0.35);
-  opacity: 0;
-  transition: transform 180ms ease, opacity 120ms ease;
-}
-
-/* Hover scaling */
-.cursor-hover .cursor-ring {
-  transform: translate(-50%, -50%) scale(1.16);
-  border-color: rgba(23, 229, 194, 0.55);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.30) inset,
-    0 0 28px rgba(0, 255, 204, 0.14);
-}
-
-.cursor-hover .cursor-dot {
-  transform: translate(-50%, -50%) scale(1.10);
-}
 
 /* Click feedback */
-.cursor-down .cursor-ring {
-  transform: translate(-50%, -50%) scale(0.92);
-  opacity: 0.95;
+
+.has-cursor-fx body {
+  cursor: auto;
 }
 
-/* Hard disable on touch */
-@media (any-pointer: coarse), (pointer: coarse) {
-  .cursor-ring,
-  .cursor-dot {
-    display: none !important;
-  }
-  .has-cursor-fx body {
-    cursor: auto;
-  }
-}
 /* === HERO 3D LAYERING (Cinematic Pass) === */
 .hero {
   position: relative;
@@ -1755,5 +1596,87 @@ html.cursor-hidden .cursor-dot {
 
   .cta-right {
     justify-content: flex-start;
+  }
+}
+
+/* =============================
+   Cursor FX (definitive)
+   - fixed positioning
+   - ring + dot always centered (JS drives translate)
+   - magnet state supported (html.cursor-magnet-on)
+   - hides cleanly when html.cursor-hidden is present
+   ============================= */
+
+.has-cursor-fx,
+.has-cursor-fx body {
+  cursor: none;
+}
+
+/* Base cursor elements */
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  /* JS writes inline transform; keep CSS neutral and avoid fighting */
+  transform: translate3d(-9999px, -9999px, 0);
+  transform-origin: 50% 50%;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: opacity 140ms ease;
+}
+
+/* Ring */
+.cursor-ring {
+  width: 46px;
+  height: 46px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 245, 160, 0.30);
+  box-shadow:
+    0 0 0 1px rgba(0, 245, 160, 0.10) inset,
+    0 0 22px rgba(0, 245, 160, 0.10);
+  backdrop-filter: blur(2px);
+}
+
+/* Dot */
+.cursor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: rgba(0, 245, 160, 0.90);
+  box-shadow: 0 0 16px rgba(0, 245, 160, 0.32);
+}
+
+/* Magnet state (optional extra signal) */
+html.cursor-magnet-on .cursor-ring {
+  border-color: rgba(0, 245, 160, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(0, 245, 160, 0.14) inset,
+    0 0 30px rgba(0, 245, 160, 0.14);
+}
+
+html.cursor-magnet-on .cursor-dot {
+  background: rgba(0, 245, 160, 0.98);
+  box-shadow: 0 0 22px rgba(0, 245, 160, 0.42);
+}
+
+/* Hide cursor when selecting text / focusing inputs */
+html.cursor-hidden .cursor-ring,
+html.cursor-hidden .cursor-dot {
+  opacity: 0 !important;
+}
+
+/* Safety: never show custom cursor on touch / coarse pointers */
+@media (pointer: coarse), (hover: none) {
+  .has-cursor-fx,
+  .has-cursor-fx body {
+    cursor: auto;
+  }
+
+  .cursor-ring,
+  .cursor-dot {
+    display: none !important;
   }
 }
