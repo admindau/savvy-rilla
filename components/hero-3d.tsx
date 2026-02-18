@@ -2,28 +2,17 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
 
 type Hero3DProps = {
-  /** URL to an SVG (public/) */
   src?: string;
-  /** Alias used by the loader */
   svgUrl?: string;
-
   className?: string;
-
-  /** overall scale of the logo group */
   scale?: number;
-  /** extrusion depth */
   depth?: number;
-  /** enable motion */
   animate?: boolean;
-
-  /** render DPR override from loader */
   dpr?: number | [number, number];
-
-  /** if 3D fails (404/parse), show this */
   fallbackSrc?: string;
 };
 
@@ -36,7 +25,7 @@ function damp(current: number, target: number, lambda: number, dt: number) {
 }
 
 function ParticleField({
-  count = 700,
+  count = 650,
   radius = 10,
   depth = 10,
   opacity = 0.04,
@@ -61,7 +50,7 @@ function ParticleField({
       positions[i3 + 1] = (Math.random() - 0.5) * radius * 0.7;
       positions[i3 + 2] = (Math.random() - 0.5) * depth;
 
-      speeds[i] = 0.15 + Math.random() * 0.35;
+      speeds[i] = 0.12 + Math.random() * 0.3;
     }
 
     return { positions, speeds };
@@ -115,9 +104,7 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         setError(null);
 
         const res = await fetch(src, { cache: "force-cache" });
-        if (!res.ok) {
-          throw new Error(`SVG fetch failed: ${res.status} ${res.statusText} (${src})`);
-        }
+        if (!res.ok) throw new Error(`SVG fetch failed: ${res.status} ${res.statusText} (${src})`);
 
         const txt = await res.text();
         const loader = new SVGLoader();
@@ -130,28 +117,28 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
 
         const baseMat = new THREE.MeshStandardMaterial({
           color: new THREE.Color("#0b1417"),
-          metalness: 0.12,
+          metalness: 0.14,
           roughness: 0.78,
           emissive: new THREE.Color("#0c2a2e"),
           emissiveIntensity: 0.06,
           transparent: true,
-          opacity: 0.88,
+          opacity: 0.9,
         });
 
         const rimMat = new THREE.MeshStandardMaterial({
           color: new THREE.Color("#0a0f12"),
-          metalness: 0.25,
+          metalness: 0.26,
           roughness: 0.35,
           emissive: new THREE.Color("#00c7a0"),
-          emissiveIntensity: 0.12,
+          emissiveIntensity: 0.13,
           transparent: true,
-          opacity: 0.35,
+          opacity: 0.34,
         });
 
         const edgeMat = new THREE.LineBasicMaterial({
           color: new THREE.Color("#3bffd9"),
           transparent: true,
-          opacity: 0.28,
+          opacity: 0.24,
         });
 
         let builtAny = false;
@@ -170,25 +157,21 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
                 curveSegments: 8,
               });
 
-              const m = new THREE.Mesh(geom, baseMat);
-              g.add(m);
+              g.add(new THREE.Mesh(geom, baseMat));
 
-              const m2 = new THREE.Mesh(geom, rimMat);
-              m2.scale.setScalar(1.006);
-              m2.position.z += extrusionDepth * 0.02;
-              g.add(m2);
+              const shell = new THREE.Mesh(geom, rimMat);
+              shell.scale.setScalar(1.006);
+              shell.position.z += extrusionDepth * 0.02;
+              g.add(shell);
 
               const edges = new THREE.EdgesGeometry(geom, 20);
-              const ls = new THREE.LineSegments(edges, edgeMat);
-              ls.renderOrder = 1;
-              g.add(ls);
+              g.add(new THREE.LineSegments(edges, edgeMat));
 
               builtAny = true;
             }
             continue;
           }
 
-          // Stroke-only fallback: tube along points
           const pts = (p as any).getPoints ? (p as any).getPoints(240) : [];
           if (!Array.isArray(pts) || pts.length < 2) continue;
 
@@ -211,9 +194,7 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
           builtAny = true;
         }
 
-        if (!builtAny) {
-          throw new Error(`SVG parsed but produced no geometry (${src}).`);
-        }
+        if (!builtAny) throw new Error(`SVG parsed but produced no geometry (${src}).`);
 
         // Center group
         const box = new THREE.Box3().setFromObject(g);
@@ -226,18 +207,18 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         g.position.y -= center.y;
         g.position.z -= center.z;
 
-        // Normalize roughly by width
+        // ✅ Smaller normalization target (this is the “too big” fix)
         const w = Math.max(size.x, 1e-6);
-        const target = 3.2;
+        const target = 2.35; // was larger; now more “hero object” than “background slab”
         const s = target / w;
         g.scale.setScalar(s);
 
         // Flip Y (SVG is Y-down)
         g.scale.y *= -1;
 
-        // Start slightly tilted
-        g.rotation.x = -0.18;
-        g.rotation.y = 0.22;
+        // Initial pose
+        g.rotation.x = -0.16;
+        g.rotation.y = 0.18;
 
         if (!alive) return;
         setGroup(g);
@@ -245,19 +226,39 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         if (!alive) return;
         setGroup(null);
         setError(e?.message ?? "3D logo failed to load");
-        // eslint-disable-next-line no-console
         console.warn("[Hero3D] failed:", e);
       }
     }
 
     run();
-
     return () => {
       alive = false;
     };
   }, [src, extrusionDepth]);
 
   return { group, error };
+}
+
+/**
+ * Window pointer tracker so motion works even when canvas has pointer-events:none
+ */
+function useWindowPointer() {
+  const pointer = useRef({ x: 0, y: 0 }); // normalized -1..1
+  const has = useRef(false);
+
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      const nx = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
+      const ny = (e.clientY / Math.max(1, window.innerHeight)) * 2 - 1;
+      pointer.current.x = clamp(nx, -1, 1);
+      pointer.current.y = clamp(ny, -1, 1);
+      has.current = true;
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, []);
+
+  return { pointer, has };
 }
 
 function LogoRig({
@@ -272,38 +273,41 @@ function LogoRig({
   animate: boolean;
 }) {
   const { group } = useSvgMeshes(src, depth);
-  const ref = useRef<THREE.Group>(null);
-  const { mouse } = useThree();
+  const rigRef = useRef<THREE.Group>(null);
+
+  const { pointer } = useWindowPointer();
 
   useFrame((state, dt) => {
-    const rig = ref.current;
+    const rig = rigRef.current;
     if (!rig) return;
 
     const t = state.clock.getElapsedTime();
-    const idleY = Math.sin(t * 0.12) * 0.05;
-    const idleX = Math.cos(t * 0.1) * 0.04;
 
-    const mx = clamp(mouse.x, -0.65, 0.65);
-    const my = clamp(mouse.y, -0.55, 0.55);
+    // ✅ Slightly more visible idle motion
+    const idleY = Math.sin(t * 0.18) * 0.06;
+    const idleX = Math.cos(t * 0.14) * 0.05;
 
-    const targetRy = 0.28 + (animate ? mx * 0.28 : 0);
-    const targetRx = -0.16 + (animate ? -my * 0.18 : 0);
+    const mx = clamp(pointer.current.x, -0.7, 0.7);
+    const my = clamp(pointer.current.y, -0.6, 0.6);
 
-    rig.rotation.y = damp(rig.rotation.y, targetRy, 6.5, dt);
-    rig.rotation.x = damp(rig.rotation.x, targetRx, 6.5, dt);
+    // ✅ Responsive parallax even without canvas pointer events
+    const targetRy = 0.22 + (animate ? mx * 0.28 : 0);
+    const targetRx = -0.14 + (animate ? -my * 0.18 : 0);
 
-    // Clamp rotation to kill silhouette moments
-    rig.rotation.y = clamp(rig.rotation.y, -0.25, 0.65);
-    rig.rotation.x = clamp(rig.rotation.x, -0.45, 0.15);
+    rig.rotation.y = damp(rig.rotation.y, targetRy, 6.2, dt);
+    rig.rotation.x = damp(rig.rotation.x, targetRx, 6.2, dt);
 
-    rig.position.y = damp(rig.position.y, idleY, 3.5, dt);
-    rig.position.x = damp(rig.position.x, idleX, 3.5, dt);
+    rig.rotation.y = clamp(rig.rotation.y, -0.25, 0.62);
+    rig.rotation.x = clamp(rig.rotation.x, -0.45, 0.16);
+
+    rig.position.y = damp(rig.position.y, idleY, 3.4, dt);
+    rig.position.x = damp(rig.position.x, idleX, 3.4, dt);
   });
 
   if (!group) return null;
 
   return (
-    <group ref={ref} scale={scale} renderOrder={0}>
+    <group ref={rigRef} scale={scale} renderOrder={0}>
       <primitive object={group} />
     </group>
   );
@@ -322,14 +326,14 @@ function Scene({
 }) {
   return (
     <>
-      {/* keep alpha canvas; don’t set an opaque scene background */}
       <fog attach="fog" args={["#020507", 10.0, 21.0]} />
 
       <ambientLight intensity={0.45} />
-      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.6} />
-      <pointLight position={[-2.5, 1.5, 2.5]} intensity={0.35} />
+      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.62} />
+      <directionalLight position={[-3.6, 1.4, 4.0]} intensity={0.38} color={new THREE.Color("#76ffe2")} />
+      <directionalLight position={[-2.6, 2.6, -3.8]} intensity={0.55} color={new THREE.Color("#00f5a0")} />
 
-      <ParticleField count={700} radius={10} depth={10} opacity={0.05} />
+      <ParticleField count={650} radius={10} depth={10} opacity={0.045} />
       <LogoRig src={src} scale={scale} depth={depth} animate={animate} />
     </>
   );
@@ -348,16 +352,10 @@ export default function Hero3D({
   const resolvedSrc = svgUrl ?? src ?? "/srt-logo.svg";
   const { error } = useSvgMeshes(resolvedSrc, depth);
 
-  // If 3D fails (404/parse), show fallback SVG so something is ALWAYS visible.
   if (error && (fallbackSrc || resolvedSrc)) {
     return (
       <div className={`hero-visual__fallback ${className ?? ""}`.trim()} aria-hidden="true">
-        <img
-          className="hero3d-fallback-mark"
-          src={fallbackSrc ?? resolvedSrc}
-          alt=""
-          draggable={false}
-        />
+        <img className="hero3d-fallback-mark" src={fallbackSrc ?? resolvedSrc} alt="" draggable={false} />
       </div>
     );
   }
@@ -367,7 +365,14 @@ export default function Hero3D({
       <Canvas
         dpr={dpr}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-        camera={{ position: [0, 0, 8.4], fov: 40, near: 0.1, far: 50 }}
+        camera={{ position: [0, 0, 8.9], fov: 40, near: 0.1, far: 50 }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0);
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1.06;
+          // @ts-ignore
+          gl.outputColorSpace = THREE.SRGBColorSpace;
+        }}
       >
         <Scene src={resolvedSrc} scale={scale} depth={depth} animate={animate} />
       </Canvas>
