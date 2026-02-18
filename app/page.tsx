@@ -377,6 +377,46 @@ export default function Page() {
       </section>
 
       {/* FOOTER */}
+      <footer className="footer">
+        <div className="container footer-inner">
+          <div className="footer-left">
+            <div className="footer-brand">Savvy Rilla Technologies</div>
+            <div className="footer-sub">Secure enterprise systems for South Sudan.</div>
+          </div>
+
+          <div className="footer-links">
+            <Link href="/platforms" data-cursor-magnet>
+              Platforms
+            </Link>
+            <Link href="/enterprise" data-cursor-magnet>
+              Enterprise
+            </Link>
+            <Link href="/infrastructure" data-cursor-magnet>
+              Infrastructure
+            </Link>
+            <Link href="/industries" data-cursor-magnet>
+              Industries
+            </Link>
+            <Link href="/insights" data-cursor-magnet>
+              Insights
+            </Link>
+            <Link href="/company" data-cursor-magnet>
+              Company
+            </Link>
+            <Link href="/contact" data-cursor-magnet>
+              Contact
+            </Link>
+            <Link href="/status" data-cursor-magnet>
+              Status
+            </Link>
+          </div>
+
+          <div className="footer-meta">
+            <div>Operational since 2023</div>
+            <div>© {new Date().getFullYear()} Savvy Rilla Technologies</div>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
