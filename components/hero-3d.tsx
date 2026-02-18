@@ -116,25 +116,25 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         metalness: 0.12,
         roughness: 0.78,
         emissive: new THREE.Color("#0c2a2e"),
-        emissiveIntensity: 0.08,
+        emissiveIntensity: 0.06,
         transparent: true,
-        opacity: 0.92,
+        opacity: 0.88,
       });
 
       const rimMat = new THREE.MeshStandardMaterial({
         color: new THREE.Color("#0a0f12"),
         metalness: 0.25,
-        roughness: 0.28,
+        roughness: 0.35,
         emissive: new THREE.Color("#00c7a0"),
-        emissiveIntensity: 0.22,
+        emissiveIntensity: 0.12,
         transparent: true,
-        opacity: 0.48,
+        opacity: 0.35,
       });
 
       const edgeMat = new THREE.LineBasicMaterial({
         color: new THREE.Color("#3bffd9"),
         transparent: true,
-        opacity: 0.36,
+        opacity: 0.28,
       });
 
       for (const p of paths) {
@@ -284,12 +284,16 @@ function Scene({
   animate: boolean;
 }) {
   return (
-    <>      <ambientLight intensity={0.55} />
-      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.75} />
-      <pointLight position={[-2.5, 1.5, 2.5]} intensity={0.45} />
+    <>
+      <color attach="background" args={["#030507"]} />
+      <fog attach="fog" args={["#020507", 10.0, 21.0]} />
+
+      <ambientLight intensity={0.45} />
+      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.6} />
+      <pointLight position={[-2.5, 1.5, 2.5]} intensity={0.35} />
 
       {/* Barely visible particle drift behind everything */}
-      <ParticleField count={700} radius={10} depth={10} opacity={0.06} />
+      <ParticleField count={700} radius={10} depth={10} opacity={0.04} />
 
       <LogoRig src={src} scale={scale} depth={depth} animate={animate} />
     </>
@@ -312,9 +316,6 @@ export default function Hero3D({
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         camera={{ position: [0, 0, 8.4], fov: 40, near: 0.1, far: 50 }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(0x000000, 0);
-        }}
       >
         <Scene src={resolvedSrc} scale={scale} depth={depth} animate={animate} />
       </Canvas>

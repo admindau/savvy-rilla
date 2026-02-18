@@ -8,26 +8,33 @@ export default function Page() {
   return (
     <main className="page">
       {/* HERO */}
-      <section className="hero">
+      <section className="hero hero--cinematic">
         <div className="hero-bg" aria-hidden="true">
           <div className="hero-stars" />
+          {/* Cinematic space/earth + africa silhouette */}
+          <div className="hero-space" />
           <div className="hero-africa" />
-          <div className="hero-orb" aria-hidden="true">
-            <Hero3DLoader className="hero-visual" svgUrl="/srt-logo.svg" />
+
+          {/* Orb / 3D logo */}
+          <div className="hero-orb">
+            <Hero3DLoader className="hero-visual" svgUrl="/srt-logo.svg" scale={1} depth={0.24} />
           </div>
+
           <div className="hero-vignette" />
         </div>
 
         <div className="container hero-container">
-          <div className="hero-grid">
+          <div className="hero-grid hero-grid--cinematic">
             <div className="hero-left">
               <Reveal className="hero-kicker" delay={0.06}>
                 SAVVY RILLA TECHNOLOGIES
               </Reveal>
 
               <Reveal delay={0.1}>
-                <h1 className="hero-title">
-                  POWERING SECURE
+                <h1 className="hero-title hero-title--xl">
+                  POWERING
+                  <br />
+                  SECURE
                   <br />
                   DIGITAL
                   <br />
@@ -37,9 +44,10 @@ export default function Page() {
                 </h1>
               </Reveal>
 
-              <Reveal className="hero-subtitle" delay={0.12}>
+              <Reveal className="hero-text" delay={0.12}>
                 We design, build, and operate enterprise-grade technology platforms for financial institutions,
-                governments, and organisations — engineered for performance, security, and real-world African constraints.
+                governments, and organisations — engineered for performance, security, and real-world African
+                constraints.
               </Reveal>
 
               <Reveal className="hero-actions" delay={0.14}>
@@ -52,11 +60,14 @@ export default function Page() {
                   </Link>
                 </div>
 
-                <div className="hero-trust-strip">
-                  <span className="pill">Secure by architecture</span>
-                  <span className="pill">API-first systems</span>
-                  <span className="pill">Performance optimized</span>
-                  <span className="pill">Multi-region ready</span>
+                <div className="hero-trust-strip" aria-label="Trust indicators">
+                  <span className="hero-trust-pill">Secure by architecture</span>
+                  <span className="hero-trust-dot" aria-hidden="true" />
+                  <span className="hero-trust-pill">API-first systems</span>
+                  <span className="hero-trust-dot" aria-hidden="true" />
+                  <span className="hero-trust-pill">Performance optimized</span>
+                  <span className="hero-trust-dot" aria-hidden="true" />
+                  <span className="hero-trust-pill">Multi-region ready</span>
                 </div>
               </Reveal>
             </div>
@@ -64,11 +75,14 @@ export default function Page() {
             <div className="hero-right">
               <Reveal className="ops-card" delay={0.12}>
                 <div className="ops-head">
-                  <div>
+                  <div className="ops-head-left">
                     <div className="ops-title">Operational Overview</div>
-                    <div className="ops-sub">LIVE SYSTEMS SNAPSHOT</div>
+                    <div className="ops-subtitle">LIVE SYSTEMS SNAPSHOT</div>
                   </div>
-                  <div className="ops-badge">ACTIVE</div>
+                  <div className="ops-badge">
+                    <span className="ops-badge-dot" aria-hidden="true" />
+                    ACTIVE
+                  </div>
                 </div>
 
                 <div className="ops-grid">
@@ -90,56 +104,20 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="ops-foot">
-                  Engineering resilient systems for institutions in emerging markets.
-                </div>
+                <div className="ops-note">Engineering resilient systems for institutions in emerging markets.</div>
               </Reveal>
 
-              {/* DASHBOARD PREVIEW — DEPTH/REACTIVITY RESTORED */}
               <Reveal className="hero-image-card" delay={0.16}>
-                <Parallax className="hero-image-parallax" strength={8} hoverScale={1.02}>
-                  <div
-                    data-cursor-magnet
-                    style={{
-                      position: "relative",
-                      borderRadius: "inherit",
-                      overflow: "hidden",
-                    }}
-                  >
+                <Parallax className="hero-image-parallax" strength={9} hoverScale={1.03}>
+                  <div className="hero-image-wrap" data-cursor-magnet>
                     <img
                       className="hero-image"
                       src="/dashboard.png"
                       alt="Gorilla Ledger dashboard preview"
                       loading="lazy"
                     />
-
-                    {/* Foreground gloss */}
-                    <div
-                      data-depth="0.9"
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        pointerEvents: "none",
-                        borderRadius: "inherit",
-                        background:
-                          "radial-gradient(60% 60% at 30% 20%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%)",
-                      }}
-                    />
-
-                    {/* Mid-layer grid */}
-                    <div
-                      data-depth="0.35"
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        pointerEvents: "none",
-                        borderRadius: "inherit",
-                        opacity: 0.22,
-                        backgroundImage:
-                          "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
-                        backgroundSize: "42px 42px",
-                      }}
-                    />
+                    <div className="hero-image-glow" />
+                    <div className="hero-image-grid" />
                   </div>
                 </Parallax>
               </Reveal>
@@ -379,6 +357,48 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      {/* FOOTER */}
+      <footer className="footer">
+        <div className="container footer-inner">
+          <div className="footer-left">
+            <div className="footer-brand">Savvy Rilla Technologies</div>
+            <div className="footer-sub">Secure enterprise systems for South Sudan.</div>
+          </div>
+
+          <div className="footer-links">
+            <Link href="/platforms" data-cursor-magnet>
+              Platforms
+            </Link>
+            <Link href="/enterprise" data-cursor-magnet>
+              Enterprise
+            </Link>
+            <Link href="/infrastructure" data-cursor-magnet>
+              Infrastructure
+            </Link>
+            <Link href="/industries" data-cursor-magnet>
+              Industries
+            </Link>
+            <Link href="/insights" data-cursor-magnet>
+              Insights
+            </Link>
+            <Link href="/company" data-cursor-magnet>
+              Company
+            </Link>
+            <Link href="/contact" data-cursor-magnet>
+              Contact
+            </Link>
+            <Link href="/status" data-cursor-magnet>
+              Status
+            </Link>
+          </div>
+
+          <div className="footer-meta">
+            <div>Operational since 2023</div>
+            <div>© {new Date().getFullYear()} Savvy Rilla Technologies</div>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

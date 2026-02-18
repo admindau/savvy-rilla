@@ -34,7 +34,7 @@ function useFlags() {
       setFlags({
         prefersReduced: reduced.matches,
         coarse: coarse.matches,
-        lowPower: saveData,
+        lowPower: saveData || ((navigator as any)?.deviceMemory && (navigator as any).deviceMemory <= 4),
       });
     };
 
