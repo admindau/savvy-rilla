@@ -59,10 +59,6 @@ export default function CursorFX() {
     let cx = x;
     let cy = y;
 
-    // Dot position (snappier)
-    let dx = x;
-    let dy = y;
-
     // Magnet state
     let magnetEl: MagnetTarget = null;
     let magnetRect: DOMRect | null = null;
@@ -77,6 +73,7 @@ export default function CursorFX() {
 
       if (el) document.documentElement.classList.add("cursor-magnet-on");
       else document.documentElement.classList.remove("cursor-magnet-on");
+      document.documentElement.classList.remove("cursor-down");
     };
 
     const onMove = (e: PointerEvent) => {
@@ -102,25 +99,28 @@ export default function CursorFX() {
       }
 
       // Obvious but controlled scale on hover
-      targetScale = target ? 1.30 : 1;
+      targetScale = target ? 1.42 : 1;
     };
 
     const onDown = () => {
+      document.documentElement.classList.add("cursor-down");
       ring.style.opacity = "0.9";
       dot.style.opacity = "0.95";
-      targetScale = magnetEl ? 1.34 : 1.10;
+      targetScale = magnetEl ? 1.46 : 1.14;
     };
 
     const onUp = () => {
+      document.documentElement.classList.remove("cursor-down");
       ring.style.opacity = "1";
       dot.style.opacity = "1";
-      targetScale = magnetEl ? 1.30 : 1;
+      targetScale = magnetEl ? 1.42 : 1;
     };
 
     const onLeaveWindow = () => {
       ring.style.opacity = "0";
       dot.style.opacity = "0";
       document.documentElement.classList.remove("cursor-magnet-on");
+      document.documentElement.classList.remove("cursor-down");
     };
 
     const onEnterWindow = () => {
@@ -134,50 +134,34 @@ export default function CursorFX() {
     };
 
     const tick = () => {
-      /**
-       * Cursor feel:
-       * - Dot is "snappy" (fast follow)
-       * - Ring has a controlled lag (premium/weighted feel)
-       * - Magnet affects ring more than dot (so it feels intentional, not toy-like)
-       */
-      const dotFollow = 0.55; // higher = faster
-      const ringFollow = 0.22; // lower = more lag
+      // Fast follow = less lag
+      const follow = 0.28;
 
       // Default is raw pointer
       let tx = x;
       let ty = y;
 
-      // Magnet: pull slightly toward element center (ring bias)
-      let ringTx = x;
-      let ringTy = y;
-
+      // Magnet: pull slightly toward element center
       if (magnetEl && magnetRect) {
         const mx = magnetRect.left + magnetRect.width / 2;
         const my = magnetRect.top + magnetRect.height / 2;
 
-        const pullRing = 0.38; // ring pull
-        const pullDot = 0.14; // dot pull (subtle)
-
-        ringTx = x + (mx - x) * pullRing;
-        ringTy = y + (my - y) * pullRing;
-
-        tx = x + (mx - x) * pullDot;
-        ty = y + (my - y) * pullDot;
+        // Pull strength: noticeable but not toy-like
+        const pull = 0.34;
+        tx = x + (mx - x) * pull;
+        ty = y + (my - y) * pull;
       }
 
-      // Smooth positions (separate)
-      // Ring uses cx/cy, dot uses dx/dy so it stays centered and aligned.
-      cx += (ringTx - cx) * ringFollow;
-      cy += (ringTy - cy) * ringFollow;
+      // Smooth position
+      cx += (tx - cx) * follow;
+      cy += (ty - cy) * follow;
 
-      dx += (tx - dx) * dotFollow;
-      dy += (ty - dy) * dotFollow;
+      // Smooth scale
+      scale += (targetScale - scale) * 0.20;
 
-      // Smooth scale (ring only)
-      scale += (targetScale - scale) * 0.22;
-
+      // Apply transforms (both share same cx/cy -> dot centered)
       ring.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%) scale(${scale})`;
-      dot.style.transform = `translate3d(${dx}px, ${dy}px, 0) translate(-50%, -50%)`;
+      dot.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
 
       raf = window.requestAnimationFrame(tick);
     };
@@ -191,7 +175,6 @@ export default function CursorFX() {
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onDown, { passive: true });
     window.addEventListener("pointerup", onUp, { passive: true });
-    window.addEventListener("blur", onLeaveWindow, { passive: true });
     window.addEventListener("scroll", onScrollOrResize, { passive: true });
     window.addEventListener("resize", onScrollOrResize, { passive: true });
 
@@ -203,13 +186,13 @@ export default function CursorFX() {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("blur", onLeaveWindow);
       window.removeEventListener("scroll", onScrollOrResize);
       window.removeEventListener("resize", onScrollOrResize);
       document.removeEventListener("pointerleave", onLeaveWindow as any);
       document.removeEventListener("pointerenter", onEnterWindow as any);
 
       document.documentElement.classList.remove("cursor-magnet-on");
+      document.documentElement.classList.remove("cursor-down");
       document.documentElement.classList.remove("has-cursor-fx");
     };
   }, []);
