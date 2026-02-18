@@ -1226,111 +1226,10 @@ a {
   z-index: 2;
 }
 
-/* Magnetic cursor (desktop only via JS gating). */
-.cursor-ring,
-.cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  pointer-events: none;
-  transform: translate3d(-9999px, -9999px, 0);
-  opacity: 1;
-  will-change: transform, opacity;
-}
-
-.cursor-ring {
-  width: 46px;
-  height: 46px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(0, 255, 200, 0.35);
-  box-shadow:
-    0 0 0 1px rgba(0, 255, 200, 0.12) inset,
-    0 0 28px rgba(0, 255, 200, 0.10);
-  backdrop-filter: blur(2px);
-}
-
-.cursor-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-md);
-  background: rgba(0, 255, 200, 0.85);
-  box-shadow: 0 0 18px rgba(0, 255, 200, 0.35);
-}
-
-html.cursor-hidden .cursor-ring,
-html.cursor-hidden .cursor-dot {
-  opacity: 0 !important;
-}
-
 /* Make sure the hero content sits above the visual layer */
 .hero > .container {
   position: relative;
   z-index: 2;
-}
-
-/* =============================
-   CursorFX (missing selectors)
-   ============================= */
-
-.has-cursor-fx {
-  cursor: none;
-}
-
-.cursor-ring,
-.cursor-dot {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 9999;
-  pointer-events: none;
-  transform: translate3d(var(--cx, 50vw), var(--cy, 50vh), 0);
-  will-change: transform, opacity;
-}
-
-.cursor-ring {
-  width: 42px;
-  height: 42px;
-  margin-left: -21px;
-  margin-top: -21px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(0, 245, 160, 0.28);
-  box-shadow:
-    0 0 0 1px rgba(0, 245, 160, 0.10) inset,
-    0 0 18px rgba(0, 245, 160, 0.10);
-  backdrop-filter: blur(2px);
-  opacity: 0.75;
-  transition: width 140ms ease, height 140ms ease, margin 140ms ease, opacity 140ms ease,
-    border-color 140ms ease;
-}
-
-.cursor-dot {
-  width: 7px;
-  height: 7px;
-  margin-left: -3.5px;
-  margin-top: -3.5px;
-  border-radius: var(--radius-md);
-  background: rgba(0, 245, 160, 0.95);
-  box-shadow: 0 0 16px rgba(0, 245, 160, 0.18);
-  opacity: 0.85;
-  transition: opacity 140ms ease;
-}
-
-.cursor-hover .cursor-ring {
-  width: 52px;
-  height: 52px;
-  margin-left: -26px;
-  margin-top: -26px;
-  border-color: rgba(0, 245, 160, 0.42);
-  opacity: 0.85;
-}
-
-.cursor-down .cursor-ring {
-  width: 36px;
-  height: 36px;
-  margin-left: -18px;
-  margin-top: -18px;
-  opacity: 0.9;
 }
 
 /* Inputs / text selection: fade custom cursor */
@@ -1756,4 +1655,98 @@ html.cursor-hidden .cursor-dot {
   .cta-right {
     justify-content: flex-start;
   }
+}
+/* ========================================================================== */
+/* CursorFX v2 (aligned ring + dot, magnetic + safe hover lift)                */
+/* ========================================================================== */
+
+html.cursor-ready,
+html.cursor-ready body {
+  cursor: none;
+}
+
+.cursor-fx-root {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+  opacity: 0;
+  transform: translate3d(-9999px, -9999px, 0);
+  will-change: transform, opacity;
+}
+
+.cursor-fx-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 9999px;
+  transform: translate3d(-50%, -50%, 0);
+  border: 2px solid rgba(0, 245, 160, 0.7);
+  box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.1) inset,
+    0 0 28px rgba(0, 245, 160, 0.12);
+  transition: width 160ms ease, height 160ms ease, border-color 160ms ease,
+    opacity 160ms ease;
+  opacity: 0.9;
+}
+
+.cursor-fx-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  transform: translate3d(-50%, -50%, 0);
+  background: rgba(0, 245, 160, 0.95);
+  box-shadow: 0 0 16px rgba(0, 245, 160, 0.22);
+  opacity: 0.95;
+}
+
+html.cursor-magnet-on .cursor-fx-ring {
+  width: 48px;
+  height: 48px;
+  border-color: rgba(0, 245, 160, 0.85);
+}
+
+html.cursor-down .cursor-fx-ring {
+  width: 32px;
+  height: 32px;
+}
+
+html.cursor-text .cursor-fx-ring,
+html.cursor-text .cursor-fx-dot {
+  opacity: 0.18;
+}
+
+/* Magnetic hover glow + lift (no transform fighting with Parallax inner) */
+[data-cursor-magnet] {
+  position: relative;
+  transition: transform 180ms ease, box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+[data-cursor-magnet]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(0, 245, 160, 0.14) inset,
+    0 0 24px rgba(0, 245, 160, 0.06);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+[data-cursor-magnet]:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2), 0 0 0 1px rgba(0, 245, 160, 0.1) inset;
+}
+
+[data-cursor-magnet]:hover::after {
+  opacity: 1;
 }

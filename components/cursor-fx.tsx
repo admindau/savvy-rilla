@@ -7,20 +7,32 @@ type Point = { x: number; y: number };
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
+
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
+
 function prefersReducedMotion() {
-  return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches
+  );
 }
 
+/**
+ * CursorFX
+ * - Green circular ring + centered dot (always aligned)
+ * - Magnetic hover on elements with [data-cursor-magnet]
+ *   - optional: data-cursor-magnet="0.12..0.45" controls pull strength
+ * - Adds html classes for styling: cursor-ready, cursor-magnet-on, cursor-down, cursor-text
+ */
 export default function CursorFX() {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   const pointer = useRef<Point>({ x: 0, y: 0 });
   const pos = useRef<Point>({ x: 0, y: 0 });
-  const raf = useRef<number | null>(null);
 
+  const raf = useRef<number | null>(null);
   const hasMoved = useRef(false);
   const isDown = useRef(false);
 
@@ -37,6 +49,7 @@ export default function CursorFX() {
   });
 
   useEffect(() => {
+    // Disable on touch / coarse pointers
     const isTouch =
       "ontouchstart" in window ||
       (navigator as any).maxTouchPoints > 0 ||
@@ -48,12 +61,30 @@ export default function CursorFX() {
     const html = document.documentElement;
     html.classList.add("cursor-ready");
 
+    const setTextMode = (el: HTMLElement | null) => {
+      if (!el) {
+        html.classList.remove("cursor-text");
+        return;
+      }
+
+      const tag = el.tagName;
+      const isTexty =
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        el.isContentEditable ||
+        el.getAttribute("role") === "textbox";
+
+      if (isTexty) html.classList.add("cursor-text");
+      else html.classList.remove("cursor-text");
+    };
+
     const setMagnetTarget = (el: HTMLElement | null) => {
       magnet.current.target = el;
 
       if (!el) {
         magnet.current.active = false;
-        html.classList.remove("cursor-hover", "cursor-magnet-on");
+        html.classList.remove("cursor-magnet-on");
         return;
       }
 
@@ -62,10 +93,14 @@ export default function CursorFX() {
 
       const raw = el.getAttribute("data-cursor-magnet");
       const strength = raw == null || raw === "" ? 0.26 : Number(raw);
-      magnet.current.strength = clamp(Number.isFinite(strength) ? strength : 0.26, 0.12, 0.45);
-      magnet.current.active = true;
+      magnet.current.strength = clamp(
+        Number.isFinite(strength) ? strength : 0.26,
+        0.12,
+        0.45
+      );
 
-      html.classList.add("cursor-hover", "cursor-magnet-on");
+      magnet.current.active = true;
+      html.classList.add("cursor-magnet-on");
     };
 
     const refreshMagnetCenter = () => {
@@ -83,8 +118,9 @@ export default function CursorFX() {
       pointer.current.y = e.clientY;
 
       const tgt = e.target as HTMLElement | null;
-      const magnetEl = tgt?.closest?.("[data-cursor-magnet]") as HTMLElement | null;
+      setTextMode(tgt);
 
+      const magnetEl = tgt?.closest?.("[data-cursor-magnet]") as HTMLElement | null;
       if (magnetEl !== currentMagnet) {
         currentMagnet = magnetEl;
         setMagnetTarget(magnetEl);
@@ -109,6 +145,7 @@ export default function CursorFX() {
     const tick = () => {
       const p = pointer.current;
 
+      // Initialize to avoid lerp from (0,0)
       if (hasMoved.current && pos.current.x === 0 && pos.current.y === 0) {
         pos.current.x = p.x;
         pos.current.y = p.y;
@@ -129,7 +166,6 @@ export default function CursorFX() {
       pos.current.y = lerp(pos.current.y, ty, follow);
 
       if (rootRef.current) {
-        // Single anchor = perfect alignment of ring + dot
         rootRef.current.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0)`;
         rootRef.current.style.opacity = "1";
       }
@@ -152,74 +188,14 @@ export default function CursorFX() {
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      html.classList.remove("cursor-ready", "cursor-hover", "cursor-down", "cursor-magnet-on");
+      html.classList.remove("cursor-ready", "cursor-magnet-on", "cursor-down", "cursor-text");
     };
   }, []);
 
-  const green = "rgba(34, 197, 94, 0.95)";
-  const greenSoft = "rgba(34, 197, 94, 0.22)";
-
   return (
-    <>
-      {/* Cursor root is the ONLY element that moves. Children stay perfectly centered. */}
-      <div
-        ref={rootRef}
-        aria-hidden="true"
-        style={{
-          position: "fixed",
-          left: 0,
-          top: 0,
-          width: 0,
-          height: 0,
-          pointerEvents: "none",
-          zIndex: 2147483647,
-          opacity: 0, // becomes 1 after first move
-          transform: "translate3d(0,0,0)",
-        }}
-      >
-        {/* ring */}
-        <div
-          className="cursor-ring"
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            width: 36,
-            height: 36,
-            borderRadius: 9999,
-            border: `2px solid ${green}`,
-            boxShadow: `0 0 28px ${greenSoft}`,
-            transform: "translate3d(-50%, -50%, 0)",
-            transition: "width 160ms ease, height 160ms ease, border-width 160ms ease",
-          }}
-        />
-        {/* dot */}
-        <div
-          className="cursor-dot"
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            width: 6,
-            height: 6,
-            borderRadius: 9999,
-            background: green,
-            boxShadow: `0 0 16px ${greenSoft}`,
-            transform: "translate3d(-50%, -50%, 0)",
-          }}
-        />
-      </div>
-
-      {/* Minimal state styling without relying on your globals */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-            html.cursor-ready, html.cursor-ready body { cursor: none; }
-            html.cursor-ready.cursor-magnet-on .cursor-ring { width: 46px; height: 46px; }
-            html.cursor-ready.cursor-down .cursor-ring { width: 30px; height: 30px; }
-          `,
-        }}
-      />
-    </>
+    <div ref={rootRef} className="cursor-fx-root" aria-hidden="true">
+      <div className="cursor-fx-ring" />
+      <div className="cursor-fx-dot" />
+    </div>
   );
 }

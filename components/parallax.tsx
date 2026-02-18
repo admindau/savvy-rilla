@@ -2,9 +2,8 @@
 
 import React, { useEffect, useRef } from "react";
 
-type ParallaxProps = {
+type ParallaxProps = React.HTMLAttributes<HTMLDivElement> & {
   children: React.ReactNode;
-  className?: string;
 
   /** Max rotation strength. Clamped internally to avoid toy-feel. */
   strength?: number;
@@ -21,11 +20,17 @@ function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
+/**
+ * Parallax
+ * - Owns tilt/depth via transforms on .parallax-inner
+ * - Root stays transform-free (safe place to attach hover glow/lift and [data-cursor-magnet])
+ */
 export default function Parallax({
   children,
   className = "",
   strength = 10,
   hoverScale = 1.015,
+  ...rest
 }: ParallaxProps) {
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -50,6 +55,7 @@ export default function Parallax({
     let running = false;
     let settleFrames = 0;
 
+    // targets + currents (smoothed)
     let tRx = 0;
     let tRy = 0;
     let cRx = 0;
@@ -58,7 +64,7 @@ export default function Parallax({
     let tScale = 1;
     let cScale = 1;
 
-    // Depth layers: anything inside with data-depth="0.2..1"
+    // depth layers: anything inside with data-depth="0.2..1"
     const layers = Array.from(root.querySelectorAll<HTMLElement>("[data-depth]"));
     for (const node of layers) node.style.willChange = "transform";
 
@@ -83,8 +89,11 @@ export default function Parallax({
 
     const onMove = (ev: PointerEvent) => {
       const rect = root.getBoundingClientRect();
-      const nx = (ev.clientX - rect.left) / Math.max(1, rect.width); // 0..1
-      const ny = (ev.clientY - rect.top) / Math.max(1, rect.height); // 0..1
+      const w = Math.max(1, rect.width);
+      const h = Math.max(1, rect.height);
+
+      const nx = (ev.clientX - rect.left) / w; // 0..1
+      const ny = (ev.clientY - rect.top) / h; // 0..1
       const px = (nx - 0.5) * 2; // -1..1
       const py = (ny - 0.5) * 2; // -1..1
 
@@ -107,9 +116,9 @@ export default function Parallax({
       cRy = lerp(cRy, tRy, 0.12);
       cScale = lerp(cScale, tScale, 0.14);
 
-      inner.style.transform = `perspective(950px) rotateX(${cRx.toFixed(2)}deg) rotateY(${cRy.toFixed(
+      inner.style.transform = `perspective(950px) rotateX(${cRx.toFixed(
         2
-      )}deg) translateZ(0) scale(${cScale.toFixed(3)})`;
+      )}deg) rotateY(${cRy.toFixed(2)}deg) translateZ(0) scale(${cScale.toFixed(3)})`;
 
       for (const node of layers) {
         const d = clamp(Number(node.dataset.depth ?? "0.6"), 0.15, 1);
@@ -142,11 +151,15 @@ export default function Parallax({
       root.removeEventListener("pointermove", onMove);
       root.removeEventListener("pointerleave", onLeave);
       root.classList.remove("parallax-active");
+      inner.style.transform = "";
+      inner.style.willChange = "";
+      inner.style.transformStyle = "";
+      for (const node of layers) node.style.transform = "";
     };
   }, [strength, hoverScale]);
 
   return (
-    <div ref={ref} className={`parallax ${className}`.trim()}>
+    <div ref={ref} className={`parallax ${className}`.trim()} {...rest}>
       <div className="parallax-inner">{children}</div>
     </div>
   );
