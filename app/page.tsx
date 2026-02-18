@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import Hero3DLoader from "@/components/hero-3d-loader";
 import Reveal from "@/components/reveal";
+import Parallax from "@/components/parallax";
 
 export default function HomePage() {
   return (
@@ -33,7 +34,8 @@ export default function HomePage() {
               </Reveal>
 
               <Reveal className="hero-text" delay={0.08}>
-                We build institutional-grade systems for organizations in South Sudan — engineered for stability, security, and real operational constraints.
+                We build institutional-grade systems for organizations in South Sudan — engineered for
+                stability, security, and real operational constraints.
               </Reveal>
 
               <Reveal className="hero-cta" delay={0.12}>
@@ -55,43 +57,71 @@ export default function HomePage() {
             </div>
 
             <div className="hero-right">
-              <Reveal className="hero-panel" delay={0.1}>
-                <div className="hero-panel-head">
-                  <div className="hero-panel-brand">
-                    <div>
-                      <p className="hero-panel-title">Operational Overview</p>
-                      <p className="hero-panel-subtitle">Live systems snapshot</p>
+              {/* =========================
+                  Operational Overview CARD
+                  - Parallax owns tilt/depth
+                  - data-cursor-magnet on Parallax root (safe)
+                  ========================= */}
+              <Reveal delay={0.1}>
+                <Parallax
+                  className="hero-panel"
+                  data-cursor-magnet="0.32"
+                  strength={9}
+                  hoverScale={1.02}
+                >
+                  <div className="hero-panel-head">
+                    <div className="hero-panel-brand">
+                      <div>
+                        <p className="hero-panel-title">Operational Overview</p>
+                        <p className="hero-panel-subtitle">Live systems snapshot</p>
+                      </div>
+                    </div>
+                    <span className="hero-panel-badge">ACTIVE</span>
+                  </div>
+
+                  <div className="hero-metrics">
+                    <div className="metric">
+                      <div className="metric-label">Active platforms</div>
+                      <div className="metric-value">3</div>
+                    </div>
+                    <div className="metric">
+                      <div className="metric-label">Systems deployed</div>
+                      <div className="metric-value">12+</div>
+                    </div>
+                    <div className="metric">
+                      <div className="metric-label">Avg response time</div>
+                      <div className="metric-value">&lt;200ms</div>
+                    </div>
+                    <div className="metric">
+                      <div className="metric-label">Uptime target</div>
+                      <div className="metric-value">99.9%</div>
                     </div>
                   </div>
-                  <span className="hero-panel-badge">ACTIVE</span>
-                </div>
 
-                <div className="hero-metrics">
-                  <div className="metric">
-                    <div className="metric-label">Active platforms</div>
-                    <div className="metric-value">3</div>
+                  <div className="hero-panel-note">
+                    Engineering resilient systems for institutions in emerging markets.
                   </div>
-                  <div className="metric">
-                    <div className="metric-label">Systems deployed</div>
-                    <div className="metric-value">12+</div>
-                  </div>
-                  <div className="metric">
-                    <div className="metric-label">Avg response time</div>
-                    <div className="metric-value">&lt;200ms</div>
-                  </div>
-                  <div className="metric">
-                    <div className="metric-label">Uptime target</div>
-                    <div className="metric-value">99.9%</div>
-                  </div>
-                </div>
-
-                <div className="hero-panel-note">
-                  Engineering resilient systems for institutions in emerging markets.
-                </div>
+                </Parallax>
               </Reveal>
 
-              <Reveal className="hero-image-card" delay={0.16}>
-                <img className="hero-image" src="/dashboard.png" alt="Gorilla Ledger dashboard preview" />
+              {/* =========================
+                  Dashboard preview MODULE
+                  - Parallax owns tilt/depth
+                  - data-cursor-magnet on Parallax root (safe)
+                  ========================= */}
+              <Reveal delay={0.16}>
+                <Parallax
+                  className="hero-image-card"
+                  data-cursor-magnet="0.28"
+                  strength={8}
+                  hoverScale={1.018}
+                >
+                  <img
+                    className="hero-image"
+                    src="/dashboard.png"
+                    alt="Gorilla Ledger dashboard preview"
+                  />
+                </Parallax>
               </Reveal>
             </div>
           </div>
@@ -109,8 +139,9 @@ export default function HomePage() {
               Built for institutions. Designed for continuity.
             </Reveal>
             <Reveal className="mb-sub" delay={0.08}>
-              Savvy Rilla Technologies is a product company delivering custom enterprise system builds in
-              South Sudan — engineered for governance, reliability, and long-term operational resilience.
+              Savvy Rilla Technologies is a product company delivering custom enterprise system builds
+              in South Sudan — engineered for governance, reliability, and long-term operational
+              resilience.
             </Reveal>
           </div>
 
@@ -120,7 +151,8 @@ export default function HomePage() {
               <div className="card-kicker">Operating posture</div>
               <div className="card-title">Institutional-grade engineering</div>
               <div className="card-text">
-                Systems designed to be audit-friendly, maintainable, and stable under real operational constraints.
+                Systems designed to be audit-friendly, maintainable, and stable under real operational
+                constraints.
               </div>
               <div className="card-hover">
                 <div className="card-metrics">
@@ -141,7 +173,8 @@ export default function HomePage() {
               <div className="card-kicker">Delivery model</div>
               <div className="card-title">Product + custom builds</div>
               <div className="card-text">
-                We ship platform capabilities, then tailor workflows, controls, and integrations to each environment.
+                We ship platform capabilities, then tailor workflows, controls, and integrations to each
+                environment.
               </div>
               <div className="card-hover">
                 <Link className="btn btn-sm card-cta" href="/enterprise" data-cursor-magnet>
@@ -155,7 +188,8 @@ export default function HomePage() {
               <div className="card-kicker">Trust layer</div>
               <div className="card-title">Security-first foundations</div>
               <div className="card-text">
-                Access control, policy-first data design, and governance-minded implementation from day one.
+                Access control, policy-first data design, and governance-minded implementation from day
+                one.
               </div>
               <div className="card-hover">
                 <Link className="btn btn-sm card-cta" href="/infrastructure" data-cursor-magnet>
@@ -246,7 +280,8 @@ export default function HomePage() {
               <div className="card-kicker">Engineering standards</div>
               <div className="card-title">Maintainable by design</div>
               <div className="card-text">
-                Modular components, explicit interfaces, and documentation-ready delivery — so systems can evolve without chaos.
+                Modular components, explicit interfaces, and documentation-ready delivery — so systems can
+                evolve without chaos.
               </div>
             </Reveal>
 
@@ -254,7 +289,8 @@ export default function HomePage() {
               <div className="card-kicker">Operations</div>
               <div className="card-title">Observable &amp; supportable</div>
               <div className="card-text">
-                Deployment discipline, monitoring hooks, and incident-ready patterns for institutions that cannot afford downtime.
+                Deployment discipline, monitoring hooks, and incident-ready patterns for institutions
+                that cannot afford downtime.
               </div>
             </Reveal>
 
@@ -262,7 +298,8 @@ export default function HomePage() {
               <div className="card-kicker">Delivery velocity</div>
               <div className="card-title">Platform acceleration</div>
               <div className="card-text">
-                Reusable modules that reduce build time while preserving enterprise security and governance.
+                Reusable modules that reduce build time while preserving enterprise security and
+                governance.
               </div>
             </Reveal>
           </div>
@@ -279,7 +316,8 @@ export default function HomePage() {
               Security + governance baked in
             </Reveal>
             <Reveal className="mb-sub" delay={0.08}>
-              Enterprise credibility comes from stability signals and implementation discipline — not slogans.
+              Enterprise credibility comes from stability signals and implementation discipline — not
+              slogans.
             </Reveal>
           </div>
 
@@ -288,7 +326,8 @@ export default function HomePage() {
               <div className="card-kicker">Security posture</div>
               <div className="card-title">Least privilege access</div>
               <div className="card-text">
-                Role-based permissions, secure defaults, and separation of duties aligned with institutional environments.
+                Role-based permissions, secure defaults, and separation of duties aligned with
+                institutional environments.
               </div>
             </Reveal>
 
@@ -296,7 +335,8 @@ export default function HomePage() {
               <div className="card-kicker">Governance</div>
               <div className="card-title">Audit-friendly foundations</div>
               <div className="card-text">
-                Policy-first data handling, traceable actions, and change control patterns that support compliance readiness.
+                Policy-first data handling, traceable actions, and change control patterns that support
+                compliance readiness.
               </div>
             </Reveal>
 
@@ -304,7 +344,8 @@ export default function HomePage() {
               <div className="card-kicker">Reliability</div>
               <div className="card-title">Uptime-minded delivery</div>
               <div className="card-text">
-                Clear operational boundaries, support models, and performance budgets designed for long-term continuity.
+                Clear operational boundaries, support models, and performance budgets designed for
+                long-term continuity.
               </div>
             </Reveal>
           </div>
@@ -322,7 +363,8 @@ export default function HomePage() {
                 Where this works
               </Reveal>
               <Reveal className="mb-sub" delay={0.08}>
-                Use cases aligned to institutional environments across South Sudan — operations-heavy, security-sensitive, mission-critical.
+                Use cases aligned to institutional environments across South Sudan — operations-heavy,
+                security-sensitive, mission-critical.
               </Reveal>
             </div>
             <Reveal className="mb-head-cta" delay={0.1}>
@@ -342,7 +384,8 @@ export default function HomePage() {
               <Reveal key={t} className="card" delay={0.06 + i * 0.03}>
                 <div className="card-title">{t}</div>
                 <div className="card-text">
-                  Structured workflows, governed data, and security-first design — engineered for operational reality.
+                  Structured workflows, governed data, and security-first design — engineered for
+                  operational reality.
                 </div>
               </Reveal>
             ))}
@@ -357,7 +400,8 @@ export default function HomePage() {
               <div className="cta-kicker">ENGAGE</div>
               <h2 className="cta-title">Request a consultation</h2>
               <p className="cta-text">
-                Short discovery call. Clear architecture proposal. Delivery plan aligned to your operational environment in South Sudan.
+                Short discovery call. Clear architecture proposal. Delivery plan aligned to your
+                operational environment in South Sudan.
               </p>
             </div>
             <div className="cta-right">
@@ -371,7 +415,6 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
-
     </main>
   );
 }
