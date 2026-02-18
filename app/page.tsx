@@ -11,7 +11,10 @@ export default function Page() {
       <section className="hero">
         <div className="hero-bg" aria-hidden="true">
           <div className="hero-stars" />
-          <Hero3DLoader className="hero-visual" svgUrl="/srt-logo.svg" />
+          <div className="hero-africa" />
+          <div className="hero-orb" aria-hidden="true">
+            <Hero3DLoader className="hero-visual" svgUrl="/srt-logo.svg" />
+          </div>
           <div className="hero-vignette" />
         </div>
 
@@ -24,19 +27,19 @@ export default function Page() {
 
               <Reveal delay={0.1}>
                 <h1 className="hero-title">
-                  SECURE
+                  POWERING SECURE
                   <br />
-                  ENTERPRISE
+                  DIGITAL
                   <br />
-                  SOFTWARE
+                  INFRASTRUCTURE
                   <br />
-                  FOR SOUTH SUDAN.
+                  ACROSS AFRICA.
                 </h1>
               </Reveal>
 
               <Reveal className="hero-subtitle" delay={0.12}>
-                We build institutional-grade systems for organizations in South Sudan — engineered for stability,
-                security, and real operational constraints.
+                We design, build, and operate enterprise-grade technology platforms for financial institutions,
+                governments, and organisations — engineered for performance, security, and real-world African constraints.
               </Reveal>
 
               <Reveal className="hero-actions" delay={0.14}>
@@ -50,9 +53,10 @@ export default function Page() {
                 </div>
 
                 <div className="hero-trust-strip">
-                  <span className="pill">Operational since 2023</span>
-                  <span className="pill">Built &amp; deployed in South Sudan</span>
-                  <span className="pill">Security-first architecture</span>
+                  <span className="pill">Secure by architecture</span>
+                  <span className="pill">API-first systems</span>
+                  <span className="pill">Performance optimized</span>
+                  <span className="pill">Multi-region ready</span>
                 </div>
               </Reveal>
             </div>
@@ -375,48 +379,6 @@ export default function Page() {
           </div>
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="footer">
-        <div className="container footer-inner">
-          <div className="footer-left">
-            <div className="footer-brand">Savvy Rilla Technologies</div>
-            <div className="footer-sub">Secure enterprise systems for South Sudan.</div>
-          </div>
-
-          <div className="footer-links">
-            <Link href="/platforms" data-cursor-magnet>
-              Platforms
-            </Link>
-            <Link href="/enterprise" data-cursor-magnet>
-              Enterprise
-            </Link>
-            <Link href="/infrastructure" data-cursor-magnet>
-              Infrastructure
-            </Link>
-            <Link href="/industries" data-cursor-magnet>
-              Industries
-            </Link>
-            <Link href="/insights" data-cursor-magnet>
-              Insights
-            </Link>
-            <Link href="/company" data-cursor-magnet>
-              Company
-            </Link>
-            <Link href="/contact" data-cursor-magnet>
-              Contact
-            </Link>
-            <Link href="/status" data-cursor-magnet>
-              Status
-            </Link>
-          </div>
-
-          <div className="footer-meta">
-            <div>Operational since 2023</div>
-            <div>© {new Date().getFullYear()} Savvy Rilla Technologies</div>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

@@ -56,8 +56,10 @@ export default function CursorFX() {
     let y = window.innerHeight / 2;
 
     // Smoothed cursor position (USED BY BOTH ring + dot so they stay centered)
-    let cx = x;
-    let cy = y;
+    let rcx = x;
+    let rcy = y;
+    let dcx = x;
+    let dcy = y;
 
     // Magnet state
     let magnetEl: MagnetTarget = null;
@@ -73,6 +75,7 @@ export default function CursorFX() {
 
       if (el) document.documentElement.classList.add("cursor-magnet-on");
       else document.documentElement.classList.remove("cursor-magnet-on");
+      document.documentElement.classList.remove("cursor-down");
     };
 
     const onMove = (e: PointerEvent) => {
@@ -98,25 +101,28 @@ export default function CursorFX() {
       }
 
       // Obvious but controlled scale on hover
-      targetScale = target ? 1.30 : 1;
+      targetScale = target ? 1.34 : 1;
     };
 
     const onDown = () => {
+      document.documentElement.classList.add("cursor-down");
       ring.style.opacity = "0.9";
       dot.style.opacity = "0.95";
-      targetScale = magnetEl ? 1.34 : 1.10;
+      targetScale = magnetEl ? 1.38 : 1.12;
     };
 
     const onUp = () => {
+      document.documentElement.classList.remove("cursor-down");
       ring.style.opacity = "1";
       dot.style.opacity = "1";
-      targetScale = magnetEl ? 1.30 : 1;
+      targetScale = magnetEl ? 1.34 : 1;
     };
 
     const onLeaveWindow = () => {
       ring.style.opacity = "0";
       dot.style.opacity = "0";
       document.documentElement.classList.remove("cursor-magnet-on");
+      document.documentElement.classList.remove("cursor-down");
     };
 
     const onEnterWindow = () => {
@@ -130,34 +136,36 @@ export default function CursorFX() {
     };
 
     const tick = () => {
-      // Fast follow = less lag
-      const follow = 0.28;
+      // Separate smoothing so the dot feels snappy and the ring feels weighted.
+      const dotFollow = 0.46;   // faster
+      const ringFollow = 0.18;  // slower
 
       // Default is raw pointer
       let tx = x;
       let ty = y;
 
-      // Magnet: pull slightly toward element center
+      // Magnet: pull cursor toward element center, but keep it subtle and premium.
       if (magnetEl && magnetRect) {
         const mx = magnetRect.left + magnetRect.width / 2;
         const my = magnetRect.top + magnetRect.height / 2;
 
-        // Pull strength: noticeable but not toy-like
-        const pull = 0.34;
+        const pull = 0.42;
         tx = x + (mx - x) * pull;
         ty = y + (my - y) * pull;
       }
 
-      // Smooth position
-      cx += (tx - cx) * follow;
-      cy += (ty - cy) * follow;
+      // Smooth positions (ring uses rcx/rcy; dot uses dcx/dcy)
+      rcx += (tx - rcx) * ringFollow;
+      rcy += (ty - rcy) * ringFollow;
 
-      // Smooth scale
-      scale += (targetScale - scale) * 0.20;
+      dcx += (tx - dcx) * dotFollow;
+      dcy += (ty - dcy) * dotFollow;
 
-      // Apply transforms (both share same cx/cy -> dot centered)
-      ring.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%) scale(${scale})`;
-      dot.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+      // Smooth scale (ring only)
+      scale += (targetScale - scale) * 0.18;
+
+      ring.style.transform = `translate3d(${rcx}px, ${rcy}px, 0) translate(-50%, -50%) scale(${scale})`;
+      dot.style.transform = `translate3d(${dcx}px, ${dcy}px, 0) translate(-50%, -50%)`;
 
       raf = window.requestAnimationFrame(tick);
     };
@@ -188,6 +196,7 @@ export default function CursorFX() {
       document.removeEventListener("pointerenter", onEnterWindow as any);
 
       document.documentElement.classList.remove("cursor-magnet-on");
+      document.documentElement.classList.remove("cursor-down");
       document.documentElement.classList.remove("has-cursor-fx");
     };
   }, []);

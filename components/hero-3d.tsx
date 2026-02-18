@@ -284,14 +284,12 @@ function Scene({
   animate: boolean;
 }) {
   return (
-    <>      <fog attach="fog" args={["#000000", 10.0, 21.0]} />
-
-      <ambientLight intensity={0.45} />
-      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.6} />
-      <pointLight position={[-2.5, 1.5, 2.5]} intensity={0.35} />
+    <>      <ambientLight intensity={0.55} />
+      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.75} />
+      <pointLight position={[-2.5, 1.5, 2.5]} intensity={0.45} />
 
       {/* Barely visible particle drift behind everything */}
-      <ParticleField count={700} radius={10} depth={10} opacity={0.04} />
+      <ParticleField count={700} radius={10} depth={10} opacity={0.06} />
 
       <LogoRig src={src} scale={scale} depth={depth} animate={animate} />
     </>
@@ -314,6 +312,9 @@ export default function Hero3D({
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         camera={{ position: [0, 0, 8.4], fov: 40, near: 0.1, far: 50 }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0);
+        }}
       >
         <Scene src={resolvedSrc} scale={scale} depth={depth} animate={animate} />
       </Canvas>
