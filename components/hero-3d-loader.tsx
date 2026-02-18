@@ -8,6 +8,7 @@ type Props = {
   svgUrl?: string;
   /** Back-compat alias */
   src?: string;
+
   scale?: number;
   depth?: number;
   className?: string;
@@ -41,8 +42,7 @@ function useFlags() {
       const mem = (navigator as any)?.deviceMemory ?? 0;
       const cores = (navigator as any)?.hardwareConcurrency ?? 0;
 
-      // IMPORTANT: be conservative — 4 cores is NOT “low power” by default.
-      // Only flag lowPower if Save-Data is on, memory is very low, or cores are very low.
+      // Conservative: only flag lowPower on very small devices or Save-Data.
       const lowPower =
         saveData ||
         (mem && mem <= 3) ||
@@ -50,8 +50,6 @@ function useFlags() {
         document.documentElement.classList.contains("low-power");
 
       const deviceDpr = window.devicePixelRatio ?? 1;
-
-      // Cap DPR on lowPower but do not disable 3D
       const dpr = lowPower ? Math.min(1.35, deviceDpr) : Math.min(2, deviceDpr);
 
       setFlags({
@@ -84,36 +82,41 @@ export default function Hero3DLoader({
   force3d,
 }: Props) {
   const resolvedSrc = svgUrl ?? src;
-  const { prefersReduced, coarse, lowPower, dpr } = useFlags();
+  const { prefersReduced, coarse, dpr } = useFlags();
 
   const allow3d = useMemo(() => {
-    // explicit override
     if (force3d === false) return false;
     if (force3d === true) return true;
 
-    // accessibility + touch gating
+    // Accessibility + touch gating
     if (prefersReduced) return false;
     if (coarse) return false;
 
-    // lowPower no longer disables — only reduces quality
     return true;
   }, [prefersReduced, coarse, force3d]);
 
   const animate = useMemo(() => {
     if (prefersReduced) return false;
     if (coarse) return false;
-    // on lowPower, keep motion but it’s already subtle; you can disable if you want:
-    // return !lowPower;
     return true;
   }, [prefersReduced, coarse]);
 
-  if (!allow3d) {
-    return (
-      <div className={`hero3d-fallback ${className ?? ""}`.trim()} aria-hidden="true">
-        <img className="hero3d-fallback-mark" src={resolvedSrc} alt="" />
-      </div>
-    );
-  }
+  // Fallback that matches your CSS hook: .hero-visual__fallback
+  const Fallback = (
+    <div
+      className={`hero-visual__fallback ${className ?? ""}`.trim()}
+      aria-hidden="true"
+    >
+      <img
+        className="hero3d-fallback-mark"
+        src={resolvedSrc}
+        alt=""
+        draggable={false}
+      />
+    </div>
+  );
+
+  if (!allow3d) return Fallback;
 
   return (
     <Hero3D
@@ -123,6 +126,7 @@ export default function Hero3DLoader({
       animate={animate}
       className={className}
       dpr={dpr}
+      fallbackSrc={resolvedSrc}
     />
   );
 }
