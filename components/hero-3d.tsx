@@ -116,25 +116,25 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         metalness: 0.12,
         roughness: 0.78,
         emissive: new THREE.Color("#0c2a2e"),
-        emissiveIntensity: 0.06,
+        emissiveIntensity: 0.08,
         transparent: true,
-        opacity: 0.88,
+        opacity: 0.92,
       });
 
       const rimMat = new THREE.MeshStandardMaterial({
         color: new THREE.Color("#0a0f12"),
         metalness: 0.25,
-        roughness: 0.35,
+        roughness: 0.28,
         emissive: new THREE.Color("#00c7a0"),
-        emissiveIntensity: 0.12,
+        emissiveIntensity: 0.22,
         transparent: true,
-        opacity: 0.35,
+        opacity: 0.48,
       });
 
       const edgeMat = new THREE.LineBasicMaterial({
         color: new THREE.Color("#3bffd9"),
         transparent: true,
-        opacity: 0.28,
+        opacity: 0.36,
       });
 
       for (const p of paths) {
@@ -284,9 +284,7 @@ function Scene({
   animate: boolean;
 }) {
   return (
-    <>
-      <color attach="background" args={["#030507"]} />
-      <fog attach="fog" args={["#020507", 10.0, 21.0]} />
+    <>      <fog attach="fog" args={["#000000", 10.0, 21.0]} />
 
       <ambientLight intensity={0.45} />
       <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.6} />

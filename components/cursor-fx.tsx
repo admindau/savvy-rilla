@@ -73,7 +73,6 @@ export default function CursorFX() {
 
       if (el) document.documentElement.classList.add("cursor-magnet-on");
       else document.documentElement.classList.remove("cursor-magnet-on");
-      document.documentElement.classList.remove("cursor-down");
     };
 
     const onMove = (e: PointerEvent) => {
@@ -99,28 +98,25 @@ export default function CursorFX() {
       }
 
       // Obvious but controlled scale on hover
-      targetScale = target ? 1.42 : 1;
+      targetScale = target ? 1.30 : 1;
     };
 
     const onDown = () => {
-      document.documentElement.classList.add("cursor-down");
       ring.style.opacity = "0.9";
       dot.style.opacity = "0.95";
-      targetScale = magnetEl ? 1.46 : 1.14;
+      targetScale = magnetEl ? 1.34 : 1.10;
     };
 
     const onUp = () => {
-      document.documentElement.classList.remove("cursor-down");
       ring.style.opacity = "1";
       dot.style.opacity = "1";
-      targetScale = magnetEl ? 1.42 : 1;
+      targetScale = magnetEl ? 1.30 : 1;
     };
 
     const onLeaveWindow = () => {
       ring.style.opacity = "0";
       dot.style.opacity = "0";
       document.documentElement.classList.remove("cursor-magnet-on");
-      document.documentElement.classList.remove("cursor-down");
     };
 
     const onEnterWindow = () => {
@@ -192,7 +188,6 @@ export default function CursorFX() {
       document.removeEventListener("pointerenter", onEnterWindow as any);
 
       document.documentElement.classList.remove("cursor-magnet-on");
-      document.documentElement.classList.remove("cursor-down");
       document.documentElement.classList.remove("has-cursor-fx");
     };
   }, []);
