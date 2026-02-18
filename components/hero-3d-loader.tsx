@@ -34,7 +34,7 @@ function useFlags() {
       setFlags({
         prefersReduced: reduced.matches,
         coarse: coarse.matches,
-        lowPower: saveData || dpr > 2.25,
+        lowPower: saveData,
       });
     };
 
