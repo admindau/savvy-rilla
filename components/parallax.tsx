@@ -44,12 +44,12 @@ export default function Parallax({
     const maxTranslate = clamp(10 + maxDeg * 0.9, 10, 18);
 
     inner.style.willChange = "transform";
+    inner.style.transformStyle = "preserve-3d";
 
     let raf = 0;
     let running = false;
     let settleFrames = 0;
 
-    // targets + currents (Rq: smoothed)
     let tRx = 0;
     let tRy = 0;
     let cRx = 0;
@@ -58,8 +58,9 @@ export default function Parallax({
     let tScale = 1;
     let cScale = 1;
 
-    // depth layers: anything inside with data-depth="0.2..1"
+    // Depth layers: anything inside with data-depth="0.2..1"
     const layers = Array.from(root.querySelectorAll<HTMLElement>("[data-depth]"));
+    for (const node of layers) node.style.willChange = "transform";
 
     const startRaf = () => {
       if (running) return;
@@ -82,8 +83,8 @@ export default function Parallax({
 
     const onMove = (ev: PointerEvent) => {
       const rect = root.getBoundingClientRect();
-      const nx = (ev.clientX - rect.left) / rect.width; // 0..1
-      const ny = (ev.clientY - rect.top) / rect.height; // 0..1
+      const nx = (ev.clientX - rect.left) / Math.max(1, rect.width); // 0..1
+      const ny = (ev.clientY - rect.top) / Math.max(1, rect.height); // 0..1
       const px = (nx - 0.5) * 2; // -1..1
       const py = (ny - 0.5) * 2; // -1..1
 
@@ -106,9 +107,9 @@ export default function Parallax({
       cRy = lerp(cRy, tRy, 0.12);
       cScale = lerp(cScale, tScale, 0.14);
 
-      inner.style.transform = `perspective(950px) rotateX(${cRx.toFixed(
+      inner.style.transform = `perspective(950px) rotateX(${cRx.toFixed(2)}deg) rotateY(${cRy.toFixed(
         2
-      )}deg) rotateY(${cRy.toFixed(2)}deg) translateZ(0) scale(${cScale.toFixed(3)})`;
+      )}deg) translateZ(0) scale(${cScale.toFixed(3)})`;
 
       for (const node of layers) {
         const d = clamp(Number(node.dataset.depth ?? "0.6"), 0.15, 1);
