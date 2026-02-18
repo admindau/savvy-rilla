@@ -11,12 +11,18 @@ type Hero3DProps = {
   /** Alias used by the loader */
   svgUrl?: string;
   className?: string;
+
   /** overall scale of the logo group */
   scale?: number;
+
   /** extrusion depth */
   depth?: number;
+
   /** enable motion */
   animate?: boolean;
+
+  /** optional: cap DPR for performance */
+  dpr?: number | [number, number];
 };
 
 function clamp(n: number, min: number, max: number) {
@@ -28,10 +34,10 @@ function damp(current: number, target: number, lambda: number, dt: number) {
 }
 
 function ParticleField({
-  count = 900,
+  count = 800,
   radius = 10,
-  depth = 8,
-  opacity = 0.18,
+  depth = 10,
+  opacity = 0.06,
 }: {
   count?: number;
   radius?: number;
@@ -51,7 +57,7 @@ function ParticleField({
       positions[i3 + 0] = Math.cos(t) * r;
       positions[i3 + 1] = (Math.random() - 0.5) * radius * 0.7;
       positions[i3 + 2] = (Math.random() - 0.5) * depth;
-      speeds[i] = 0.15 + Math.random() * 0.35;
+      speeds[i] = 0.12 + Math.random() * 0.3;
     }
 
     return { positions, speeds };
@@ -82,7 +88,7 @@ function ParticleField({
         transparent
         opacity={opacity}
         depthWrite={false}
-        color={new THREE.Color("#7fffd4")}
+        color={new THREE.Color("#bfffee")}
         sizeAttenuation
       />
     </points>
@@ -97,44 +103,42 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
 
     async function run() {
       const loader = new SVGLoader();
+      const svgText = await fetch(src).then((r) => r.text());
+      if (!alive) return;
 
-      const data = await new Promise<ReturnType<SVGLoader["parse"]>>((resolve, reject) => {
-        fetch(src)
-          .then((r) => r.text())
-          .then((txt) => resolve(loader.parse(txt)))
-          .catch(reject);
-      });
-
+      const data = loader.parse(svgText);
       if (!alive) return;
 
       const g = new THREE.Group();
       const paths = data.paths || [];
 
-      // Material choices are tuned so the logo is readable but still “in atmosphere”.
-      const baseMat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color("#0b1417"),
-        metalness: 0.12,
-        roughness: 0.78,
-        emissive: new THREE.Color("#0c2a2e"),
-        emissiveIntensity: 0.06,
-        transparent: true,
-        opacity: 0.88,
-      });
-
-      const rimMat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color("#0a0f12"),
-        metalness: 0.25,
-        roughness: 0.35,
-        emissive: new THREE.Color("#00c7a0"),
+      // Core material: dark body with subtle green emissive so it reads on black.
+      const coreMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color("#071014"),
+        metalness: 0.18,
+        roughness: 0.7,
+        emissive: new THREE.Color("#043a33"),
         emissiveIntensity: 0.12,
         transparent: true,
-        opacity: 0.35,
+        opacity: 0.92,
       });
 
-      const edgeMat = new THREE.LineBasicMaterial({
-        color: new THREE.Color("#3bffd9"),
+      // Rim shell: slightly larger, more emissive edge for premium “powered” look.
+      const rimMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color("#05090b"),
+        metalness: 0.35,
+        roughness: 0.35,
+        emissive: new THREE.Color("#00f5a0"),
+        emissiveIntensity: 0.22,
         transparent: true,
-        opacity: 0.28,
+        opacity: 0.38,
+      });
+
+      // Edges: low opacity outline to help silhouette without turning into a wireframe.
+      const edgeMat = new THREE.LineBasicMaterial({
+        color: new THREE.Color("#7dffe0"),
+        transparent: true,
+        opacity: 0.2,
       });
 
       for (const p of paths) {
@@ -148,18 +152,18 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
               bevelThickness: extrusionDepth * 0.18,
               bevelSize: extrusionDepth * 0.12,
               bevelSegments: 2,
-              curveSegments: 8,
+              curveSegments: 10,
             });
 
-            const m = new THREE.Mesh(geom, baseMat);
+            const m = new THREE.Mesh(geom, coreMat);
             g.add(m);
 
-            const m2 = new THREE.Mesh(geom, rimMat);
-            m2.scale.setScalar(1.006);
-            m2.position.z += extrusionDepth * 0.02;
-            g.add(m2);
+            const shell = new THREE.Mesh(geom, rimMat);
+            shell.scale.setScalar(1.006);
+            shell.position.z += extrusionDepth * 0.02;
+            g.add(shell);
 
-            const edges = new THREE.EdgesGeometry(geom, 20);
+            const edges = new THREE.EdgesGeometry(geom, 18);
             const ls = new THREE.LineSegments(edges, edgeMat);
             ls.renderOrder = 1;
             g.add(ls);
@@ -167,21 +171,21 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
           continue;
         }
 
-        // Stroke-only fallback: tube along points (prevents “outline-only invisibility”)
-        const pts = (p as any).getPoints ? (p as any).getPoints(240) : [];
+        // Stroke-only fallback: tube along points (prevents outline-only invisibility)
+        const pts = (p as any).getPoints ? (p as any).getPoints(260) : [];
         if (!Array.isArray(pts) || pts.length < 2) continue;
 
         const curve = new THREE.CatmullRomCurve3(pts.map((v: any) => new THREE.Vector3(v.x, v.y, 0)));
+        const tube = new THREE.TubeGeometry(curve, 180, extrusionDepth * 0.12, 10, false);
 
-        const tube = new THREE.TubeGeometry(curve, 160, extrusionDepth * 0.12, 10, false);
         const strokeMat = new THREE.MeshStandardMaterial({
-          color: new THREE.Color("#0b1417"),
-          metalness: 0.2,
+          color: new THREE.Color("#071014"),
+          metalness: 0.25,
           roughness: 0.6,
-          emissive: new THREE.Color("#00c7a0"),
-          emissiveIntensity: 0.18,
+          emissive: new THREE.Color("#00f5a0"),
+          emissiveIntensity: 0.22,
           transparent: true,
-          opacity: 0.72,
+          opacity: 0.74,
         });
 
         g.add(new THREE.Mesh(tube, strokeMat));
@@ -193,34 +197,49 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
       const center = new THREE.Vector3();
       box.getSize(size);
       box.getCenter(center);
+
       g.position.x -= center.x;
       g.position.y -= center.y;
       g.position.z -= center.z;
 
-      // Normalize roughly by width
+      // Normalize by width: keep it “hero object”, not a background takeover.
       const w = Math.max(size.x, 1e-6);
-      const target = 3.2;
+      const target = 2.55; // smaller than before to prevent the giant gorilla bleed
       const s = target / w;
       g.scale.setScalar(s);
 
       // Flip Y (SVG is Y-down)
       g.scale.y *= -1;
 
-      // Start slightly tilted to avoid face-on “giant mask”
+      // Slight initial hero pose
       g.rotation.x = -0.18;
-      g.rotation.y = 0.22;
+      g.rotation.y = 0.28;
 
       setGroup(g);
     }
 
     run();
-
     return () => {
       alive = false;
     };
   }, [src, extrusionDepth]);
 
   return group;
+}
+
+function BackGlow() {
+  // Soft green halo “behind” the logo to keep it readable on very dark scenes
+  return (
+    <mesh position={[0, 0, -1.2]} renderOrder={-1}>
+      <planeGeometry args={[8, 5]} />
+      <meshBasicMaterial
+        transparent
+        opacity={0.22}
+        color={new THREE.Color("#00f5a0")}
+        blending={THREE.AdditiveBlending}
+      />
+    </mesh>
+  );
 }
 
 function LogoRig({
@@ -243,30 +262,34 @@ function LogoRig({
     if (!rig) return;
 
     const t = state.clock.getElapsedTime();
-    const idleY = Math.sin(t * 0.12) * 0.05;
-    const idleX = Math.cos(t * 0.1) * 0.04;
 
-    const mx = clamp(mouse.x, -0.65, 0.65);
-    const my = clamp(mouse.y, -0.55, 0.55);
+    // premium idle: slow, minimal drift
+    const idleY = Math.sin(t * 0.12) * 0.04;
+    const idleX = Math.cos(t * 0.10) * 0.03;
 
-    const targetRy = 0.28 + (animate ? mx * 0.28 : 0);
+    const mx = clamp(mouse.x, -0.7, 0.7);
+    const my = clamp(mouse.y, -0.6, 0.6);
+
+    const targetRy = 0.28 + (animate ? mx * 0.26 : 0);
     const targetRx = -0.16 + (animate ? -my * 0.18 : 0);
 
-    rig.rotation.y = damp(rig.rotation.y, targetRy, 6.5, dt);
-    rig.rotation.x = damp(rig.rotation.x, targetRx, 6.5, dt);
+    rig.rotation.y = damp(rig.rotation.y, targetRy, 6.8, dt);
+    rig.rotation.x = damp(rig.rotation.x, targetRx, 6.8, dt);
 
-    // Clamp rotation to kill the “giant silhouette” moment
-    rig.rotation.y = clamp(rig.rotation.y, -0.25, 0.65);
-    rig.rotation.x = clamp(rig.rotation.x, -0.45, 0.15);
+    // hard clamp to avoid “giant silhouette mask”
+    rig.rotation.y = clamp(rig.rotation.y, -0.18, 0.62);
+    rig.rotation.x = clamp(rig.rotation.x, -0.42, 0.14);
 
-    rig.position.y = damp(rig.position.y, idleY, 3.5, dt);
-    rig.position.x = damp(rig.position.x, idleX, 3.5, dt);
+    rig.position.y = damp(rig.position.y, idleY, 3.8, dt);
+    rig.position.x = damp(rig.position.x, idleX, 3.8, dt);
   });
 
   if (!g) return null;
 
   return (
     <group ref={ref} scale={scale} renderOrder={0}>
+      {/* glow behind */}
+      <BackGlow />
       <primitive object={g} />
     </group>
   );
@@ -285,15 +308,36 @@ function Scene({
 }) {
   return (
     <>
-      <color attach="background" args={["#030507"]} />
-      <fog attach="fog" args={["#020507", 10.0, 21.0]} />
+      {/* IMPORTANT: keep transparent background (no <color attach="background" ... />) */}
+      {/* Subtle fog feel without “painting” the background */}
+      <fog attach="fog" args={["#020507", 8.5, 20.5]} />
 
-      <ambientLight intensity={0.45} />
-      <directionalLight position={[3.2, 2.1, 5.2]} intensity={0.6} />
-      <pointLight position={[-2.5, 1.5, 2.5]} intensity={0.35} />
+      {/* Lighting: key + fill + rim */}
+      <ambientLight intensity={0.32} />
 
-      {/* Barely visible particle drift behind everything */}
-      <ParticleField count={700} radius={10} depth={10} opacity={0.04} />
+      <directionalLight
+        position={[3.4, 2.4, 4.8]}
+        intensity={1.05}
+        color={new THREE.Color("#cffff3")}
+      />
+
+      <directionalLight
+        position={[-4.2, 1.0, 3.2]}
+        intensity={0.55}
+        color={new THREE.Color("#76ffe2")}
+      />
+
+      {/* Rim / back light */}
+      <directionalLight
+        position={[-2.5, 2.8, -3.8]}
+        intensity={0.85}
+        color={new THREE.Color("#00f5a0")}
+      />
+
+      <pointLight position={[0, -1.2, 3.2]} intensity={0.28} color={new THREE.Color("#7dffe0")} />
+
+      {/* Particle drift behind everything */}
+      <ParticleField count={760} radius={10} depth={10} opacity={0.05} />
 
       <LogoRig src={src} scale={scale} depth={depth} animate={animate} />
     </>
@@ -305,17 +349,30 @@ export default function Hero3D({
   svgUrl,
   className,
   scale = 1,
-  depth = 0.22,
+  depth = 0.24,
   animate = true,
+  dpr = [1, 2],
 }: Hero3DProps) {
   const resolvedSrc = svgUrl ?? src ?? "/srt-logo.svg";
 
   return (
     <div className={className} aria-hidden="true">
       <Canvas
-        dpr={[1, 2]}
+        dpr={dpr}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-        camera={{ position: [0, 0, 8.4], fov: 40, near: 0.1, far: 50 }}
+        camera={{ position: [0, 0, 8.6], fov: 40, near: 0.1, far: 60 }}
+        onCreated={({ gl }) => {
+          // Transparent clear
+          gl.setClearColor(0x000000, 0);
+
+          // Premium tone mapping
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1.08;
+
+          // Color space
+          // @ts-ignore (three versions differ)
+          gl.outputColorSpace = THREE.SRGBColorSpace;
+        }}
       >
         <Scene src={resolvedSrc} scale={scale} depth={depth} animate={animate} />
       </Canvas>

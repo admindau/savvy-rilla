@@ -20,6 +20,7 @@ function useFlags() {
     prefersReduced: false,
     coarse: false,
     lowPower: false,
+    dpr: 2,
   });
 
   useEffect(() => {
@@ -30,11 +31,19 @@ function useFlags() {
     const saveData = (navigator as any)?.connection?.saveData === true;
 
     const compute = () => {
-      const dpr = window.devicePixelRatio ?? 1;
+      const mem = (navigator as any)?.deviceMemory ?? 0;
+      const cores = (navigator as any)?.hardwareConcurrency ?? 0;
+      const lowPower = saveData || (mem && mem <= 4) || (cores && cores <= 4);
+
+      // Cap DPR when low power
+      const deviceDpr = window.devicePixelRatio ?? 1;
+      const dpr = lowPower ? Math.min(1.35, deviceDpr) : Math.min(2, deviceDpr);
+
       setFlags({
         prefersReduced: reduced.matches,
         coarse: coarse.matches,
-        lowPower: saveData || ((navigator as any)?.deviceMemory && (navigator as any).deviceMemory <= 4),
+        lowPower,
+        dpr,
       });
     };
 
@@ -55,11 +64,11 @@ export default function Hero3DLoader({
   svgUrl,
   src = "/srt-logo.svg",
   scale = 1,
-  depth = 0.22,
+  depth = 0.24,
   className,
 }: Props) {
   const resolvedSrc = svgUrl ?? src;
-  const { prefersReduced, coarse, lowPower } = useFlags();
+  const { prefersReduced, coarse, lowPower, dpr } = useFlags();
 
   const allow3d = useMemo(() => {
     if (prefersReduced) return false;
@@ -68,7 +77,7 @@ export default function Hero3DLoader({
     return true;
   }, [prefersReduced, coarse, lowPower]);
 
-  // Keep the scene alive on desktop; still “cinematic” but not battery-killing.
+  // Keep the scene alive on desktop; still cinematic but not battery-killing.
   const animate = !prefersReduced && !coarse;
 
   if (!allow3d) {
@@ -86,6 +95,7 @@ export default function Hero3DLoader({
       depth={depth}
       animate={animate}
       className={className}
+      dpr={dpr}
     />
   );
 }

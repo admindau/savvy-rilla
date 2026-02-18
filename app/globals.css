@@ -1186,9 +1186,9 @@ a {
    HERO: stars + 3D logo visual
    ============================= */
 
-/* Ensure the hero background can host an absolutely positioned Canvas */
 .hero {
   position: relative;
+  overflow: hidden;
 }
 
 .hero-bg {
@@ -1196,14 +1196,50 @@ a {
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  pointer-events: none;
 }
-
-/* Canvas wrapper. Keep it behind all hero UI and ignore pointer events. */
+/*
+  3D logo should read as a center-right hero object, not a full-bleed background.
+  We anchor it to the right side, allow some overscan, and keep it behind UI.
+*/
 .hero-visual {
   position: absolute;
-  inset: 0;
+  top: -6vh;
+  right: -10vw;
+  width: min(78vw, 980px);
+  height: calc(100% + 12vh);
   z-index: 0;
   pointer-events: none;
+  opacity: 1;
+  filter: saturate(1.05) contrast(1.05);
+}
+
+/* Ensure the canvas stays transparent and crisp */
+.hero-visual canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* On smaller screens: center it, reduce visual dominance */
+@media (max-width: 900px) {
+  .hero-visual {
+    top: -10vh;
+    right: -18vw;
+    width: 110vw;
+    height: 85vh;
+    opacity: 0.85;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-visual {
+    top: -14vh;
+    right: -28vw;
+    width: 140vw;
+    height: 78vh;
+    opacity: 0.68;
+  }
 }
 
 /* Subtle vignette ABOVE 3D but BELOW hero UI */
@@ -1213,20 +1249,13 @@ a {
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(1200px 700px at 55% 45%, rgba(0, 255, 200, 0.10), transparent 60%),
-    radial-gradient(900px 600px at 25% 35%, rgba(0, 255, 200, 0.06), transparent 55%),
-    radial-gradient(800px 500px at 75% 60%, rgba(0, 0, 0, 0.65), transparent 58%),
-    radial-gradient(1200px 700px at 50% 50%, transparent 35%, rgba(0, 0, 0, 0.88) 100%);
+    radial-gradient(900px 650px at 72% 45%, rgba(0, 255, 200, 0.12), transparent 60%),
+    radial-gradient(700px 520px at 78% 55%, rgba(0, 255, 200, 0.07), transparent 62%),
+    radial-gradient(1100px 720px at 50% 50%, transparent 35%, rgba(0, 0, 0, 0.90) 100%);
   mix-blend-mode: normal;
 }
 
 /* Hero content ABOVE vignette */
-.hero > .container {
-  position: relative;
-  z-index: 2;
-}
-
-/* Make sure the hero content sits above the visual layer */
 .hero > .container {
   position: relative;
   z-index: 2;
