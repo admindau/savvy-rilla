@@ -1221,6 +1221,11 @@ a {
 }
 
 /* Magnetic cursor (desktop only via JS gating). */
+
+html.has-cursor-fx {
+  cursor: none;
+}
+
 .cursor-ring,
 .cursor-dot {
   position: fixed;
@@ -1263,103 +1268,6 @@ html.cursor-hidden .cursor-dot {
   z-index: 2;
 }
 
-/* =============================
-   CursorFX (missing selectors)
-   ============================= */
-
-.has-cursor-fx {
-  cursor: none;
-}
-
-.cursor-ring,
-.cursor-dot {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 9999;
-  pointer-events: none;
-  transform: translate3d(var(--cx, 50vw), var(--cy, 50vh), 0);
-  will-change: transform, opacity;
-}
-
-.cursor-ring {
-  width: 42px;
-  height: 42px;
-  margin-left: -21px;
-  margin-top: -21px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 245, 160, 0.28);
-  box-shadow:
-    0 0 0 1px rgba(0, 245, 160, 0.10) inset,
-    0 0 18px rgba(0, 245, 160, 0.10);
-  backdrop-filter: blur(2px);
-  opacity: 0.75;
-  transition: width 140ms ease, height 140ms ease, margin 140ms ease, opacity 140ms ease,
-    border-color 140ms ease;
-}
-
-.cursor-dot {
-  width: 7px;
-  height: 7px;
-  margin-left: -3.5px;
-  margin-top: -3.5px;
-  border-radius: 999px;
-  background: rgba(0, 245, 160, 0.95);
-  box-shadow: 0 0 16px rgba(0, 245, 160, 0.18);
-  opacity: 0.85;
-  transition: opacity 140ms ease;
-}
-
-.cursor-hover .cursor-ring {
-  width: 52px;
-  height: 52px;
-  margin-left: -26px;
-  margin-top: -26px;
-  border-color: rgba(0, 245, 160, 0.42);
-  opacity: 0.85;
-}
-
-.cursor-down .cursor-ring {
-  width: 36px;
-  height: 36px;
-  margin-left: -18px;
-  margin-top: -18px;
-  opacity: 0.9;
-}
-
-/* Inputs / text selection: fade custom cursor */
-.cursor-text .cursor-ring,
-.cursor-text .cursor-dot {
-  opacity: 0.12;
-}
-
-/* Click ripple */
-.has-ripple {
-  position: relative;
-  overflow: hidden;
-}
-
-.click-ripple {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(0, 245, 160, 0.22), rgba(0, 245, 160, 0.0) 65%);
-  animation: rippleOut 720ms ease-out forwards;
-  pointer-events: none;
-}
-
-@keyframes rippleOut {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(20);
-  }
-}
 /* ========================================================================== */
 /* Cinematic pass overrides (kept at file end to win specificity)              */
 /* ========================================================================== */
