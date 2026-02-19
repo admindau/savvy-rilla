@@ -126,7 +126,151 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+      
+      {/* System Console — command-center band */}
+      <section className="mb-section mb-section--console" aria-label="System console">
+        <div className="container">
+          <div className="console-shell">
+            <div className="console-head">
+              <Reveal className="mb-kicker" delay={0.02}>
+                SYSTEM CONSOLE
+              </Reveal>
+              <Reveal as="h2" className="mb-title" delay={0.05}>
+                A command-center experience — not a brochure.
+              </Reveal>
+              <Reveal className="mb-sub" delay={0.08}>
+                Clear signals. Structured delivery. Evidence of operational maturity — designed to build trust
+                with institutions.
+              </Reveal>
+            </div>
+
+            <div className="console-grid">
+              <Reveal className="console-panel" delay={0.06}>
+                <div className="console-panel-head">
+                  <div>
+                    <div className="console-kicker">Delivery pipeline</div>
+                    <div className="console-title">From scope → deployment</div>
+                  </div>
+                  <span className="console-badge">DISCIPLINED</span>
+                </div>
+
+                <ol className="console-steps">
+                  {[
+                    {
+                      t: "Discovery",
+                      d: "Define workflows, risks, data owners, and access boundaries.",
+                    },
+                    {
+                      t: "Architecture",
+                      d: "Produce system map, security model, and integration plan.",
+                    },
+                    {
+                      t: "Build",
+                      d: "Ship working increments with review loops and change control.",
+                    },
+                    {
+                      t: "Deploy",
+                      d: "Controlled releases with monitoring hooks and rollback paths.",
+                    },
+                    {
+                      t: "Support",
+                      d: "Operational handover, documentation, and continuity support.",
+                    },
+                  ].map((x) => (
+                    <li key={x.t} className="console-step">
+                      <div className="console-step-dot" aria-hidden="true" />
+                      <div className="console-step-body">
+                        <div className="console-step-title">{x.t}</div>
+                        <div className="console-step-text">{x.d}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </Reveal>
+
+              <Reveal className="console-panel console-panel--right" delay={0.09}>
+                <div className="console-panel-head">
+                  <div>
+                    <div className="console-kicker">Controls</div>
+                    <div className="console-title">Institution-ready defaults</div>
+                  </div>
+                  <span className="console-badge console-badge--alt">HARDENED</span>
+                </div>
+
+                <div className="console-checks" role="list">
+                  {[
+                    "Role-based access control (RBAC) + least privilege",
+                    "Audit trails for critical actions",
+                    "Segregation of duties for approvals",
+                    "Operational logging + monitoring hooks",
+                    "Data governance: owners, retention, and exports",
+                    "Performance budgets + uptime-minded patterns",
+                  ].map((t) => (
+                    <div key={t} className="console-check" role="listitem">
+                      <span className="console-check-icon" aria-hidden="true">
+                        ▸
+                      </span>
+                      <span className="console-check-text">{t}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="console-faq">
+                  <details className="console-details">
+                    <summary className="console-summary" data-cursor-magnet>
+                      What does onboarding look like?
+                    </summary>
+                    <div className="console-details-body">
+                      We start with a short discovery call, map your workflows and access model, then share a
+                      clear proposal: architecture outline, milestones, and delivery plan.
+                    </div>
+                  </details>
+
+                  <details className="console-details">
+                    <summary className="console-summary" data-cursor-magnet>
+                      Can you work with limited connectivity?
+                    </summary>
+                    <div className="console-details-body">
+                      Yes. We design for real constraints: caching, offline-tolerant workflows, and operational
+                      fallbacks where needed.
+                    </div>
+                  </details>
+
+                  <details className="console-details">
+                    <summary className="console-summary" data-cursor-magnet>
+                      Do you support systems after launch?
+                    </summary>
+                    <div className="console-details-body">
+                      Yes. Delivery includes documentation, handover, and an optional support model aligned to
+                      your operational needs.
+                    </div>
+                  </details>
+                </div>
+              </Reveal>
+            </div>
+
+            <Reveal className="console-foot" delay={0.12}>
+              <div className="console-foot-left">
+                <div className="console-foot-title">Operational signals</div>
+                <div className="console-foot-text">
+                  A clean interface is good — but institutions buy reliability. The site now surfaces that
+                  posture intentionally.
+                </div>
+              </div>
+              <div className="console-foot-right">
+                <Link className="btn btn-ghost" href="/infrastructure" data-cursor-magnet>
+                  View infrastructure <span className="cta-arrow">→</span>
+                </Link>
+                <Link className="btn btn-primary" href="/contact" data-cursor-magnet>
+                  Start a scope call
+                </Link>
+              </div>
+            </Reveal>
+          </div>
+        </div>
       </section>
+
+</section>
 
       {/* Mission Briefing — Narrative Architecture */}
       <section className="mb-section" aria-label="Vision and positioning">

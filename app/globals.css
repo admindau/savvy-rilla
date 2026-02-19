@@ -1773,3 +1773,329 @@ html.cursor-text .cursor-fx-dot {
 [data-cursor-magnet]:hover::after {
   opacity: 1;
 }
+
+
+/* ============================================================
+   2026-02 HERO BACKGROUND UPGRADE (Non-destructive overrides)
+   Goal:
+   - Remove "giant background image" feeling
+   - Keep stars + 3D logo, but contained and masked
+   - Add premium depth: nebula gradients + subtle noise
+   ============================================================ */
+
+/* Ensure hero section clips anything overscanning */
+.hero {
+  isolation: isolate; /* predictable blending */
+}
+
+/* Layered hero backdrop (no bitmap): nebula + grain + vignette */
+.hero-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0; /* behind the 3D canvas */
+  pointer-events: none;
+  background:
+    radial-gradient(1000px 700px at 18% 26%, rgba(0, 217, 255, 0.10), transparent 58%),
+    radial-gradient(900px 650px at 72% 44%, rgba(0, 245, 160, 0.10), transparent 60%),
+    radial-gradient(1200px 900px at 55% 70%, rgba(255, 255, 255, 0.05), transparent 65%),
+    linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.88));
+  opacity: 1;
+}
+
+/* Film grain / texture (tiny SVG data URI) */
+.hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* above ::before but below vignette */
+  pointer-events: none;
+  opacity: 0.12;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+/*
+  Contain the 3D visual so it reads as a hero object instead of a full-bleed watermark.
+  We apply a mask that fades it out toward the left/top and reduce overall opacity.
+*/
+.hero-visual {
+  opacity: 0.38; /* was ~0.9; reduces "giant background image" feel */
+  filter: saturate(0.92) contrast(1.06) blur(0.2px);
+  /* Fade out into the content area */
+  -webkit-mask-image: radial-gradient(closest-side at 78% 50%, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 92%);
+  mask-image: radial-gradient(closest-side at 78% 50%, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 92%);
+}
+
+/* Desktop sizing refinement (less overscan, less right spill) */
+@media (min-width: 1100px) {
+  .hero-visual {
+    top: -2vh;
+    right: -10vw;
+    width: min(52vw, 700px);
+    height: calc(100% + 6vh);
+  }
+}
+
+/* Tablet: keep stars, reduce logo dominance */
+@media (max-width: 900px) {
+  .hero-visual {
+    opacity: 0.30;
+    right: -28vw;
+    width: 120vw;
+    height: 72vh;
+    -webkit-mask-image: radial-gradient(closest-side at 68% 42%, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 88%);
+    mask-image: radial-gradient(closest-side at 68% 42%, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 88%);
+  }
+}
+
+/* Mobile: background stays atmospheric; hero object stays subtle */
+@media (max-width: 640px) {
+  .hero-visual {
+    opacity: 0.22;
+    right: -40vw;
+    width: 160vw;
+    height: 64vh;
+  }
+}
+
+/* Prefer reduced motion: disable texture and reduce blending cost */
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg::after {
+    display: none;
+  }
+  .hero-visual {
+    filter: none;
+  }
+}
+
+/* ============================================================
+   SYSTEM CONSOLE (new section styles)
+   ============================================================ */
+
+.mb-section--console {
+  padding-top: 2.5rem;
+}
+
+.console-shell {
+  border-radius: calc(var(--radius-lg) + 0.25rem);
+  border: 1px solid rgba(255,255,255,0.10);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0,245,160,0.08), transparent 55%),
+    radial-gradient(circle at 80% 65%, rgba(0,217,255,0.06), transparent 55%),
+    rgba(12, 16, 22, 0.62);
+  box-shadow: var(--shadow-soft);
+  padding: 1.25rem;
+}
+
+.console-head {
+  padding: 0.25rem 0.25rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.console-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+@media (max-width: 900px) {
+  .console-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.console-panel {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.10);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.05), transparent 55%),
+    rgba(0,0,0,0.22);
+  padding: 1rem;
+}
+
+.console-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.console-kicker {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.62);
+}
+
+.console-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.console-badge {
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0,245,160,0.22);
+  background: rgba(0,245,160,0.06);
+  color: rgba(0,245,160,0.95);
+}
+
+.console-badge--alt {
+  border-color: rgba(0,217,255,0.22);
+  background: rgba(0,217,255,0.06);
+  color: rgba(0,217,255,0.95);
+}
+
+.console-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.console-step {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.console-step-dot {
+  margin-top: 0.35rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0,245,160,0.55);
+  box-shadow: 0 0 0 2px rgba(0,245,160,0.10), 0 0 18px rgba(0,245,160,0.10);
+}
+
+.console-step-title {
+  font-weight: 650;
+}
+
+.console-step-text {
+  color: rgba(255,255,255,0.70);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.console-checks {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.console-check {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  padding: 0.6rem 0.65rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+}
+
+.console-check-icon {
+  color: rgba(0,245,160,0.9);
+  line-height: 1.2;
+  margin-top: 0.05rem;
+}
+
+.console-check-text {
+  color: rgba(255,255,255,0.78);
+  line-height: 1.35;
+}
+
+.console-faq {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.console-details {
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.02);
+  overflow: hidden;
+}
+
+.console-summary {
+  cursor: pointer;
+  user-select: none;
+  padding: 0.7rem 0.8rem;
+  font-weight: 650;
+  color: rgba(255,255,255,0.86);
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.console-summary::-webkit-details-marker {
+  display: none;
+}
+
+.console-summary::after {
+  content: "+";
+  color: rgba(255,255,255,0.65);
+  margin-left: 0.75rem;
+}
+
+.console-details[open] .console-summary::after {
+  content: "–";
+}
+
+.console-details-body {
+  padding: 0 0.8rem 0.75rem;
+  color: rgba(255,255,255,0.70);
+  line-height: 1.5;
+}
+
+.console-foot {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.console-foot-left {
+  max-width: 48rem;
+}
+
+.console-foot-title {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.console-foot-text {
+  color: rgba(255,255,255,0.68);
+}
+
+.console-foot-right {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+/* Low-power: reduce expensive effects in console as well */
+.low-power .console-shell {
+  background: rgba(12, 16, 22, 0.72);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console-shell {
+    background: rgba(12, 16, 22, 0.72);
+  }
+}
+
