@@ -1204,41 +1204,35 @@ a {
 */
 .hero-visual {
   position: absolute;
-  top: -6vh;
-  right: -10vw;
-  width: min(78vw, 980px);
-  height: calc(100% + 12vh);
+  top: -4vh;
+  right: -14vw;
+  width: min(60vw, 760px);
+  height: calc(100% + 8vh);
   z-index: 0;
   pointer-events: none;
-  opacity: 1;
-  filter: saturate(1.05) contrast(1.05);
+  opacity: 0.92;
+  filter: saturate(1.03) contrast(1.03);
 }
 
-/* Ensure the canvas stays transparent and crisp */
-.hero-visual canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-
-/* On smaller screens: center it, reduce visual dominance */
+/* Tablet */
 @media (max-width: 900px) {
   .hero-visual {
     top: -10vh;
-    right: -18vw;
+    right: -26vw;
     width: 110vw;
-    height: 85vh;
-    opacity: 0.85;
+    height: 78vh;
+    opacity: 0.72;
   }
 }
 
+/* Mobile */
 @media (max-width: 640px) {
   .hero-visual {
-    top: -14vh;
-    right: -28vw;
+    top: -12vh;
+    right: -36vw;
     width: 140vw;
-    height: 78vh;
-    opacity: 0.68;
+    height: 70vh;
+    opacity: 0.55;
   }
 }
 
