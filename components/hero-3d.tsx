@@ -28,7 +28,7 @@ function ParticleField({
   count = 650,
   radius = 10,
   depth = 10,
-  opacity = 0.04,
+  opacity = 0.045,
 }: {
   count?: number;
   radius?: number;
@@ -104,7 +104,9 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         setError(null);
 
         const res = await fetch(src, { cache: "force-cache" });
-        if (!res.ok) throw new Error(`SVG fetch failed: ${res.status} ${res.statusText} (${src})`);
+        if (!res.ok) {
+          throw new Error(`SVG fetch failed: ${res.status} ${res.statusText} (${src})`);
+        }
 
         const txt = await res.text();
         const loader = new SVGLoader();
@@ -172,6 +174,7 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
             continue;
           }
 
+          // Stroke-only fallback: tube along points
           const pts = (p as any).getPoints ? (p as any).getPoints(240) : [];
           if (!Array.isArray(pts) || pts.length < 2) continue;
 
@@ -207,9 +210,9 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         g.position.y -= center.y;
         g.position.z -= center.z;
 
-        // ✅ Smaller normalization target (this is the “too big” fix)
+        // ✅ Smaller normalization target (was 3.2)
         const w = Math.max(size.x, 1e-6);
-        const target = 2.35; // was larger; now more “hero object” than “background slab”
+        const target = 2.35;
         const s = target / w;
         g.scale.setScalar(s);
 
@@ -226,6 +229,7 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
         if (!alive) return;
         setGroup(null);
         setError(e?.message ?? "3D logo failed to load");
+        // eslint-disable-next-line no-console
         console.warn("[Hero3D] failed:", e);
       }
     }
@@ -239,12 +243,9 @@ function useSvgMeshes(src: string, extrusionDepth: number) {
   return { group, error };
 }
 
-/**
- * Window pointer tracker so motion works even when canvas has pointer-events:none
- */
+/** Track pointer from window so motion works even when canvas has pointer-events:none */
 function useWindowPointer() {
   const pointer = useRef({ x: 0, y: 0 }); // normalized -1..1
-  const has = useRef(false);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -252,13 +253,13 @@ function useWindowPointer() {
       const ny = (e.clientY / Math.max(1, window.innerHeight)) * 2 - 1;
       pointer.current.x = clamp(nx, -1, 1);
       pointer.current.y = clamp(ny, -1, 1);
-      has.current = true;
     };
+
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => window.removeEventListener("pointermove", onMove);
   }, []);
 
-  return { pointer, has };
+  return pointer;
 }
 
 function LogoRig({
@@ -273,24 +274,22 @@ function LogoRig({
   animate: boolean;
 }) {
   const { group } = useSvgMeshes(src, depth);
-  const rigRef = useRef<THREE.Group>(null);
-
-  const { pointer } = useWindowPointer();
+  const ref = useRef<THREE.Group>(null);
+  const pointer = useWindowPointer();
 
   useFrame((state, dt) => {
-    const rig = rigRef.current;
+    const rig = ref.current;
     if (!rig) return;
 
     const t = state.clock.getElapsedTime();
 
-    // ✅ Slightly more visible idle motion
+    // Slightly more visible idle so it never feels static
     const idleY = Math.sin(t * 0.18) * 0.06;
     const idleX = Math.cos(t * 0.14) * 0.05;
 
     const mx = clamp(pointer.current.x, -0.7, 0.7);
     const my = clamp(pointer.current.y, -0.6, 0.6);
 
-    // ✅ Responsive parallax even without canvas pointer events
     const targetRy = 0.22 + (animate ? mx * 0.28 : 0);
     const targetRx = -0.14 + (animate ? -my * 0.18 : 0);
 
@@ -307,7 +306,7 @@ function LogoRig({
   if (!group) return null;
 
   return (
-    <group ref={rigRef} scale={scale} renderOrder={0}>
+    <group ref={ref} scale={scale} renderOrder={0}>
       <primitive object={group} />
     </group>
   );
@@ -326,6 +325,7 @@ function Scene({
 }) {
   return (
     <>
+      {/* Keep the canvas transparent: do NOT set a background color */}
       <fog attach="fog" args={["#020507", 10.0, 21.0]} />
 
       <ambientLight intensity={0.45} />
@@ -352,6 +352,7 @@ export default function Hero3D({
   const resolvedSrc = svgUrl ?? src ?? "/srt-logo.svg";
   const { error } = useSvgMeshes(resolvedSrc, depth);
 
+  // If 3D fails, show the SVG image so there's always *something* visible
   if (error && (fallbackSrc || resolvedSrc)) {
     return (
       <div className={`hero-visual__fallback ${className ?? ""}`.trim()} aria-hidden="true">
