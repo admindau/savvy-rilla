@@ -3,6 +3,8 @@
 :root {
   --background: #000000;
   --foreground: #ffffff;
+  --x: 50%;
+  --y: 50%;
 }
 
 * {
@@ -44,11 +46,29 @@ a {
   animation: noisePulse 6s ease-in-out infinite;
 }
 
+.particles-layer {
+  pointer-events: none;
+  opacity: 0.18;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.55) 1px, transparent 1px),
+    radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px);
+  background-size: 120px 120px, 180px 180px;
+  background-position: 0 0, 60px 80px;
+  animation: particlesFloat 28s linear infinite;
+}
+
 .pointer-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.11), transparent 28%);
+  z-index: 1;
+  background: radial-gradient(
+    circle at var(--x) var(--y),
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0.04) 12%,
+    transparent 30%
+  );
   pointer-events: none;
+  transition: background 120ms linear;
 }
 
 .orbit {
@@ -56,7 +76,7 @@ a {
   left: 50%;
   top: 50%;
   border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   transform: translate(-50%, -50%);
 }
 
@@ -68,28 +88,28 @@ a {
   height: 6px;
   width: 6px;
   border-radius: 9999px;
-  background: rgba(255,255,255,0.55);
-  box-shadow: 0 0 22px rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.45);
+  box-shadow: 0 0 18px rgba(255,255,255,0.55);
 }
 
 .orbit-lg {
   width: 760px;
   height: 760px;
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.095);
   animation: orbitRotate 48s linear infinite;
 }
 
 .orbit-md {
   width: 560px;
   height: 560px;
-  border-color: rgba(255, 255, 255, 0.095);
+  border-color: rgba(255, 255, 255, 0.07);
   animation: orbitRotateReverse 38s linear infinite;
 }
 
 .orbit-sm {
   width: 380px;
   height: 380px;
-  border-color: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 255, 255, 0.04);
   animation: orbitRotate 30s linear infinite;
 }
 
@@ -98,7 +118,7 @@ a {
   height: 8px;
   width: 8px;
   border-radius: 9999px;
-  background: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.38);
 }
 
 .ring-dot-top {
@@ -174,7 +194,7 @@ a {
   left: 2rem;
   right: 2rem;
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.9), transparent);
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.95), transparent);
 }
 
 .command-button::before {
@@ -183,14 +203,16 @@ a {
 
 .command-button::after {
   bottom: 0;
-  opacity: 0.75;
+  opacity: 0.85;
 }
 
 .command-button:hover {
   transform: translateY(-4px);
-  border-color: rgba(255,255,255,0.55);
-  background: rgba(255,255,255,0.08);
-  box-shadow: 0 0 90px rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.11);
+  box-shadow:
+    0 0 35px rgba(255,255,255,0.18),
+    0 0 95px rgba(255,255,255,0.28);
 }
 
 @keyframes orbitRotate {
@@ -252,5 +274,14 @@ a {
   }
   80% {
     opacity: 0;
+  }
+}
+
+@keyframes particlesFloat {
+  from {
+    background-position: 0 0, 60px 80px;
+  }
+  to {
+    background-position: 120px -180px, 240px -120px;
   }
 }

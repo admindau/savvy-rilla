@@ -1,4 +1,21 @@
+"use client";
+
+import { useEffect } from "react";
+
 export default function HomePage() {
+  useEffect(() => {
+    const handlePointerMove = (event: PointerEvent) => {
+      document.documentElement.style.setProperty("--x", `${event.clientX}px`);
+      document.documentElement.style.setProperty("--y", `${event.clientY}px`);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+    };
+  }, []);
+
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black text-white">
       <div className="pointer-glow" />
@@ -8,6 +25,7 @@ export default function HomePage() {
 
       <div className="animated-grid absolute inset-0 opacity-[0.045]" />
       <div className="noise-layer absolute inset-0 opacity-[0.04]" />
+      <div className="particles-layer absolute inset-0" />
 
       <div className="orbit orbit-lg" />
       <div className="orbit orbit-md" />
@@ -33,7 +51,7 @@ export default function HomePage() {
           </span>
         </h1>
 
-        <p className="mt-8 max-w-2xl text-center text-base leading-8 text-white/68 sm:text-lg">
+        <p className="mt-8 max-w-2xl text-center text-base leading-8 text-white/60 sm:text-lg">
           A new digital experience is currently under construction.
         </p>
 
