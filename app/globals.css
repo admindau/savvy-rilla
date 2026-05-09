@@ -29,3 +29,228 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+.animated-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: 80px 80px;
+  animation: gridDrift 18s linear infinite;
+}
+
+.noise-layer {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+  background-size: 34px 34px;
+  animation: noisePulse 6s ease-in-out infinite;
+}
+
+.pointer-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.11), transparent 28%);
+  pointer-events: none;
+}
+
+.orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -50%);
+}
+
+.orbit::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  height: 6px;
+  width: 6px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.55);
+  box-shadow: 0 0 22px rgba(255,255,255,0.75);
+}
+
+.orbit-lg {
+  width: 760px;
+  height: 760px;
+  border-color: rgba(255, 255, 255, 0.16);
+  animation: orbitRotate 48s linear infinite;
+}
+
+.orbit-md {
+  width: 560px;
+  height: 560px;
+  border-color: rgba(255, 255, 255, 0.095);
+  animation: orbitRotateReverse 38s linear infinite;
+}
+
+.orbit-sm {
+  width: 380px;
+  height: 380px;
+  border-color: rgba(255, 255, 255, 0.055);
+  animation: orbitRotate 30s linear infinite;
+}
+
+.ring-dot {
+  position: absolute;
+  height: 8px;
+  width: 8px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.45);
+}
+
+.ring-dot-top {
+  left: 50%;
+  top: calc(50% - 380px);
+  transform: translateX(-50%);
+}
+
+.ring-dot-bottom {
+  left: 50%;
+  top: calc(50% + 380px);
+  transform: translateX(-50%);
+}
+
+.ring-dot-left {
+  left: calc(50% - 380px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.ring-dot-right {
+  left: calc(50% + 380px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.hero-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.35) 45%, transparent 65%);
+  transform: translateX(-120%);
+  animation: shimmer 5s ease-in-out infinite;
+}
+
+.scanner-line::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 0;
+  height: 5px;
+  width: 90px;
+  background: rgba(255,255,255,0.85);
+  filter: blur(6px);
+  animation: scanMove 3.5s ease-in-out infinite;
+}
+
+.command-button {
+  position: relative;
+  display: inline-flex;
+  min-width: 27rem;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(0,0,0,0.65);
+  padding: 1.25rem 2.5rem;
+  box-shadow: 0 0 70px rgba(255,255,255,0.18);
+  backdrop-filter: blur(16px);
+  transition: 300ms ease;
+}
+
+.command-button::before,
+.command-button::after {
+  content: "";
+  position: absolute;
+  left: 2rem;
+  right: 2rem;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.9), transparent);
+}
+
+.command-button::before {
+  top: 0;
+}
+
+.command-button::after {
+  bottom: 0;
+  opacity: 0.75;
+}
+
+.command-button:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 0 90px rgba(255,255,255,0.22);
+}
+
+@keyframes orbitRotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes orbitRotateReverse {
+  from {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+}
+
+@keyframes gridDrift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 80px 80px;
+  }
+}
+
+@keyframes noisePulse {
+  0%, 100% {
+    opacity: 0.035;
+  }
+  50% {
+    opacity: 0.065;
+  }
+}
+
+@keyframes shimmer {
+  0%, 70% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes scanMove {
+  0%, 100% {
+    left: 0;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  50% {
+    left: calc(100% - 90px);
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+}
