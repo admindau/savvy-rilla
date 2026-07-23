@@ -7,9 +7,13 @@ const dist = resolve(root, "dist");
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(resolve(dist, "server"), { recursive: true });
-cpSync(openNext, resolve(dist, "open-next"), { recursive: true });
+cpSync(openNext, resolve(dist, "open-next"), {
+  recursive: true,
+  dereference: true,
+});
 cpSync(resolve(openNext, "assets"), resolve(dist, "assets"), {
   recursive: true,
+  dereference: true,
 });
 
 writeFileSync(
