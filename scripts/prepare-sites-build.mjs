@@ -1,4 +1,5 @@
-import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 
 const root = process.cwd();
@@ -7,14 +8,15 @@ const dist = resolve(root, "dist");
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(resolve(dist, "server"), { recursive: true });
-cpSync(openNext, resolve(dist, "open-next"), {
-  recursive: true,
-  dereference: true,
-});
-cpSync(resolve(openNext, "assets"), resolve(dist, "assets"), {
-  recursive: true,
-  dereference: true,
-});
+mkdirSync(resolve(dist, "open-next"), { recursive: true });
+mkdirSync(resolve(dist, "assets"), { recursive: true });
+
+execFileSync("cp", ["-RL", `${openNext}/.`, resolve(dist, "open-next")]);
+execFileSync("cp", [
+  "-RL",
+  `${resolve(openNext, "assets")}/.`,
+  resolve(dist, "assets"),
+]);
 
 writeFileSync(
   resolve(dist, "server", "index.js"),
