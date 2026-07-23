@@ -5,29 +5,30 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:sites": "opennextjs-cloudflare build && node scripts/prepare-sites-build.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20.9 <25"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.5.0",
-    "@supabase/supabase-js": "^2.81.1",
-    "next": "16.0.7",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "resend": "^6.4.2",
-    "three": "^0.182.0",
-    "three-stdlib": "^2.36.1"
+    "@supabase/supabase-js": "^2.110.8",
+    "next": "16.2.11",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "resend": "^6.18.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@opennextjs/cloudflare": "1.20.2",
     "@types/node": "^20",
-    "@types/react": "^19",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19",
-    "@types/three": "^0.182.0",
-    "baseline-browser-mapping": "^2.9.19",
-    "eslint": "^9",
-    "eslint-config-next": "16.0.3",
+    "baseline-browser-mapping": "^2.11.1",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.2.11",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

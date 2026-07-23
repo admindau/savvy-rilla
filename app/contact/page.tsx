@@ -1,87 +1,52 @@
-import Link from "next/link";
+import type { Metadata } from "next";
+import ContactForm from "@/components/contact-form";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Contact Savvy Rilla Technologies™ about products, partnerships, and technology systems.",
+  alternates: { canonical: "/contact" },
+};
 
 export default function ContactPage() {
   return (
-    <div className="page">
-      <section className="hero hero--matrix">
-        <div className="container">
-          <p className="hero-kicker">Contact</p>
-          <h1 className="hero-main-title">Request a consultation.</h1>
-          <p className="hero-text">
-            Tell us what you’re trying to build. We’ll propose an architecture, delivery approach, and the operational model to run it properly.
+    <main id="main-content">
+      <section className="page-hero">
+        <div className="shell">
+          <p className="eyebrow">Contact</p>
+          <h1>Let’s make something useful.</h1>
+          <p className="page-hero-copy">
+            Ask about a Savvy Rilla product, explore a partnership, or tell us
+            about a system worth building.
           </p>
-
-          <div className="hero-actions">
-            <Link href="/platforms" className="btn btn-ghost">Explore platforms</Link>
-            <Link href="/enterprise" className="btn btn-ghost">Enterprise engineering</Link>
-          </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="container">
-          <div className="contact-grid">
-            <div className="twocol-aside">
-              <p style={{ marginTop: 0 }}>
-                <strong>What happens next?</strong>
-              </p>
-              <p>1) We review your request and clarify constraints.</p>
-              <p>2) We propose architecture + delivery plan.</p>
-              <p>3) We align on deployment + support model.</p>
-              <p style={{ marginBottom: 0 }}>
-                <strong>Focus:</strong> secure systems, reporting platforms, dashboards, infrastructure, managed services.
-              </p>
-            </div>
-
-            <form className="card" action="#" method="post">
-              <div style={{ display: "grid", gap: "0.9rem" }}>
-                <div style={{ display: "grid", gap: "0.4rem" }}>
-                  <label htmlFor="name">Name</label>
-                  <input id="name" name="name" type="text" placeholder="Your name" required />
-                </div>
-
-                <div style={{ display: "grid", gap: "0.4rem" }}>
-                  <label htmlFor="email">Email</label>
-                  <input id="email" name="email" type="email" placeholder="you@example.com" required />
-                </div>
-
-                <div style={{ display: "grid", gap: "0.4rem" }}>
-                  <label htmlFor="org">Organisation</label>
-                  <input id="org" name="org" type="text" placeholder="Organisation name" />
-                </div>
-
-                <div style={{ display: "grid", gap: "0.4rem" }}>
-                  <label htmlFor="need">What do you need?</label>
-                  <select id="need" name="need" defaultValue="platform">
-                    <option value="platform">Platform demo</option>
-                    <option value="enterprise">Enterprise system build</option>
-                    <option value="infrastructure">Managed services</option>
-                    <option value="advisory">Architecture advisory</option>
-                  </select>
-                </div>
-
-                <div style={{ display: "grid", gap: "0.4rem" }}>
-                  <label htmlFor="message">Brief description</label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    placeholder="What are you trying to build? Constraints? Timeline? Users? Data sensitivity?"
-                    required
-                  />
-                </div>
-
-                <button type="submit" className="btn btn-primary">
-                  Submit request
-                </button>
-
-                <p className="section-text" style={{ margin: 0 }}>
-                  Prefer email? Write to: <strong>hello@savvyrilla.tech</strong>
-                </p>
-              </div>
-            </form>
-          </div>
+      <section className="page-section">
+        <div className="shell contact-layout">
+          <aside className="contact-aside">
+            <p className="eyebrow">Start here</p>
+            <h2>A direct line to the team.</h2>
+            <p>
+              Share enough context for us to understand what matters. We will
+              review your message and respond with the right next step.
+            </p>
+            <dl>
+              <dt>Email</dt>
+              <dd>
+                <a href="mailto:hello@savvyrilla.tech">
+                  hello@savvyrilla.tech
+                </a>
+              </dd>
+              <dt>Based in</dt>
+              <dd>Juba, South Sudan</dd>
+              <dt>Best for</dt>
+              <dd>Products · Partnerships · Technology systems</dd>
+            </dl>
+          </aside>
+          <ContactForm />
         </div>
       </section>
-    </div>
+    </main>
   );
 }

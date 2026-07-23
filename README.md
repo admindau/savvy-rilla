@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Savvy Rilla Technologies™
 
-## Getting Started
+The company website for [Savvy Rilla Technologies™](https://www.savvyrilla.tech),
+a product technology company based in Juba, South Sudan.
 
-First, run the development server:
+## Product portfolio
+
+- [SuqJunub™](https://www.suqjunub.com)
+- [Gorilla Ledger™](https://gl.savvyrilla.tech)
+- [Savvy Rilla FX](https://fx.savvyrilla.tech)
+- [HerdProof™](https://www.herdproof.com)
+- [Roots™](https://roots.savvyrilla.tech)
+
+Product metadata used by the website is maintained in `lib/products.ts`.
+
+## Local development
+
+Use Node.js 22 and pnpm.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The local site is available at `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Validation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+```
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+Copy `.env.example` to `.env.local` and add the required values. The contact
+form uses Resend for email delivery and can optionally store messages in
+Supabase.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Never commit `.env.local` or service-role credentials.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Main routes
 
-## Deploy on Vercel
+- `/` — company homepage
+- `/products` — complete portfolio
+- `/products/[slug]` — product profile
+- `/capabilities` — product and engineering capabilities
+- `/company` — company story and principles
+- `/insights` — product notes and updates
+- `/contact` — enquiries
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Legacy `/platforms`, `/enterprise`, `/infrastructure`, and `/industries` routes
+redirect to the new information architecture.

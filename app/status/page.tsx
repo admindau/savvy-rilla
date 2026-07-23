@@ -1,61 +1,46 @@
-// app/status/page.tsx
-import Link from "next/link";
+import type { Metadata } from "next";
+import { products } from "@/lib/products";
 
-export const metadata = {
-  title: "Status · Savvy Rilla Technologies",
-  description: "Operational status for Savvy Rilla platforms and services.",
+export const metadata: Metadata = {
+  title: "Product access",
+  description: "Direct access links for Savvy Rilla Technologies™ products.",
+  robots: { index: false, follow: true },
 };
 
 export default function StatusPage() {
   return (
-    <div className="page">
-      <section className="section section--dense">
-        <div className="container">
-          <div className="section-header">
-            <h1 className="hero-main-title" style={{ fontSize: "2rem", marginBottom: "0.35rem" }}>
-              System Status
-            </h1>
-            <p className="section-text">
-              Live operational visibility for Savvy Rilla platforms. This page is a clean placeholder
-              — we’ll wire it to real monitoring when needed.
-            </p>
-          </div>
-
-          <div className="cards-grid">
-            <div className="card">
-              <p className="card-tag">Overall</p>
-              <h3 className="card-title">All systems operational</h3>
-              <p className="card-text">
-                No active incidents. Uptime target maintained across monitored services.
-              </p>
-              <p className="card-meta">Incidents (30d): 0 • Target uptime: 99.9%</p>
-            </div>
-
-            <div className="card">
-              <p className="card-tag">Platforms</p>
-              <h3 className="card-title">Gorilla Ledger™</h3>
-              <p className="card-text">Operational • Scheduled maintenance: None</p>
-              <p className="card-meta">Latency target: &lt;200ms • Access: Secure</p>
-            </div>
-
-            <div className="card">
-              <p className="card-tag">Platforms</p>
-              <h3 className="card-title">FX Intelligence Engine</h3>
-              <p className="card-text">Operational • Data ingest: Normal</p>
-              <p className="card-meta">Time-series pipeline: Healthy</p>
-            </div>
-          </div>
-
-          <div style={{ marginTop: "1rem" }}>
-            <Link href="/contact" className="btn btn-primary">
-              Report an issue
-            </Link>{" "}
-            <Link href="/" className="btn btn-ghost" style={{ marginLeft: "0.6rem" }}>
-              Back to home
-            </Link>
-          </div>
+    <main id="main-content">
+      <section className="page-hero">
+        <div className="shell">
+          <p className="eyebrow">Product access</p>
+          <h1>Go directly to the products.</h1>
+          <p className="page-hero-copy">
+            This page provides direct access to each live Savvy Rilla product.
+            Formal service monitoring and incident reporting will be introduced
+            separately.
+          </p>
         </div>
       </section>
-    </div>
+      <section className="page-section page-section-soft">
+        <div className="shell detail-list">
+          {products.map((product, index) => (
+            <article key={product.slug}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h3>{product.name}</h3>
+              <p>
+                <a
+                  className="text-link"
+                  href={product.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open product <span aria-hidden="true">↗</span>
+                </a>
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }

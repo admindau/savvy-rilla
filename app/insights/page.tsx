@@ -1,69 +1,45 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-const posts = [
-  {
-    title: "Engineering Digital Infrastructure for Emerging Markets",
-    excerpt:
-      "Why architecture, security, and operational resilience matter more than flashy features in real-world deployments.",
-    href: "/insights/infrastructure-emerging-markets",
-  },
-  {
-    title: "Security by Architecture: Policy-First Data Design",
-    excerpt:
-      "How to build systems where access control lives in the data layer—not just the UI.",
-    href: "/insights/security-by-architecture",
-  },
-  {
-    title: "Building for Variable Connectivity",
-    excerpt:
-      "Performance, caching, and UX strategies for environments with unstable bandwidth and latency.",
-    href: "/insights/variable-connectivity",
-  },
-];
+export const metadata: Metadata = {
+  title: "Insights",
+  description:
+    "Product notes and company updates from Savvy Rilla Technologies™.",
+  alternates: { canonical: "/insights" },
+};
 
 export default function InsightsPage() {
   return (
-    <div className="page">
-      <section className="hero hero--matrix">
-        <div className="container">
-          <p className="hero-kicker">Insights</p>
-          <h1 className="hero-main-title">Systems thinking, documented.</h1>
-          <p className="hero-text">
-            Architecture notes, engineering perspectives, and operational lessons from building technology in African contexts.
+    <main id="main-content">
+      <section className="page-hero">
+        <div className="shell">
+          <p className="eyebrow">Insights</p>
+          <h1>Notes from the work.</h1>
+          <p className="page-hero-copy">
+            Product releases, operating lessons, and ideas about building
+            useful technology from South Sudan.
           </p>
-
-          <div className="hero-actions">
-            <Link href="/contact" className="btn btn-primary">Discuss a system</Link>
-            <Link href="/platforms" className="btn btn-ghost">Explore platforms</Link>
-          </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">Latest</h2>
-            <p className="section-text">
-              Short, high-signal writing for teams that build and operate serious systems.
+      <section className="page-section page-section-soft">
+        <div className="shell prose-grid">
+          <div>
+            <p className="eyebrow">Opening soon</p>
+            <h2>The journal is taking shape.</h2>
+          </div>
+          <div className="prose-copy">
+            <p>
+              We are preparing the first set of product notes and field
+              perspectives. Until then, the live portfolio is the clearest view
+              of what the Savvy Rilla team is building.
             </p>
-          </div>
-
-          <div className="cards-grid">
-            {posts.map((p) => (
-              <div key={p.href} className="card">
-                <p className="card-tag">Article</p>
-                <h3 className="card-title">{p.title}</h3>
-                <p className="card-text">{p.excerpt}</p>
-                <div className="card-actions">
-                  <Link href={p.href} className="btn btn-ghost btn-sm">
-                    Read
-                  </Link>
-                </div>
-              </div>
-            ))}
+            <Link className="button button-light" href="/products">
+              Explore the products <span aria-hidden="true">↗</span>
+            </Link>
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

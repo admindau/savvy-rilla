@@ -1,78 +1,206 @@
-"use client";
+import Image from "next/image";
+import Link from "next/link";
+import ProductCard from "@/components/product-card";
+import { products } from "@/lib/products";
 
-import { useEffect } from "react";
+const capabilities = [
+  {
+    number: "01",
+    title: "Product engineering",
+    text: "From a sharp first release to the systems that keep a product dependable as it grows.",
+  },
+  {
+    number: "02",
+    title: "Data and intelligence",
+    text: "Useful data products, reporting layers, and APIs built to make complex information actionable.",
+  },
+  {
+    number: "03",
+    title: "Trust infrastructure",
+    text: "Identity, provenance, permissions, and auditability designed into the product from the start.",
+  },
+  {
+    number: "04",
+    title: "Operate and improve",
+    text: "Monitoring, maintenance, and product iteration that continue long after the first launch.",
+  },
+];
 
 export default function HomePage() {
-  useEffect(() => {
-    const handlePointerMove = (event: PointerEvent) => {
-      document.documentElement.style.setProperty("--x", `${event.clientX}px`);
-      document.documentElement.style.setProperty("--y", `${event.clientY}px`);
-    };
-
-    window.addEventListener("pointermove", handlePointerMove);
-
-    return () => {
-      window.removeEventListener("pointermove", handlePointerMove);
-    };
-  }, []);
-
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black text-white">
-      <div className="pointer-glow" />
+    <main id="main-content">
+      <section className="home-hero">
+        <div className="hero-noise" aria-hidden="true" />
+        <div className="hero-orbit hero-orbit-one" aria-hidden="true" />
+        <div className="hero-orbit hero-orbit-two" aria-hidden="true" />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.14),transparent_38%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_34%,rgba(0,0,0,0.88)_86%)]" />
+        <div className="shell home-hero-grid">
+          <div className="home-hero-copy">
+            <p className="eyebrow">
+              <span className="eyebrow-dot" />
+              Born in Juba · Built for what comes next
+            </p>
+            <h1>
+              Technology for the systems that{" "}
+              <span className="text-accent">matter.</span>
+            </h1>
+            <p className="hero-intro">
+              Savvy Rilla Technologies™ creates practical digital products for
+              commerce, finance, market intelligence, livestock identity, and
+              family history.
+            </p>
+            <div className="hero-actions">
+              <Link className="button button-light" href="/products">
+                Explore our products <span aria-hidden="true">↗</span>
+              </Link>
+              <Link className="text-link" href="/company">
+                Meet the company <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
 
-      <div className="animated-grid absolute inset-0 opacity-[0.045]" />
-      <div className="noise-layer absolute inset-0 opacity-[0.04]" />
-      <div className="particles-layer absolute inset-0" />
-
-      <div className="orbit orbit-lg" />
-      <div className="orbit orbit-md" />
-      <div className="orbit orbit-sm" />
-
-      <div className="ring-dot ring-dot-top" />
-      <div className="ring-dot ring-dot-bottom" />
-      <div className="ring-dot ring-dot-left" />
-      <div className="ring-dot ring-dot-right" />
-
-      <section className="relative z-10 flex w-full flex-col items-center justify-center px-6 text-center">
-        <div className="mb-8 rounded-full border border-white/18 bg-black/55 px-6 py-2 text-xs uppercase tracking-[0.42em] text-white/65 shadow-[0_0_36px_rgba(255,255,255,0.1)] backdrop-blur-xl">
-          Savvy Rilla Technologies
-        </div>
-
-        <h1 className="hero-title flex flex-col items-center justify-center text-center text-6xl font-black leading-[0.88] tracking-[-0.065em] sm:text-8xl lg:text-[10rem]">
-          <span className="hero-shimmer block text-white drop-shadow-[0_0_28px_rgba(255,255,255,0.34)]">
-            COMING
-          </span>
-
-          <span className="block bg-gradient-to-b from-white via-white/70 to-white/8 bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(255,255,255,0.22)]">
-            SOON
-          </span>
-        </h1>
-
-        <p className="mt-8 max-w-2xl text-center text-base leading-8 text-white/60 sm:text-lg">
-          A new digital experience is currently under construction.
-        </p>
-
-        <div className="relative mt-8 flex w-full justify-center">
-          <div className="scanner-line relative h-px w-[34rem] max-w-full bg-gradient-to-r from-transparent via-white/55 to-transparent">
-            <div className="absolute left-1/2 top-1/2 h-5 w-44 -translate-x-1/2 -translate-y-1/2 bg-white/35 blur-xl" />
+          <div className="ecosystem-visual" aria-label="Savvy Rilla product ecosystem">
+            <div className="ecosystem-glow" aria-hidden="true" />
+            <div className="ecosystem-core">
+              <Image
+                src="/logo-white.png"
+                alt="Savvy Rilla Technologies"
+                width={112}
+                height={112}
+                priority
+              />
+              <span>SRT</span>
+            </div>
+            {products.map((product, index) => (
+              <Link
+                className={`ecosystem-node ecosystem-node-${index + 1}`}
+                href={`/products/${product.slug}`}
+                key={product.slug}
+                style={{ "--node-color": product.accent } as React.CSSProperties}
+                aria-label={`Explore ${product.name}`}
+              >
+                <span>{product.mark}</span>
+                <strong>{product.shortName}</strong>
+              </Link>
+            ))}
           </div>
         </div>
 
-        <div className="mt-5 flex w-full justify-center">
-          <a href="mailto:hello@savvyrilla.tech" className="command-button">
-            <span className="mr-8 text-3xl leading-none text-white/95 transition duration-300 group-hover:translate-x-1">
-              →
-            </span>
+        <div className="shell hero-proof">
+          <div>
+            <strong>05</strong>
+            <span>Products and growing</span>
+          </div>
+          <div>
+            <strong>Juba</strong>
+            <span>South Sudan</span>
+          </div>
+          <div>
+            <strong>Build + operate</strong>
+            <span>One accountable team</span>
+          </div>
+          <p>
+            Made close to the problems.
+            <br />
+            Designed for wider possibility.
+          </p>
+        </div>
+      </section>
 
-            <span className="h-9 w-px bg-white/24" />
+      <section className="section section-products">
+        <div className="shell">
+          <div className="section-heading split-heading">
+            <div>
+              <p className="eyebrow">The product family</p>
+              <h2>One company. Five ambitious products.</h2>
+            </div>
+            <p>
+              Each product starts with a specific real-world need. Together,
+              they show the breadth of what purposeful technology can unlock.
+            </p>
+          </div>
+          <div className="product-grid">
+            {products.map((product, index) => (
+              <ProductCard product={product} index={index} key={product.slug} />
+            ))}
+          </div>
+          <div className="section-end-link">
+            <Link className="text-link" href="/products">
+              Explore the full portfolio <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-            <span className="ml-8 text-sm font-bold uppercase tracking-[0.48em] text-white">
-              Contact Us
-            </span>
-          </a>
+      <section className="section belief-section">
+        <div className="shell belief-grid">
+          <div className="belief-mark" aria-hidden="true">
+            <Image src="/logo-white.png" alt="" width={220} height={220} />
+          </div>
+          <div>
+            <p className="eyebrow">What we believe</p>
+            <blockquote>
+              The most valuable technology does not arrive from somewhere else.
+              It is built with a clear understanding of the people, systems,
+              and realities it is meant to serve.
+            </blockquote>
+            <p className="belief-copy">
+              We build from South Sudan with the discipline to compete anywhere:
+              focused products, durable engineering, and a long-term commitment
+              to the systems we put into the world.
+            </p>
+            <Link className="text-link" href="/company">
+              Our story and principles <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="section capability-preview">
+        <div className="shell">
+          <div className="section-heading split-heading">
+            <div>
+              <p className="eyebrow">How we build</p>
+              <h2>From useful idea to dependable system.</h2>
+            </div>
+            <p>
+              Product thinking and operational discipline belong in the same
+              room. We bring them together from the first decision.
+            </p>
+          </div>
+          <div className="capability-grid">
+            {capabilities.map((capability) => (
+              <article key={capability.number}>
+                <span>{capability.number}</span>
+                <h3>{capability.title}</h3>
+                <p>{capability.text}</p>
+              </article>
+            ))}
+          </div>
+          <div className="section-end-link">
+            <Link className="text-link" href="/capabilities">
+              See our capabilities <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="section product-bridge">
+        <div className="shell product-bridge-inner">
+          <p className="eyebrow">The Savvy Rilla ecosystem</p>
+          <h2>
+            Different products.
+            <br />
+            One standard of care.
+          </h2>
+          <p>
+            Every Savvy Rilla product carries the same promise: clear purpose,
+            thoughtful engineering, and an experience worthy of the people who
+            depend on it.
+          </p>
+          <Link className="button button-dark" href="/contact">
+            Build with us <span aria-hidden="true">↗</span>
+          </Link>
         </div>
       </section>
     </main>
