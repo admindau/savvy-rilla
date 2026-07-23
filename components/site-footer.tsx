@@ -18,7 +18,7 @@ export default function SiteFooter() {
 
         <div className="footer-grid">
           <div className="footer-brand">
-            <Link className="brand" href="/" aria-label="Savvy Rilla Technologies home">
+            <Link className="brand" href="/">
               <Image src="/logo-white.png" alt="" width={44} height={44} />
               <span className="brand-copy">
                 <strong>Savvy Rilla</strong>
@@ -39,6 +39,7 @@ export default function SiteFooter() {
             <Link href="/company">Company</Link>
             <Link href="/insights">Insights</Link>
             <Link href="/contact">Contact</Link>
+            <Link href="/status">Product access</Link>
           </div>
 
           <div className="footer-column">

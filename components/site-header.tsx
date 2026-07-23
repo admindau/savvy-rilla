@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const navigation = [
   { href: "/products", label: "Products" },
@@ -9,10 +13,17 @@ const navigation = [
 ];
 
 export default function SiteHeader() {
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  function isCurrent(href: string) {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
   return (
     <header className="site-header">
       <div className="shell nav-shell">
-        <Link className="brand" href="/" aria-label="Savvy Rilla Technologies home">
+        <Link className="brand" href="/">
           <Image
             className="brand-mark"
             src="/logo-white.png"
@@ -29,7 +40,12 @@ export default function SiteHeader() {
 
         <nav className="desktop-nav" aria-label="Primary navigation">
           {navigation.map((item) => (
-            <Link key={item.href} href={item.href}>
+            <Link
+              aria-current={isCurrent(item.href) ? "page" : undefined}
+              className={isCurrent(item.href) ? "nav-link-active" : undefined}
+              key={item.href}
+              href={item.href}
+            >
               {item.label}
             </Link>
           ))}
@@ -40,20 +56,41 @@ export default function SiteHeader() {
           <span aria-hidden="true">↗</span>
         </Link>
 
-        <details className="mobile-nav">
-          <summary aria-label="Open navigation">
+        <div className="mobile-nav">
+          <button
+            aria-controls="mobile-navigation"
+            aria-expanded={mobileOpen}
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            className="mobile-nav-toggle"
+            onClick={() => setMobileOpen((open) => !open)}
+            type="button"
+          >
             <span />
             <span />
-          </summary>
-          <div className="mobile-nav-panel">
+          </button>
+          {mobileOpen ? (
+          <nav
+            aria-label="Mobile navigation"
+            className="mobile-nav-panel"
+            id="mobile-navigation"
+          >
             {navigation.map((item) => (
-              <Link key={item.href} href={item.href}>
+              <Link
+                aria-current={isCurrent(item.href) ? "page" : undefined}
+                className={isCurrent(item.href) ? "nav-link-active" : undefined}
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+              >
                 {item.label}
               </Link>
             ))}
-            <Link href="/contact">Start a conversation</Link>
-          </div>
-        </details>
+            <Link href="/contact" onClick={() => setMobileOpen(false)}>
+              Start a conversation
+            </Link>
+          </nav>
+          ) : null}
+        </div>
       </div>
     </header>
   );

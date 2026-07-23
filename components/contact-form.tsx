@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 
 type FormState = {
   state: "idle" | "submitting" | "success" | "error";
@@ -102,17 +103,24 @@ export default function ContactForm() {
         />
       </div>
 
-      <button
-        className="button button-light"
-        type="submit"
-        disabled={status.state === "submitting"}
-      >
-        {status.state === "submitting" ? "Sending…" : "Send message"}
-        <span aria-hidden="true">↗</span>
-      </button>
+      <div className="form-submit form-field-full">
+        <button
+          aria-busy={status.state === "submitting"}
+          className="button button-light"
+          type="submit"
+          disabled={status.state === "submitting"}
+        >
+          {status.state === "submitting" ? "Sending…" : "Send message"}
+          <span aria-hidden="true">↗</span>
+        </button>
+        <p>
+          By submitting, you agree that we may use this information to respond
+          to your enquiry. See our <Link href="/privacy">privacy notice</Link>.
+        </p>
+      </div>
 
       <p
-        className="form-status"
+        className="form-status form-field-full"
         data-state={status.state}
         role="status"
         aria-live="polite"

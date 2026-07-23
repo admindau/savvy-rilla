@@ -8,7 +8,7 @@
   --line-strong: rgba(255, 255, 255, 0.2);
   --text: #f4f5ef;
   --muted: #a4aaa2;
-  --quiet: #717770;
+  --quiet: #818880;
   --acid: #c9ff58;
   --warm: #f2efe5;
   --shell: 1240px;
@@ -80,10 +80,12 @@ img {
 }
 
 .site-header {
-  position: absolute;
+  position: fixed;
   z-index: 50;
   inset: 0 0 auto;
+  background: rgba(8, 9, 8, 0.78);
   border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(18px) saturate(130%);
 }
 
 .nav-shell {
@@ -143,11 +145,26 @@ img {
 
 .desktop-nav a:hover,
 .desktop-nav a:focus-visible,
+.desktop-nav .nav-link-active,
 .footer-column a:hover,
 .footer-column a:focus-visible,
 .footer-brand > a:hover,
 .footer-brand > a:focus-visible {
   color: var(--acid);
+}
+
+.desktop-nav .nav-link-active {
+  position: relative;
+}
+
+.desktop-nav .nav-link-active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -14px;
+  left: 0;
+  height: 1px;
+  background: var(--acid);
 }
 
 .nav-contact {
@@ -763,7 +780,7 @@ img {
 
 .capability-grid p {
   margin: 0;
-  color: var(--quiet);
+  color: #858c84;
   font-size: 0.8rem;
   line-height: 1.65;
 }
@@ -1151,6 +1168,39 @@ img {
   width: max-content;
 }
 
+.contact-form .button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+}
+
+.form-submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.form-submit p {
+  max-width: 390px;
+  margin: 0;
+  color: var(--quiet);
+  font-size: 0.69rem;
+  line-height: 1.6;
+}
+
+.form-submit p a {
+  color: #dfe2db;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 3px;
+}
+
+.form-submit p a:hover,
+.form-submit p a:focus-visible {
+  color: var(--acid);
+}
+
 .legal-page {
   padding: 190px 0 110px;
 }
@@ -1243,7 +1293,7 @@ img {
   align-items: center;
   gap: 30px;
   border-top: 1px solid var(--line);
-  color: #5f655e;
+  color: #818780;
   font-size: 0.65rem;
 }
 
@@ -1267,27 +1317,43 @@ img {
     display: block;
   }
 
-  .mobile-nav summary {
+  .mobile-nav-toggle {
     width: 44px;
     height: 44px;
     display: grid;
     place-content: center;
     gap: 6px;
     cursor: pointer;
-    list-style: none;
+    color: var(--text);
+    background: rgba(16, 18, 16, 0.92);
     border: 1px solid var(--line);
     border-radius: 50%;
+    transition:
+      border-color 180ms ease,
+      background 180ms ease;
   }
 
-  .mobile-nav summary::-webkit-details-marker {
-    display: none;
+  .mobile-nav-toggle:hover,
+  .mobile-nav-toggle:focus-visible,
+  .mobile-nav-toggle[aria-expanded="true"] {
+    background: var(--surface-2);
+    border-color: var(--acid);
   }
 
-  .mobile-nav summary span {
+  .mobile-nav-toggle span {
     width: 17px;
     height: 1px;
     display: block;
     background: var(--text);
+    transition: transform 180ms ease;
+  }
+
+  .mobile-nav-toggle[aria-expanded="true"] span:first-child {
+    transform: translateY(3.5px) rotate(45deg);
+  }
+
+  .mobile-nav-toggle[aria-expanded="true"] span:last-child {
+    transform: translateY(-3.5px) rotate(-45deg);
   }
 
   .mobile-nav-panel {
@@ -1301,12 +1367,17 @@ img {
     background: #111311;
     border: 1px solid var(--line);
     box-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+    border-radius: 2px;
   }
 
   .mobile-nav-panel a {
     padding: 14px 12px;
     border-bottom: 1px solid var(--line);
     font-size: 0.82rem;
+  }
+
+  .mobile-nav-panel .nav-link-active {
+    color: var(--acid);
   }
 
   .mobile-nav-panel a:last-child {
@@ -1323,6 +1394,10 @@ img {
   .home-hero-grid,
   .product-detail-layout {
     grid-template-columns: 1fr;
+  }
+
+  .home-hero-grid {
+    gap: 40px;
   }
 
   .ecosystem-visual {
@@ -1362,7 +1437,7 @@ img {
   }
 
   .site-header {
-    position: absolute;
+    position: fixed;
   }
 
   .nav-shell {
@@ -1395,7 +1470,8 @@ img {
   }
 
   .ecosystem-visual {
-    min-height: 460px;
+    min-height: 420px;
+    margin-top: -16px;
     scale: 0.92;
   }
 
@@ -1522,6 +1598,11 @@ img {
   .contact-form {
     grid-template-columns: 1fr;
     padding: 24px;
+  }
+
+  .form-submit {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .form-field-full {

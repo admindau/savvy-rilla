@@ -65,8 +65,9 @@ export default function HomePage() {
               <Image
                 src="/logo-white.png"
                 alt="Savvy Rilla Technologies"
-                width={112}
-                height={112}
+                width={92}
+                height={92}
+                sizes="92px"
                 priority
               />
               <span>SRT</span>
@@ -77,7 +78,7 @@ export default function HomePage() {
                 href={`/products/${product.slug}`}
                 key={product.slug}
                 style={{ "--node-color": product.accent } as React.CSSProperties}
-                aria-label={`Explore ${product.name}`}
+                aria-label={`${product.mark} ${product.shortName} — product story`}
               >
                 <span>{product.mark}</span>
                 <strong>{product.shortName}</strong>
@@ -135,7 +136,13 @@ export default function HomePage() {
       <section className="section belief-section">
         <div className="shell belief-grid">
           <div className="belief-mark" aria-hidden="true">
-            <Image src="/logo-white.png" alt="" width={220} height={220} />
+            <Image
+              src="/logo-white.png"
+              alt=""
+              width={170}
+              height={170}
+              sizes="170px"
+            />
           </div>
           <div>
             <p className="eyebrow">What we believe</p>

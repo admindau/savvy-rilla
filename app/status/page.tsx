@@ -4,6 +4,7 @@ import { products } from "@/lib/products";
 export const metadata: Metadata = {
   title: "Product access",
   description: "Direct access links for Savvy Rilla Technologies™ products.",
+  alternates: { canonical: "/status" },
   robots: { index: false, follow: true },
 };
 
