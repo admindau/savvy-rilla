@@ -16,6 +16,37 @@ execFileSync("cp", [
   `${openNext}/.`,
   resolve(dist, "server", "open-next"),
 ]);
+rmSync(resolve(dist, "server", "open-next", "assets"), {
+  recursive: true,
+  force: true,
+});
+
+const sourceModules = resolve(
+  openNext,
+  "server-functions",
+  "default",
+  "node_modules",
+);
+const targetModules = resolve(
+  dist,
+  "server",
+  "open-next",
+  "server-functions",
+  "default",
+  "node_modules",
+);
+
+rmSync(targetModules, { recursive: true, force: true });
+mkdirSync(targetModules, { recursive: true });
+
+for (const packageName of ["next", "react", "react-dom"]) {
+  execFileSync("cp", [
+    "-RL",
+    resolve(sourceModules, packageName),
+    resolve(targetModules, packageName),
+  ]);
+}
+
 execFileSync("cp", [
   "-RL",
   `${resolve(openNext, "assets")}/.`,
