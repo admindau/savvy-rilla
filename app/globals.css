@@ -402,23 +402,41 @@ img {
   letter-spacing: 0.26em;
 }
 
+.product-logo {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.product-logo img {
+  object-fit: contain;
+}
+
 .ecosystem-node {
   --node-color: var(--acid);
   position: absolute;
   z-index: 4;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 13px 9px 9px;
+  justify-content: center;
+  width: 76px;
+  height: 64px;
+  padding: 8px;
   color: #d9ddd5;
-  background: rgba(16, 18, 16, 0.9);
+  background:
+    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--node-color) 16%, transparent), transparent 70%),
+    rgba(16, 18, 16, 0.92);
   border: 1px solid var(--line);
-  border-radius: 100px;
-  font-size: 0.63rem;
+  border-radius: 18px;
   transition:
     border-color 180ms ease,
     transform 180ms ease;
   backdrop-filter: blur(10px);
+}
+
+.ecosystem-node[data-logo-variant="wordmark"] {
+  width: 108px;
 }
 
 .ecosystem-node:hover,
@@ -427,20 +445,15 @@ img {
   border-color: var(--node-color);
 }
 
-.ecosystem-node > span {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  color: #090a09;
-  background: var(--node-color);
-  border-radius: 50%;
-  font-weight: 800;
-  font-size: 0.58rem;
+.ecosystem-node .product-logo {
+  width: 48px;
+  height: 48px;
 }
 
-.ecosystem-node strong {
-  white-space: nowrap;
+.ecosystem-node .product-logo-wordmark {
+  width: 88px;
+  height: 30px;
+  border-radius: 3px;
 }
 
 .ecosystem-node-1 {
@@ -607,16 +620,31 @@ img {
 }
 
 .product-mark {
-  width: 64px;
-  height: 64px;
+  width: 88px;
+  height: 72px;
   display: grid;
   place-items: center;
-  color: #080908;
-  background: var(--product-accent);
-  border-radius: 50%;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  padding: 10px;
+  background:
+    radial-gradient(circle at 50% 30%, var(--product-soft), transparent 75%),
+    rgba(8, 9, 8, 0.65);
+  border: 1px solid color-mix(in srgb, var(--product-accent) 48%, transparent);
+  border-radius: 18px;
+}
+
+.product-mark-wordmark {
+  width: 136px;
+}
+
+.product-mark .product-logo {
+  width: 52px;
+  height: 52px;
+}
+
+.product-mark .product-logo-wordmark {
+  width: 114px;
+  height: 38px;
+  border-radius: 3px;
 }
 
 .product-card-copy {
@@ -1007,16 +1035,23 @@ img {
   border-style: dashed;
 }
 
-.product-symbol span {
-  width: 130px;
-  height: 130px;
-  display: grid;
-  place-items: center;
-  color: #080908;
-  background: var(--detail-accent);
-  border-radius: 50%;
-  font-size: 1.5rem;
-  font-weight: 800;
+.product-symbol > .product-logo {
+  z-index: 2;
+  width: 164px;
+  height: 164px;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 50% 30%, var(--detail-soft), transparent 72%),
+    rgba(8, 9, 8, 0.76);
+  border: 1px solid color-mix(in srgb, var(--detail-accent) 44%, transparent);
+  border-radius: 28px;
+}
+
+.product-symbol > .product-logo-wordmark {
+  width: 250px;
+  height: 92px;
+  padding: 12px;
+  border-radius: 18px;
 }
 
 .product-facts {
@@ -1494,14 +1529,6 @@ img {
     min-height: 420px;
     margin-top: -16px;
     scale: 0.92;
-  }
-
-  .ecosystem-node strong {
-    display: none;
-  }
-
-  .ecosystem-node {
-    padding-right: 9px;
   }
 
   .hero-proof {

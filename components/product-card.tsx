@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import ProductLogo from "@/components/product-logo";
 import type { Product } from "@/lib/products";
 
 export default function ProductCard({
@@ -18,8 +19,15 @@ export default function ProductCard({
     <article className="product-card" style={style}>
       <div className="product-card-top">
         <span className="product-number">{String(index + 1).padStart(2, "0")}</span>
-        <span className="product-mark" aria-hidden="true">
-          {product.mark}
+        <span
+          className={`product-mark product-mark-${product.logoVariant}`}
+          aria-hidden="true"
+        >
+          <ProductLogo
+            product={product}
+            decorative
+            sizes={product.logoVariant === "wordmark" ? "114px" : "52px"}
+          />
         </span>
       </div>
       <div className="product-card-copy">

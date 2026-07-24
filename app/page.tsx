@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/components/product-card";
+import ProductLogo from "@/components/product-logo";
 import { products } from "@/lib/products";
 
 const capabilities = [
@@ -78,10 +79,14 @@ export default function HomePage() {
                 href={`/products/${product.slug}`}
                 key={product.slug}
                 style={{ "--node-color": product.accent } as React.CSSProperties}
-                aria-label={`${product.mark} ${product.shortName} — product story`}
+                aria-label={`${product.shortName} — product story`}
+                data-logo-variant={product.logoVariant}
               >
-                <span>{product.mark}</span>
-                <strong>{product.shortName}</strong>
+                <ProductLogo
+                  product={product}
+                  decorative
+                  sizes={product.logoVariant === "wordmark" ? "88px" : "48px"}
+                />
               </Link>
             ))}
           </div>

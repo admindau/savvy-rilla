@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ProductLogo from "@/components/product-logo";
 import { getProduct, products } from "@/lib/products";
 
 type ProductPageProps = {
@@ -72,7 +73,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             </div>
             <div className="product-symbol" aria-hidden="true">
-              <span>{product.mark}</span>
+              <ProductLogo
+                product={product}
+                decorative
+                sizes={product.logoVariant === "wordmark" ? "250px" : "164px"}
+              />
             </div>
           </div>
 

@@ -2,7 +2,8 @@ export type Product = {
   slug: string;
   name: string;
   shortName: string;
-  mark: string;
+  logo: string;
+  logoVariant: "emblem" | "wordmark";
   category: string;
   tagline: string;
   description: string;
@@ -19,7 +20,8 @@ export const products: Product[] = [
     slug: "suqjunub",
     name: "SuqJunub™",
     shortName: "SuqJunub",
-    mark: "SJ",
+    logo: "/products/suqjunub-logo.png",
+    logoVariant: "wordmark",
     category: "Digital commerce",
     tagline: "Commerce built on trust.",
     description:
@@ -35,7 +37,8 @@ export const products: Product[] = [
     slug: "gorilla-ledger",
     name: "Gorilla Ledger™",
     shortName: "Gorilla Ledger",
-    mark: "GL",
+    logo: "/products/gorilla-ledger-logo.png",
+    logoVariant: "emblem",
     category: "Financial technology",
     tagline: "Clarity for every currency.",
     description:
@@ -51,7 +54,8 @@ export const products: Product[] = [
     slug: "savvy-rilla-fx",
     name: "Savvy Rilla FX",
     shortName: "Savvy Rilla FX",
-    mark: "FX",
+    logo: "/products/savvy-rilla-fx-logo.png",
+    logoVariant: "emblem",
     category: "Market intelligence",
     tagline: "Clearer exchange-rate data for South Sudan.",
     description:
@@ -67,7 +71,8 @@ export const products: Product[] = [
     slug: "herdproof",
     name: "HerdProof™",
     shortName: "HerdProof",
-    mark: "HP",
+    logo: "/products/herdproof-mark.svg",
+    logoVariant: "emblem",
     category: "Livestock infrastructure",
     tagline: "Identity and traceability for livestock.",
     description:
@@ -83,7 +88,8 @@ export const products: Product[] = [
     slug: "roots",
     name: "Roots™",
     shortName: "Roots",
-    mark: "RT",
+    logo: "/products/roots-mark.svg",
+    logoVariant: "emblem",
     category: "Family history",
     tagline: "Every family has a story.",
     description:
