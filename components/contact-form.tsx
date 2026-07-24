@@ -62,7 +62,15 @@ export default function ContactForm() {
 
       <div className="form-field">
         <label htmlFor="name">Name</label>
-        <input id="name" name="name" type="text" autoComplete="name" required maxLength={100} />
+        <input
+          id="name"
+          name="name"
+          type="text"
+          autoComplete="name"
+          required
+          minLength={2}
+          maxLength={100}
+        />
       </div>
 
       <div className="form-field">
@@ -83,7 +91,7 @@ export default function ContactForm() {
 
       <div className="form-field">
         <label htmlFor="type">What would you like to discuss?</label>
-        <select id="type" name="type" defaultValue="product">
+        <select id="type" name="type" defaultValue="product" required>
           <option value="product">A Savvy Rilla product</option>
           <option value="partnership">Partnership</option>
           <option value="build">A product or system</option>
@@ -99,6 +107,7 @@ export default function ContactForm() {
           name="message"
           placeholder="What are you working on, and how can we help?"
           required
+          minLength={10}
           maxLength={3000}
         />
       </div>

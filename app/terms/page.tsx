@@ -45,7 +45,7 @@ export default function TermsPage() {
           </p>
           <h2>Contact</h2>
           <p>Questions about these terms can be sent to hello@savvyrilla.tech.</p>
-          <p>Last updated: 23 July 2026.</p>
+          <p>Last updated: 24 July 2026.</p>
         </div>
       </div>
     </main>

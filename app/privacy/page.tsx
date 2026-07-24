@@ -49,7 +49,7 @@ export default function PrivacyPage() {
             the information and services within those products. Their notices
             apply when you use them.
           </p>
-          <p>Last updated: 23 July 2026.</p>
+          <p>Last updated: 24 July 2026.</p>
         </div>
       </div>
     </main>

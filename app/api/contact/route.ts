@@ -10,6 +10,16 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null;
 const requestLog = new Map<string, number[]>();
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_REQUESTS = 5;
+const ALLOWED_TYPES = new Set([
+  "product",
+  "partnership",
+  "build",
+  "media",
+  "other",
+]);
+const RESPONSE_HEADERS = {
+  "Cache-Control": "no-store, max-age=0",
+};
 
 function escapeHtml(value: string) {
   return value
@@ -37,6 +47,15 @@ function isRateLimited(key: string) {
 
   recent.push(now);
   requestLog.set(key, recent);
+
+  if (requestLog.size > 1_000) {
+    for (const [loggedKey, timestamps] of requestLog) {
+      if (!timestamps.some((timestamp) => now - timestamp < WINDOW_MS)) {
+        requestLog.delete(loggedKey);
+      }
+    }
+  }
+
   return false;
 }
 
@@ -76,13 +95,32 @@ function buildConfirmationHtml({
 
 export async function POST(request: Request) {
   try {
+    if (!request.headers.get("content-type")?.includes("application/json")) {
+      return NextResponse.json(
+        { ok: false, error: "Please submit the contact form." },
+        { status: 415, headers: RESPONSE_HEADERS },
+      );
+    }
+
+    if (request.headers.get("sec-fetch-site") === "cross-site") {
+      return NextResponse.json(
+        { ok: false, error: "Cross-site requests are not accepted." },
+        { status: 403, headers: RESPONSE_HEADERS },
+      );
+    }
+
     const ip =
+      request.headers.get("cf-connecting-ip")?.trim() ||
+      request.headers.get("x-real-ip")?.trim() ||
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 
     if (isRateLimited(ip)) {
       return NextResponse.json(
         { ok: false, error: "Too many messages. Please try again shortly." },
-        { status: 429 },
+        {
+          status: 429,
+          headers: { ...RESPONSE_HEADERS, "Retry-After": "600" },
+        },
       );
     }
 
@@ -95,17 +133,21 @@ export async function POST(request: Request) {
     const website = readString(body.website, 200);
 
     if (website) {
-      return NextResponse.json({ ok: true });
+      return NextResponse.json({ ok: true }, { headers: RESPONSE_HEADERS });
     }
 
     if (
-      !name ||
-      !message ||
+      name.length < 2 ||
+      message.length < 10 ||
+      !ALLOWED_TYPES.has(type) ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     ) {
       return NextResponse.json(
-        { ok: false, error: "Please provide a valid name, email, and message." },
-        { status: 400 },
+        {
+          ok: false,
+          error: "Please provide a valid name, email, topic, and message.",
+        },
+        { status: 400, headers: RESPONSE_HEADERS },
       );
     }
 
@@ -174,11 +216,11 @@ export async function POST(request: Request) {
           error:
             "Messaging is temporarily unavailable. Please email hello@savvyrilla.tech.",
         },
-        { status: 503 },
+        { status: 503, headers: RESPONSE_HEADERS },
       );
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true }, { headers: RESPONSE_HEADERS });
   } catch (error) {
     console.error(
       "Contact request failed:",
@@ -190,7 +232,7 @@ export async function POST(request: Request) {
         error:
           "We could not send your message. Please email hello@savvyrilla.tech.",
       },
-      { status: 500 },
+      { status: 500, headers: RESPONSE_HEADERS },
     );
   }
 }
