@@ -2,6 +2,7 @@
 import type { Metadata, Viewport } from "next";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
+import { brand } from "@/lib/brand";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
       "One technology company. A growing family of products built for the systems that matter.",
     images: [
       {
-        url: "/og-savvy-v2.png",
+        url: brand.assets.socialCard,
         width: 1200,
         height: 630,
         alt: "Savvy Rilla Technologies™",
@@ -48,11 +49,11 @@ export const metadata: Metadata = {
     title: "Savvy Rilla Technologies™ | Technology built in Juba",
     description:
       "One technology company. A growing family of products built for the systems that matter.",
-    images: ["/og-savvy-v2.png"],
+    images: [brand.assets.socialCard],
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/logo-black.png",
+    icon: brand.assets.favicon,
+    apple: brand.assets.logoDark,
   },
 };
 
@@ -67,11 +68,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const organisation = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Savvy Rilla Technologies",
-    legalName: "Savvy Rilla Technologies",
-    url: "https://www.savvyrilla.tech",
-    logo: "https://www.savvyrilla.tech/logo-black.png",
-    email: "hello@savvyrilla.tech",
+    name: brand.name,
+    legalName: brand.name,
+    url: brand.url,
+    logo: `${brand.url}${brand.assets.logoDark}`,
+    email: brand.email,
     address: {
       "@type": "PostalAddress",
       addressLocality: "Juba",

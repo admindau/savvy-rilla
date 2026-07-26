@@ -18,7 +18,15 @@ export default function ProductCard({
   return (
     <article className="product-card" style={style}>
       <div className="product-card-top">
-        <span className="product-number">{String(index + 1).padStart(2, "0")}</span>
+        <div className="product-card-meta">
+          <span className="product-number">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span className="product-availability">
+            <span aria-hidden="true" />
+            {product.availability}
+          </span>
+        </div>
         <span
           className={`product-mark product-mark-${product.logoVariant}`}
           aria-hidden="true"
@@ -40,7 +48,12 @@ export default function ProductCard({
         <Link href={`/products/${product.slug}`}>
           Product story <span aria-hidden="true">→</span>
         </Link>
-        <a href={product.url} target="_blank" rel="noreferrer">
+        <a
+          aria-label={`Visit ${product.shortName} (opens in a new tab)`}
+          href={product.url}
+          target="_blank"
+          rel="noreferrer"
+        >
           Visit product <span aria-hidden="true">↗</span>
         </a>
       </div>

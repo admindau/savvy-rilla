@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/components/product-card";
 import ProductLogo from "@/components/product-logo";
+import { brand } from "@/lib/brand";
 import { products } from "@/lib/products";
 
 const capabilities = [
@@ -64,7 +65,7 @@ export default function HomePage() {
             <div className="ecosystem-glow" aria-hidden="true" />
             <div className="ecosystem-core">
               <Image
-                src="/logo-white.png"
+                src={brand.assets.logoLight}
                 alt="Savvy Rilla Technologies"
                 width={92}
                 height={92}
@@ -94,14 +95,17 @@ export default function HomePage() {
 
         <div className="shell hero-proof">
           <div>
-            <strong>05</strong>
-            <span>Products and growing</span>
+            <span className="proof-label">Portfolio</span>
+            <strong>05 live products</strong>
+            <span>One connected product family</span>
           </div>
           <div>
+            <span className="proof-label">Based in</span>
             <strong>Juba</strong>
             <span>South Sudan</span>
           </div>
           <div>
+            <span className="proof-label">Operating model</span>
             <strong>Build + operate</strong>
             <span>One accountable team</span>
           </div>
@@ -142,7 +146,7 @@ export default function HomePage() {
         <div className="shell belief-grid">
           <div className="belief-mark" aria-hidden="true">
             <Image
-              src="/logo-white.png"
+              src={brand.assets.logoLight}
               alt=""
               width={170}
               height={170}

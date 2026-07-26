@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ContactForm from "@/components/contact-form";
+import { brand } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -34,9 +35,7 @@ export default function ContactPage() {
             <dl>
               <dt>Email</dt>
               <dd>
-                <a href="mailto:hello@savvyrilla.tech">
-                  hello@savvyrilla.tech
-                </a>
+                <a href={`mailto:${brand.email}`}>{brand.email}</a>
               </dd>
               <dt>Based in</dt>
               <dd>Juba, South Sudan</dd>

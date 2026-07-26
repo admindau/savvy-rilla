@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import CompanyBrand from "@/components/company-brand";
 
 const navigation = [
   { href: "/products", label: "Products" },
@@ -75,20 +75,7 @@ export default function SiteHeader() {
   return (
     <header className="site-header" data-menu-open={mobileOpen || undefined}>
       <div className="shell nav-shell">
-        <Link className="brand" href="/">
-          <Image
-            className="brand-mark"
-            src="/logo-white.png"
-            alt=""
-            width={44}
-            height={44}
-            priority
-          />
-          <span className="brand-copy">
-            <strong>Savvy Rilla</strong>
-            <span>Technologies</span>
-          </span>
-        </Link>
+        <CompanyBrand priority />
 
         <nav className="desktop-nav" aria-label="Primary navigation">
           {navigation.map((item) => (

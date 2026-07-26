@@ -60,6 +60,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <p className="product-detail-copy">{product.description}</p>
               <div className="page-hero-actions">
                 <a
+                  aria-label={`Visit ${product.shortName} (opens in a new tab)`}
                   className="button button-light"
                   href={product.url}
                   target="_blank"
@@ -91,6 +92,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <p>{product.capability}</p>
             </div>
             <div>
+              <span>Availability</span>
+              <p>
+                <span className="inline-status" aria-hidden="true" />
+                {product.availability} · Direct product access
+              </p>
+            </div>
+            <div>
               <span>Created by</span>
               <p>Savvy Rilla Technologies™ · Juba, South Sudan</p>
             </div>
@@ -116,6 +124,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               capabilities, access its services, or join its community.
             </p>
             <a
+              aria-label={`Open ${product.shortName} (opens in a new tab)`}
               className="text-link"
               href={product.url}
               target="_blank"

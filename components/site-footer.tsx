@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+import CompanyBrand from "@/components/company-brand";
+import { brand } from "@/lib/brand";
 import { products } from "@/lib/products";
 
 export default function SiteFooter() {
@@ -18,18 +19,12 @@ export default function SiteFooter() {
 
         <div className="footer-grid">
           <div className="footer-brand">
-            <Link className="brand" href="/">
-              <Image src="/logo-white.png" alt="" width={44} height={44} />
-              <span className="brand-copy">
-                <strong>Savvy Rilla</strong>
-                <span>Technologies</span>
-              </span>
-            </Link>
+            <CompanyBrand />
             <p>
               Designing and operating practical digital products from Juba,
               South Sudan.
             </p>
-            <a href="mailto:hello@savvyrilla.tech">hello@savvyrilla.tech</a>
+            <a href={`mailto:${brand.email}`}>{brand.email}</a>
           </div>
 
           <div className="footer-column">
@@ -46,6 +41,7 @@ export default function SiteFooter() {
             <p>Products</p>
             {products.map((product) => (
               <a
+                aria-label={`Visit ${product.shortName} (opens in a new tab)`}
                 key={product.slug}
                 href={product.url}
                 target="_blank"

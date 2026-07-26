@@ -22,6 +22,7 @@ export default function ProductLogo({
         fill
         sizes={sizes}
         src={product.logo}
+        unoptimized
       />
     </span>
   );

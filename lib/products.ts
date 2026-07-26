@@ -12,6 +12,7 @@ export type Product = {
   url: string;
   accent: string;
   accentSoft: string;
+  availability: "Live";
   featured?: boolean;
 };
 
@@ -31,6 +32,7 @@ export const products: Product[] = [
     url: "https://www.suqjunub.com",
     accent: "#f7a44a",
     accentSoft: "rgba(247, 164, 74, 0.16)",
+    availability: "Live",
     featured: true,
   },
   {
@@ -48,6 +50,7 @@ export const products: Product[] = [
     url: "https://gl.savvyrilla.tech",
     accent: "#71e6a8",
     accentSoft: "rgba(113, 230, 168, 0.15)",
+    availability: "Live",
     featured: true,
   },
   {
@@ -65,6 +68,7 @@ export const products: Product[] = [
     url: "https://fx.savvyrilla.tech",
     accent: "#67b7ff",
     accentSoft: "rgba(103, 183, 255, 0.15)",
+    availability: "Live",
     featured: true,
   },
   {
@@ -82,13 +86,14 @@ export const products: Product[] = [
     url: "https://www.herdproof.com",
     accent: "#e8c66a",
     accentSoft: "rgba(232, 198, 106, 0.15)",
+    availability: "Live",
     featured: true,
   },
   {
     slug: "roots",
     name: "Roots™",
     shortName: "Roots",
-    logo: "/products/roots-mark.svg",
+    logo: "/products/roots-baobab-emblem-inverse.webp",
     logoVariant: "emblem",
     category: "Family history",
     tagline: "Every family has a story.",
@@ -99,6 +104,7 @@ export const products: Product[] = [
     url: "https://roots.savvyrilla.tech",
     accent: "#d69cff",
     accentSoft: "rgba(214, 156, 255, 0.14)",
+    availability: "Live",
     featured: true,
   },
 ];

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ProductLogo from "@/components/product-logo";
 import { products } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -25,11 +26,25 @@ export default function StatusPage() {
       <section className="page-section page-section-soft">
         <div className="shell detail-list">
           {products.map((product, index) => (
-            <article key={product.slug}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <h3>{product.name}</h3>
+            <article className="access-card" key={product.slug}>
+              <div className="access-card-top">
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <ProductLogo
+                  product={product}
+                  decorative
+                  sizes={product.logoVariant === "wordmark" ? "90px" : "42px"}
+                />
+              </div>
+              <div>
+                <p className="product-availability">
+                  <span aria-hidden="true" />
+                  {product.availability}
+                </p>
+                <h3>{product.name}</h3>
+              </div>
               <p>
                 <a
+                  aria-label={`Open ${product.shortName} (opens in a new tab)`}
                   className="text-link"
                   href={product.url}
                   target="_blank"
