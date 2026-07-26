@@ -63,6 +63,10 @@ export default function HomePage() {
 
           <div className="ecosystem-visual" aria-label="Savvy Rilla product ecosystem">
             <div className="ecosystem-glow" aria-hidden="true" />
+            <div className="hero-system-label" aria-hidden="true">
+              <span />
+              Product network · 05 live
+            </div>
             <div className="ecosystem-core">
               <Image
                 src={brand.assets.logoLight}
@@ -197,6 +201,105 @@ export default function HomePage() {
             <Link className="text-link" href="/capabilities">
               See our capabilities <span aria-hidden="true">→</span>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="section technology-section" id="technology-ecosystem">
+        <div className="shell">
+          <div className="section-heading split-heading">
+            <div>
+              <p className="eyebrow">Technology ecosystem</p>
+              <h2>Products connected by one engineering core.</h2>
+            </div>
+            <p>
+              Commerce, finance, intelligence, identity, and memory are
+              different systems. We build them with shared product discipline,
+              dependable infrastructure, and a long operating horizon.
+            </p>
+          </div>
+
+          <div className="technology-map" aria-label="Savvy Rilla technology ecosystem">
+            <div className="technology-backplane" aria-hidden="true" />
+            <div className="technology-core">
+              <Image
+                src={brand.assets.logoLight}
+                alt=""
+                width={76}
+                height={76}
+                sizes="76px"
+              />
+              <span>Product core</span>
+              <strong>SRT</strong>
+            </div>
+
+            <div className="technology-products">
+              {products.map((product, index) => (
+                <Link
+                  className="technology-product"
+                  href={`/products/${product.slug}`}
+                  key={product.slug}
+                  style={
+                    {
+                      "--technology-accent": product.accent,
+                    } as React.CSSProperties
+                  }
+                >
+                  <span className="technology-product-index">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <ProductLogo
+                    product={product}
+                    decorative
+                    sizes={product.logoVariant === "wordmark" ? "92px" : "44px"}
+                  />
+                  <span className="technology-product-copy">
+                    <strong>{product.shortName}</strong>
+                    <small>{product.category}</small>
+                  </span>
+                  <span className="technology-product-state">
+                    <i aria-hidden="true" />
+                    Live
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="technology-horizon">
+              <article>
+                <span>Exploration 01</span>
+                <h3>Applied AI systems</h3>
+                <p>Future product research</p>
+              </article>
+              <article>
+                <span>Exploration 02</span>
+                <h3>Innovation lab</h3>
+                <p>Prototypes and new systems</p>
+              </article>
+            </div>
+          </div>
+
+          <div className="technology-principles">
+            <article>
+              <span>01 / Interfaces</span>
+              <h3>Useful at first contact</h3>
+              <p>Responsive products shaped around real people and workflows.</p>
+            </article>
+            <article>
+              <span>02 / Intelligence</span>
+              <h3>Data made actionable</h3>
+              <p>APIs, reporting layers, and historical signals with clear purpose.</p>
+            </article>
+            <article>
+              <span>03 / Trust</span>
+              <h3>Confidence by design</h3>
+              <p>Identity, provenance, permissions, and auditability built in.</p>
+            </article>
+            <article>
+              <span>04 / Operations</span>
+              <h3>Owned after launch</h3>
+              <p>Monitoring, maintenance, and product iteration over the long term.</p>
+            </article>
           </div>
         </div>
       </section>

@@ -2,6 +2,7 @@
 import type { Metadata, Viewport } from "next";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
+import MotionProvider from "@/components/motion-provider";
 import { brand } from "@/lib/brand";
 import "./globals.css";
 
@@ -100,6 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         {children}
         <SiteFooter />
+        <MotionProvider />
       </body>
     </html>
   );
