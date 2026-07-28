@@ -48,8 +48,8 @@ export default function HomePage() {
             </h1>
             <p className="hero-intro">
               Savvy Rilla Technologies™ creates practical digital products for
-              commerce, finance, market intelligence, livestock identity, and
-              family history.
+              commerce, finance, regional market intelligence, livestock
+              identity, and family history.
             </p>
             <div className="hero-actions">
               <Link className="button button-light" href="/products">
@@ -65,7 +65,7 @@ export default function HomePage() {
             <div className="ecosystem-glow" aria-hidden="true" />
             <div className="hero-system-label" aria-hidden="true">
               <span />
-              Product network · 05 live
+              Product network · {String(products.length).padStart(2, "0")} live
             </div>
             <div className="ecosystem-core">
               <Image
@@ -100,7 +100,9 @@ export default function HomePage() {
         <div className="shell hero-proof">
           <div>
             <span className="proof-label">Portfolio</span>
-            <strong>05 live products</strong>
+            <strong>
+              {String(products.length).padStart(2, "0")} live products
+            </strong>
             <span>One connected product family</span>
           </div>
           <div>
@@ -126,7 +128,7 @@ export default function HomePage() {
           <div className="section-heading split-heading">
             <div>
               <p className="eyebrow">The product family</p>
-              <h2>One company. Five ambitious products.</h2>
+              <h2>One company. A growing product family.</h2>
             </div>
             <p>
               Each product starts with a specific real-world need. Together,
@@ -213,9 +215,10 @@ export default function HomePage() {
               <h2>Products connected by one engineering core.</h2>
             </div>
             <p>
-              Commerce, finance, intelligence, identity, and memory are
-              different systems. We build them with shared product discipline,
-              dependable infrastructure, and a long operating horizon.
+              Commerce, finance, regional intelligence, identity, and memory
+              are different systems. We build them with shared product
+              discipline, dependable infrastructure, and a long operating
+              horizon.
             </p>
           </div>
 

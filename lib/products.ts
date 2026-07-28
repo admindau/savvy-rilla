@@ -72,6 +72,25 @@ export const products: Product[] = [
     featured: true,
   },
   {
+    slug: "eamu",
+    name: "EAMU",
+    shortName: "EAMU",
+    logo: "/products/eamu-mark.svg",
+    logoVariant: "emblem",
+    category: "Regional market intelligence",
+    tagline: "One region. Eight economies. A shared horizon.",
+    description:
+      "Institutional-grade East African FX intelligence tracking the currency dynamics behind regional monetary convergence.",
+    audience:
+      "Policy institutions, central banks, market participants, and developers",
+    capability: "Regional FX intelligence, convergence signals, and API access",
+    url: "https://eamu.savvyrilla.tech",
+    accent: "#d3b56b",
+    accentSoft: "rgba(211, 181, 107, 0.15)",
+    availability: "Live",
+    featured: true,
+  },
+  {
     slug: "herdproof",
     name: "HerdProof™",
     shortName: "HerdProof",

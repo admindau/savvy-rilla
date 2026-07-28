@@ -4,6 +4,7 @@ import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 import MotionProvider from "@/components/motion-provider";
 import { brand } from "@/lib/brand";
+import { products } from "@/lib/products";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s | Savvy Rilla Technologies™",
   },
   description:
-    "Savvy Rilla Technologies™ builds practical digital products for commerce, finance, market intelligence, livestock identity, and family history.",
+    "Savvy Rilla Technologies™ builds practical digital products for commerce, finance, regional market intelligence, livestock identity, and family history.",
   applicationName: "Savvy Rilla Technologies™",
   keywords: [
     "Savvy Rilla Technologies",
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
     "digital products South Sudan",
     "SuqJunub",
     "Gorilla Ledger",
+    "EAMU",
     "HerdProof",
   ],
   authors: [{ name: "Savvy Rilla Technologies™" }],
@@ -79,13 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       addressLocality: "Juba",
       addressCountry: "SS",
     },
-    brand: [
-      "SuqJunub",
-      "Gorilla Ledger",
-      "Savvy Rilla FX",
-      "HerdProof",
-      "Roots",
-    ],
+    brand: products.map((product) => product.shortName),
   };
 
   return (

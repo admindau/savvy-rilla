@@ -68,14 +68,14 @@ export default function InsightsPage() {
         <div className="shell prose-grid">
           <div>
             <p className="eyebrow">Proof in practice</p>
-            <h2>Five products. One evolving point of view.</h2>
+            <h2>A growing portfolio. One evolving point of view.</h2>
           </div>
           <div className="prose-copy">
             <p>
               The Savvy Rilla portfolio is where these ideas are tested:
               commerce built around trust, clearer financial records, useful
-              market data, verifiable livestock identity, and family history
-              preserved with care.
+              market and regional monetary intelligence, verifiable livestock
+              identity, and family history preserved with care.
             </p>
             <div className="page-hero-actions">
               <Link className="button button-light" href="/products">

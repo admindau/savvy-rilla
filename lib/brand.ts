@@ -8,7 +8,7 @@ export const brand = {
   assets: {
     logoLight: "/logo-white.png",
     logoDark: "/logo-black.png",
-    socialCard: "/og-savvy-v2.png",
+    socialCard: "/og-savvy-v3.png",
     favicon: "/favicon.ico",
   },
 } as const;

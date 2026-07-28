@@ -5,7 +5,7 @@ import { products } from "@/lib/products";
 export const metadata: Metadata = {
   title: "Products",
   description:
-    "Explore the products built and operated by Savvy Rilla Technologies™ across commerce, finance, data, livestock identity, and family history.",
+    "Explore the products built and operated by Savvy Rilla Technologies™ across commerce, finance, regional intelligence, livestock identity, and family history.",
   alternates: { canonical: "/products" },
 };
 
@@ -17,9 +17,10 @@ export default function ProductsPage() {
           <p className="eyebrow">Savvy Rilla products</p>
           <h1>Built around real needs.</h1>
           <p className="page-hero-copy">
-            Our portfolio spans everyday money, trusted commerce, market data,
-            livestock identity, and family memory. Different challenges, united
-            by practical design and dependable technology.
+            Our portfolio spans everyday money, trusted commerce, regional
+            market intelligence, livestock identity, and family memory.
+            Different challenges, united by practical design and dependable
+            technology.
           </p>
         </div>
       </section>

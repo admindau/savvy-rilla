@@ -574,6 +574,11 @@ img {
   left: 0;
 }
 
+.ecosystem-node-6 {
+  top: 5%;
+  left: 43%;
+}
+
 .hero-proof {
   position: relative;
   z-index: 3;
@@ -736,11 +741,6 @@ img {
 .product-card:hover::before {
   opacity: 1;
   transform: translateX(42%);
-}
-
-.product-card:nth-child(5) {
-  grid-column: 1 / -1;
-  min-height: 440px;
 }
 
 .product-card-top {
@@ -2261,6 +2261,12 @@ img {
     left: 0;
   }
 
+  .ecosystem-node-6 {
+    top: auto;
+    right: 45%;
+    bottom: 0;
+  }
+
   .hero-system-label {
     top: 1%;
     right: 0;
@@ -2378,8 +2384,7 @@ img {
     grid-template-columns: 1fr;
   }
 
-  .product-card,
-  .product-card:nth-child(5) {
+  .product-card {
     grid-column: auto;
     min-height: 440px;
     padding: 24px;
