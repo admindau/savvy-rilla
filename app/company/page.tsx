@@ -1,11 +1,9 @@
+import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Company",
-  description:
-    "Savvy Rilla Technologies™ is a product company building practical technology from Juba, South Sudan.",
-  alternates: { canonical: "/company" },
+  ...pageMetadata("Company", "Savvy Rilla Technologies™ is a product company building practical technology from Juba, South Sudan.", "/company"),
 };
 
 export default function CompanyPage() {

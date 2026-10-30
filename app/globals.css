@@ -2262,9 +2262,10 @@ img {
   }
 
   .ecosystem-node-6 {
-    top: auto;
-    right: 45%;
-    bottom: 0;
+    top: 5%;
+    right: auto;
+    left: 8%;
+    bottom: auto;
   }
 
   .hero-system-label {
@@ -2620,4 +2621,34 @@ img {
     transform: none !important;
   }
 
+}
+
+/* Keep the orbit readable without requiring visitors to recognise every mark. */
+.ecosystem-node-label {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 50%;
+  translate: -50% 0;
+  color: var(--muted);
+  font-size: 0.6rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+html { scroll-padding-top: 100px; }
+.form-field { min-width: 0; }
+.form-field input, .form-field select, .form-field textarea { font-size: 1rem; }
+.product-card-actions a, .footer-column a { min-height: 32px; display: inline-flex; align-items: center; }
+.breadcrumb { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; color: var(--muted); font-size: 0.75rem; }
+.breadcrumb a:hover { color: var(--acid); }
+.form-status a { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 760px) {
+  .hero-system-label { top: -30px; }
+  .ecosystem-node-1 { top: 2%; left: 56%; }
+  .ecosystem-node-2 { right: 4%; }
+  .ecosystem-node-3 { right: 8%; bottom: 7%; }
+  .ecosystem-node-5 { left: 4%; top: 44%; }
+  .ecosystem-node-4 { left: 19%; bottom: 3%; }
+  .ecosystem-node-label { font-size: 0.58rem; }
+  .form-field input, .form-field select, .form-field textarea { scroll-margin-top: 100px; }
 }

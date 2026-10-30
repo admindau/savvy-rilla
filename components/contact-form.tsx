@@ -54,14 +54,14 @@ export default function ContactForm() {
   }
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit}>
+    <form aria-label="Contact Savvy Rilla" className="contact-form" onSubmit={handleSubmit}>
       <div className="form-honeypot" aria-hidden="true">
         <label htmlFor="website">Website</label>
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
       <div className="form-field">
-        <label htmlFor="name">Name</label>
+        <label htmlFor="name">Name (required)</label>
         <input
           id="name"
           name="name"
@@ -74,12 +74,12 @@ export default function ContactForm() {
       </div>
 
       <div className="form-field">
-        <label htmlFor="email">Email</label>
+        <label htmlFor="email">Email (required)</label>
         <input id="email" name="email" type="email" autoComplete="email" required maxLength={180} />
       </div>
 
       <div className="form-field">
-        <label htmlFor="organisation">Organisation</label>
+        <label htmlFor="organisation">Organisation (optional)</label>
         <input
           id="organisation"
           name="organisation"
@@ -101,7 +101,7 @@ export default function ContactForm() {
       </div>
 
       <div className="form-field form-field-full">
-        <label htmlFor="message">Tell us a little more</label>
+        <label htmlFor="message">Tell us a little more (required)</label>
         <textarea
           id="message"
           name="message"
@@ -135,6 +135,9 @@ export default function ContactForm() {
         aria-live="polite"
       >
         {status.message}
+        {status.state === "error" && (
+          <> <a href="mailto:hello@savvyrilla.tech">Email us directly ↗</a></>
+        )}
       </p>
     </form>
   );

@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/metadata";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -23,16 +24,7 @@ export async function generateMetadata({
     return {};
   }
 
-  return {
-    title: product.name,
-    description: product.description,
-    alternates: { canonical: `/products/${product.slug}` },
-    openGraph: {
-      title: `${product.name} | Savvy Rilla Technologies™`,
-      description: product.description,
-      url: `/products/${product.slug}`,
-    },
-  };
+  return pageMetadata(product.name, product.description, `/products/${product.slug}`);
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
@@ -52,6 +44,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <main id="main-content">
       <section className="product-detail-hero" style={style}>
         <div className="shell">
+          <nav className="breadcrumb" aria-label="Breadcrumb">
+            <Link href="/">Home</Link><span aria-hidden="true">/</span>
+            <Link href="/products">Products</Link><span aria-hidden="true">/</span>
+            <span aria-current="page">{product.shortName}</span>
+          </nav>
           <div className="product-detail-layout">
             <div>
               <p className="eyebrow">{product.category}</p>
@@ -132,6 +129,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             >
               Open the live product <span aria-hidden="true">↗</span>
             </a>
+            <p><Link className="text-link" href="/contact">Ask us about {product.shortName} <span aria-hidden="true">→</span></Link></p>
           </div>
         </div>
       </section>

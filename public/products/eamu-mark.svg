@@ -1,57 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="EAMU convergence mark representing eight Partner States">
+  <rect width="96" height="96" rx="24" fill="#071A1E"/>
   <defs>
-    <linearGradient id="eamu-state-0" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#176B50"/>
-      <stop offset="48%" stop-color="#E7DDC5"/>
-      <stop offset="100%" stop-color="#9F3042"/>
-    </linearGradient>
-    <linearGradient id="eamu-state-1" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#286D9C"/>
-      <stop offset="52%" stop-color="#C9A94E"/>
-      <stop offset="100%" stop-color="#973846"/>
-    </linearGradient>
-    <linearGradient id="eamu-state-2" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#171D1C"/>
-      <stop offset="48%" stop-color="#8F3440"/>
-      <stop offset="100%" stop-color="#246044"/>
-    </linearGradient>
-    <linearGradient id="eamu-state-3" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#327DA4"/>
-      <stop offset="52%" stop-color="#D0B45C"/>
-      <stop offset="100%" stop-color="#2A654A"/>
-    </linearGradient>
-    <linearGradient id="eamu-state-4" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#3478A8"/>
-      <stop offset="72%" stop-color="#6597B8"/>
-      <stop offset="100%" stop-color="#DFE8E5"/>
-    </linearGradient>
-    <linearGradient id="eamu-state-5" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#171D1C"/>
-      <stop offset="24%" stop-color="#8E3540"/>
-      <stop offset="50%" stop-color="#286348"/>
-      <stop offset="76%" stop-color="#315E8C"/>
-      <stop offset="100%" stop-color="#C6A648"/>
-    </linearGradient>
-    <linearGradient id="eamu-state-6" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#26704D"/>
-      <stop offset="32%" stop-color="#C8AA50"/>
-      <stop offset="56%" stop-color="#171D1C"/>
-      <stop offset="100%" stop-color="#327CA3"/>
-    </linearGradient>
-    <linearGradient id="eamu-state-7" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#171D1C"/>
-      <stop offset="50%" stop-color="#C9A541"/>
-      <stop offset="100%" stop-color="#9E3037"/>
-    </linearGradient>
+    <linearGradient id="bi" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#176B50"/><stop offset="48%" stop-color="#E7DDC5"/><stop offset="100%" stop-color="#9F3042"/></linearGradient>
+    <linearGradient id="cd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#286D9C"/><stop offset="52%" stop-color="#C9A94E"/><stop offset="100%" stop-color="#973846"/></linearGradient>
+    <linearGradient id="ke" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#171D1C"/><stop offset="48%" stop-color="#8F3440"/><stop offset="100%" stop-color="#246044"/></linearGradient>
+    <linearGradient id="rw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#327DA4"/><stop offset="52%" stop-color="#D0B45C"/><stop offset="100%" stop-color="#2A654A"/></linearGradient>
+    <linearGradient id="so" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3478A8"/><stop offset="72%" stop-color="#6597B8"/><stop offset="100%" stop-color="#DFE8E5"/></linearGradient>
+    <linearGradient id="ss" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#171D1C"/><stop offset="24%" stop-color="#8E3540"/><stop offset="50%" stop-color="#286348"/><stop offset="76%" stop-color="#315E8C"/><stop offset="100%" stop-color="#C6A648"/></linearGradient>
+    <linearGradient id="tz" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#26704D"/><stop offset="32%" stop-color="#C8AA50"/><stop offset="56%" stop-color="#171D1C"/><stop offset="100%" stop-color="#327CA3"/></linearGradient>
+    <linearGradient id="ug" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#171D1C"/><stop offset="50%" stop-color="#C9A541"/><stop offset="100%" stop-color="#9E3037"/></linearGradient>
   </defs>
   <g stroke="#EAD9AA" stroke-opacity=".3" stroke-width=".7" stroke-linejoin="round">
-    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#eamu-state-0)"/>
-    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#eamu-state-1)" transform="rotate(45 48 48)"/>
-    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#eamu-state-2)" transform="rotate(90 48 48)"/>
-    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#eamu-state-3)" transform="rotate(135 48 48)"/>
-    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#eamu-state-4)" transform="rotate(180 48 48)"/>
-    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#eamu-state-5)" transform="rotate(225 48 48)"/>
-    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#eamu-state-6)" transform="rotate(270 48 48)"/>
-    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#eamu-state-7)" transform="rotate(315 48 48)"/>
+    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#bi)"/>
+    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#cd)" transform="rotate(45 48 48)"/>
+    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#ke)" transform="rotate(90 48 48)"/>
+    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#rw)" transform="rotate(135 48 48)"/>
+    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#so)" transform="rotate(180 48 48)"/>
+    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#ss)" transform="rotate(225 48 48)"/>
+    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#tz)" transform="rotate(270 48 48)"/>
+    <path d="M43.5 7.5h9L58 19.25 53.25 33 48 40.5 42.75 33 38 19.25Z" fill="url(#ug)" transform="rotate(315 48 48)"/>
   </g>
 </svg>

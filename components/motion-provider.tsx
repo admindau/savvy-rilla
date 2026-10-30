@@ -45,7 +45,7 @@ export default function MotionProvider() {
             }
           }
         },
-        { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+        { rootMargin: "0px 0px -8% 0px", threshold: 0 },
       );
 
       elements.forEach((element, index) => {
@@ -64,6 +64,12 @@ export default function MotionProvider() {
     return () => {
       window.cancelAnimationFrame(frame);
       observer?.disconnect();
+      document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((element) => {
+        delete element.dataset.reveal;
+        element.classList.remove("is-visible");
+        element.style.removeProperty("--reveal-index");
+      });
+      document.documentElement.classList.remove("motion-ready");
     };
   }, [pathname]);
 

@@ -8,6 +8,7 @@ a product technology company based in Juba, South Sudan.
 - [SuqJunub™](https://www.suqjunub.com)
 - [Gorilla Ledger™](https://gl.savvyrilla.tech)
 - [Savvy Rilla FX](https://fx.savvyrilla.tech)
+- [EAMU](https://eamu.savvyrilla.tech)
 - [HerdProof™](https://www.herdproof.com)
 - [Roots™](https://roots.savvyrilla.tech)
 

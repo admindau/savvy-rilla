@@ -18,6 +18,15 @@ export default function SiteHeader() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuPanelRef = useRef<HTMLElement>(null);
 
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1051px)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setMobileOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
+
   function isCurrent(href: string) {
     return pathname === href || pathname.startsWith(`${href}/`);
   }

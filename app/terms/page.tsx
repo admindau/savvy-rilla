@@ -1,9 +1,8 @@
+import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms",
-  description: "Website terms for Savvy Rilla Technologies™.",
-  alternates: { canonical: "/terms" },
+  ...pageMetadata("Terms", "Website terms for Savvy Rilla Technologies™.", "/terms"),
 };
 
 export default function TermsPage() {

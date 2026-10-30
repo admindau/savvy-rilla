@@ -1,9 +1,8 @@
+import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy",
-  description: "Privacy information for the Savvy Rilla Technologies™ website.",
-  alternates: { canonical: "/privacy" },
+  ...pageMetadata("Privacy", "Privacy information for the Savvy Rilla Technologies™ website.", "/privacy"),
 };
 
 export default function PrivacyPage() {

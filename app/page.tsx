@@ -92,6 +92,7 @@ export default function HomePage() {
                   decorative
                   sizes={product.logoVariant === "wordmark" ? "88px" : "48px"}
                 />
+                <span className="ecosystem-node-label" aria-hidden="true">{product.shortName}</span>
               </Link>
             ))}
           </div>

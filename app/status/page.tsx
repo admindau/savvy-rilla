@@ -1,11 +1,10 @@
+import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import ProductLogo from "@/components/product-logo";
 import { products } from "@/lib/products";
 
 export const metadata: Metadata = {
-  title: "Product access",
-  description: "Direct access links for Savvy Rilla Technologies™ products.",
-  alternates: { canonical: "/status" },
+  ...pageMetadata("Product access", "Direct access links for Savvy Rilla Technologies™ products.", "/status"),
   robots: { index: false, follow: true },
 };
 

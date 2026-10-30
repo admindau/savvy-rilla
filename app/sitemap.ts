@@ -3,7 +3,7 @@ import { products } from "@/lib/products";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.savvyrilla.tech";
-  const updatedAt = new Date("2026-07-28");
+  const updatedAt = new Date("2026-10-30");
   const routes = [
     "",
     "/products",

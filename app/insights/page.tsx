@@ -1,11 +1,9 @@
+import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Insights",
-  description:
-    "Product notes and company updates from Savvy Rilla Technologies™.",
-  alternates: { canonical: "/insights" },
+  ...pageMetadata("Insights", "Product notes and company updates from Savvy Rilla Technologies™.", "/insights"),
 };
 
 export default function InsightsPage() {
@@ -34,7 +32,7 @@ export default function InsightsPage() {
           <p className="eyebrow">Insights</p>
           <h1>Notes from the work.</h1>
           <p className="page-hero-copy">
-            Product releases, operating lessons, and ideas about building
+            Operating principles, product thinking, and ideas about building
             useful technology from South Sudan.
           </p>
         </div>

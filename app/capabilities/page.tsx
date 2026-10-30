@@ -1,11 +1,9 @@
+import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Capabilities",
-  description:
-    "Product engineering, data systems, trust infrastructure, and long-term product operations from Savvy Rilla Technologies™.",
-  alternates: { canonical: "/capabilities" },
+  ...pageMetadata("Capabilities", "Product engineering, data systems, trust infrastructure, and long-term product operations from Savvy Rilla Technologies™.", "/capabilities"),
 };
 
 const capabilities = [

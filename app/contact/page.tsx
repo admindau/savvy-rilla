@@ -1,12 +1,10 @@
+import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import ContactForm from "@/components/contact-form";
 import { brand } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Contact Savvy Rilla Technologies™ about products, partnerships, and technology systems.",
-  alternates: { canonical: "/contact" },
+  ...pageMetadata("Contact", "Contact Savvy Rilla Technologies™ about products, partnerships, and technology systems.", "/contact"),
 };
 
 export default function ContactPage() {

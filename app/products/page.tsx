@@ -1,12 +1,10 @@
+import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import ProductCard from "@/components/product-card";
 import { products } from "@/lib/products";
 
 export const metadata: Metadata = {
-  title: "Products",
-  description:
-    "Explore the products built and operated by Savvy Rilla Technologies™ across commerce, finance, regional intelligence, livestock identity, and family history.",
-  alternates: { canonical: "/products" },
+  ...pageMetadata("Products", "Explore the products built and operated by Savvy Rilla Technologies™ across commerce, finance, regional intelligence, livestock identity, and family history.", "/products"),
 };
 
 export default function ProductsPage() {

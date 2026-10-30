@@ -124,7 +124,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    let body: Record<string, unknown>;
+    try {
+      const parsed: unknown = await request.json();
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        throw new Error("Invalid form data");
+      }
+      body = parsed as Record<string, unknown>;
+    } catch {
+      return NextResponse.json(
+        { ok: false, error: "Please provide valid contact form data." },
+        { status: 400, headers: RESPONSE_HEADERS },
+      );
+    }
     const name = readString(body.name, 100);
     const email = readString(body.email, 180).toLowerCase();
     const organisation = readString(body.organisation, 160);
@@ -151,62 +163,64 @@ export async function POST(request: Request) {
       );
     }
 
+    // Either durable storage or delivery to the team means the enquiry arrived.
+    // A confirmation email is best-effort and must never turn that into failure.
     let stored = false;
-    const supabase = getSupabaseServerClient();
-
-    if (supabase) {
-      const { error } = await supabase.from("contact_messages").insert({
-        name,
-        email,
-        organisation: organisation || null,
-        type: type || null,
-        message,
-        user_agent: request.headers.get("user-agent"),
-      });
-
-      stored = !error;
-
-      if (error) {
-        console.error("Contact storage failed:", error.message);
-      }
-    }
-
     let emailed = false;
-
-    if (resend && contactTo && contactFrom) {
-      const internal = await resend.emails.send({
-        from: `Savvy Rilla Contact <${contactFrom}>`,
-        to: [contactTo],
-        replyTo: email,
-        subject: `New Savvy Rilla enquiry — ${name}`,
-        text: [
-          `Name: ${name}`,
-          `Email: ${email}`,
-          `Organisation: ${organisation}`,
-          `Topic: ${type}`,
-          "",
-          message,
-        ].join("\n"),
-      });
-
-      if (internal.error) {
-        throw new Error("Email delivery failed");
-      }
-
-      const confirmation = await resend.emails.send({
-        from: `Savvy Rilla Technologies <${contactFrom}>`,
-        to: [email],
-        replyTo: contactTo,
-        subject: "We received your message — Savvy Rilla Technologies™",
-        html: buildConfirmationHtml({
+    try {
+      const supabase = getSupabaseServerClient();
+      if (supabase) {
+        const { error } = await supabase.from("contact_messages").insert({
           name,
-          organisation,
+          email,
+          organisation: organisation || null,
           type,
           message,
-        }),
-      });
+          user_agent: request.headers.get("user-agent"),
+        });
+        stored = !error;
+        if (error) console.error("Contact storage failed");
+      }
+    } catch {
+      console.error("Contact storage unavailable");
+    }
 
-      emailed = !confirmation.error;
+    if (resend && contactTo && contactFrom) {
+      try {
+        const internal = await resend.emails.send({
+          from: `Savvy Rilla Contact <${contactFrom}>`,
+          to: [contactTo],
+          replyTo: email,
+          subject: `New Savvy Rilla enquiry — ${name}`,
+          text: [
+            `Name: ${name}`,
+            `Email: ${email}`,
+            `Organisation: ${organisation}`,
+            `Topic: ${type}`,
+            "",
+            message,
+          ].join("\n"),
+        });
+        emailed = !internal.error;
+        if (internal.error) console.error("Contact email delivery failed");
+      } catch {
+        console.error("Contact email delivery unavailable");
+      }
+
+      if (stored || emailed) {
+        try {
+          const confirmation = await resend.emails.send({
+            from: `Savvy Rilla Technologies <${contactFrom}>`,
+            to: [email],
+            replyTo: contactTo,
+            subject: "We received your message — Savvy Rilla Technologies™",
+            html: buildConfirmationHtml({ name, organisation, type, message }),
+          });
+          if (confirmation.error) console.error("Contact confirmation failed");
+        } catch {
+          console.error("Contact confirmation unavailable");
+        }
+      }
     }
 
     if (!stored && !emailed) {
