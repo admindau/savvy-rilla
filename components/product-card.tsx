@@ -34,7 +34,7 @@ export default function ProductCard({
           <ProductLogo
             product={product}
             decorative
-            sizes={product.logoVariant === "wordmark" ? "114px" : "52px"}
+            sizes={product.logoVariant === "wordmark" ? "128px" : "72px"}
           />
         </span>
       </div>
@@ -45,8 +45,8 @@ export default function ProductCard({
         <p>{product.description}</p>
       </div>
       <div className="product-card-actions">
-        <Link href={`/products/${product.slug}`}>
-          Product story <span aria-hidden="true">→</span>
+        <Link aria-label={`Explore ${product.shortName}`} href={`/products/${product.slug}`}>
+          Explore product <span aria-hidden="true">→</span>
         </Link>
         <a
           aria-label={`Visit ${product.shortName} (opens in a new tab)`}

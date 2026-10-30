@@ -54,7 +54,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form aria-label="Contact Savvy Rilla" className="contact-form" onSubmit={handleSubmit}>
+    <form id="contact-form" aria-label="Contact Savvy Rilla" className="contact-form" onSubmit={handleSubmit}>
       <div className="form-honeypot" aria-hidden="true">
         <label htmlFor="website">Website</label>
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />

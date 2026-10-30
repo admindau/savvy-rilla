@@ -1,3 +1,4 @@
+import PageGraphic from "@/components/page-graphic";
 import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import ProductLogo from "@/components/product-logo";
@@ -12,14 +13,17 @@ export default function StatusPage() {
   return (
     <main id="main-content">
       <section className="page-hero">
-        <div className="shell">
-          <p className="eyebrow">Product access</p>
-          <h1>Go directly to the products.</h1>
-          <p className="page-hero-copy">
-            This page provides direct access to each live Savvy Rilla product.
-            Formal service monitoring and incident reporting will be introduced
-            separately.
-          </p>
+        <div className="shell page-hero-layout">
+          <div className="page-hero-content">
+            <p className="eyebrow">Product access</p>
+            <h1>Go directly to the products.</h1>
+            <p className="page-hero-copy">
+              This page provides direct access to each live Savvy Rilla product.
+              Formal service monitoring and incident reporting will be introduced
+              separately.
+            </p>
+          </div>
+          <PageGraphic kind="portfolio" directAccess />
         </div>
       </section>
       <section className="page-section page-section-soft">

@@ -1,3 +1,4 @@
+import PageGraphic from "@/components/page-graphic";
 import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import ProductCard from "@/components/product-card";
@@ -11,15 +12,18 @@ export default function ProductsPage() {
   return (
     <main id="main-content">
       <section className="page-hero">
-        <div className="shell">
-          <p className="eyebrow">Savvy Rilla products</p>
-          <h1>Built around real needs.</h1>
-          <p className="page-hero-copy">
-            Our portfolio spans everyday money, trusted commerce, regional
-            market intelligence, livestock identity, and family memory.
-            Different challenges, united by practical design and dependable
-            technology.
-          </p>
+        <div className="shell page-hero-layout">
+          <div className="page-hero-content">
+            <p className="eyebrow">Savvy Rilla products</p>
+            <h1>Built around real needs.</h1>
+            <p className="page-hero-copy">
+              Our portfolio spans everyday money, trusted commerce, regional
+              market intelligence, livestock identity, and family memory.
+              Different challenges, united by practical design and dependable
+              technology.
+            </p>
+          </div>
+          <PageGraphic kind="portfolio" />
         </div>
       </section>
 

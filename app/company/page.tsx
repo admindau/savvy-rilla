@@ -1,3 +1,4 @@
+import PageGraphic from "@/components/page-graphic";
 import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -10,14 +11,17 @@ export default function CompanyPage() {
   return (
     <main id="main-content">
       <section className="page-hero">
-        <div className="shell">
-          <p className="eyebrow">The company</p>
-          <h1>Built here. Ready for everywhere.</h1>
-          <p className="page-hero-copy">
-            Savvy Rilla Technologies™ is a product company based in Juba, South
-            Sudan. We create technology for important systems and stay close to
-            the work after launch.
-          </p>
+        <div className="shell page-hero-layout">
+          <div className="page-hero-content">
+            <p className="eyebrow">The company</p>
+            <h1>Built here. Ready for everywhere.</h1>
+            <p className="page-hero-copy">
+              Savvy Rilla Technologies™ is a product company based in Juba, South
+              Sudan. We create technology for important systems and stay close to
+              the work after launch.
+            </p>
+          </div>
+          <PageGraphic kind="company" />
         </div>
       </section>
 

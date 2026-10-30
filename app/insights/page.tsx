@@ -1,3 +1,4 @@
+import PageGraphic from "@/components/page-graphic";
 import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -28,13 +29,16 @@ export default function InsightsPage() {
   return (
     <main id="main-content">
       <section className="page-hero">
-        <div className="shell">
-          <p className="eyebrow">Insights</p>
-          <h1>Notes from the work.</h1>
-          <p className="page-hero-copy">
-            Operating principles, product thinking, and ideas about building
-            useful technology from South Sudan.
-          </p>
+        <div className="shell page-hero-layout">
+          <div className="page-hero-content">
+            <p className="eyebrow">Insights</p>
+            <h1>Notes from the work.</h1>
+            <p className="page-hero-copy">
+              Operating principles, product thinking, and ideas about building
+              useful technology from South Sudan.
+            </p>
+          </div>
+          <PageGraphic kind="insights" />
         </div>
       </section>
 

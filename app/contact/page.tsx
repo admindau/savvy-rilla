@@ -1,5 +1,7 @@
+import PageGraphic from "@/components/page-graphic";
 import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
+import Link from "next/link";
 import ContactForm from "@/components/contact-form";
 import { brand } from "@/lib/brand";
 
@@ -11,13 +13,17 @@ export default function ContactPage() {
   return (
     <main id="main-content">
       <section className="page-hero">
-        <div className="shell">
-          <p className="eyebrow">Contact</p>
-          <h1>Let’s make something useful.</h1>
-          <p className="page-hero-copy">
-            Ask about a Savvy Rilla product, explore a partnership, or tell us
-            about a system worth building.
-          </p>
+        <div className="shell page-hero-layout">
+          <div className="page-hero-content">
+            <p className="eyebrow">Contact</p>
+            <h1>Let’s make something useful.</h1>
+            <p className="page-hero-copy">
+              Ask about a Savvy Rilla product, explore a partnership, or tell us
+              about a system worth building.
+            </p>
+            <div className="page-hero-actions"><Link href="#contact-form" className="button button-light">Write your message <span aria-hidden="true">↓</span></Link></div>
+          </div>
+          <PageGraphic kind="contact" />
         </div>
       </section>
 

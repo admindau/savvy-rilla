@@ -1,3 +1,4 @@
+import PageGraphic from "@/components/page-graphic";
 import { pageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -43,21 +44,24 @@ export default function CapabilitiesPage() {
   return (
     <main id="main-content">
       <section className="page-hero">
-        <div className="shell">
-          <p className="eyebrow">Capabilities</p>
-          <h1>Ideas are only the beginning.</h1>
-          <p className="page-hero-copy">
-            We combine product judgement, engineering, and operations to turn
-            ambitious ideas into systems people can actually depend on.
-          </p>
-          <div className="page-hero-actions">
-            <Link className="button button-light" href="/contact">
-              Start a conversation <span aria-hidden="true">↗</span>
-            </Link>
-            <Link className="text-link" href="/products">
-              See what we operate <span aria-hidden="true">→</span>
-            </Link>
+        <div className="shell page-hero-layout">
+          <div className="page-hero-content">
+            <p className="eyebrow">Capabilities</p>
+            <h1>Ideas are only the beginning.</h1>
+            <p className="page-hero-copy">
+              We combine product judgement, engineering, and operations to turn
+              ambitious ideas into systems people can actually depend on.
+            </p>
+            <div className="page-hero-actions">
+              <Link className="button button-light" href="/contact">
+                Start a conversation <span aria-hidden="true">↗</span>
+              </Link>
+              <Link className="text-link" href="/products">
+                See what we operate <span aria-hidden="true">→</span>
+              </Link>
+            </div>
           </div>
+          <PageGraphic kind="capabilities" />
         </div>
       </section>
 
