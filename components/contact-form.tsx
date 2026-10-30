@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 
 type FormState = {
@@ -12,28 +12,36 @@ const initialState: FormState = { state: "idle", message: "" };
 
 export default function ContactForm() {
   const [status, setStatus] = useState<FormState>(initialState);
+  const submitting = useRef(false);
+  const statusRef = useRef<HTMLParagraphElement>(null);
+  const isSubmitting = status.state === "submitting";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     const form = event.currentTarget;
     const formData = new FormData(form);
 
     setStatus({ state: "submitting", message: "Sending your message…" });
 
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 30_000);
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Object.fromEntries(formData)),
       });
 
-      const result = (await response.json()) as {
+      const result = (await response.json().catch(() => null)) as {
         ok?: boolean;
         error?: string;
-      };
+      } | null;
 
-      if (!response.ok || !result.ok) {
-        throw new Error(result.error || "We could not send your message.");
+      if (!response.ok || !result?.ok) {
+        throw new Error(result?.error || "We could not confirm delivery. Please email us before trying again.");
       }
 
       form.reset();
@@ -46,10 +54,14 @@ export default function ContactForm() {
       setStatus({
         state: "error",
         message:
-          error instanceof Error
+          error instanceof Error && error.name === "Error"
             ? error.message
-            : "Something went wrong. Please email hello@savvyrilla.tech.",
+            : "We could not confirm delivery. Your message is still here. Please email us before trying again.",
       });
+    } finally {
+      window.clearTimeout(timeout);
+      submitting.current = false;
+      window.requestAnimationFrame(() => statusRef.current?.focus());
     }
   }
 
@@ -57,12 +69,12 @@ export default function ContactForm() {
     <form id="contact-form" aria-label="Contact Savvy Rilla" className="contact-form" onSubmit={handleSubmit}>
       <div className="form-honeypot" aria-hidden="true">
         <label htmlFor="website">Website</label>
-        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+        <input disabled={isSubmitting} id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
       <div className="form-field">
         <label htmlFor="name">Name (required)</label>
-        <input
+        <input disabled={isSubmitting}
           id="name"
           name="name"
           type="text"
@@ -75,12 +87,12 @@ export default function ContactForm() {
 
       <div className="form-field">
         <label htmlFor="email">Email (required)</label>
-        <input id="email" name="email" type="email" autoComplete="email" required maxLength={180} />
+        <input disabled={isSubmitting} id="email" name="email" type="email" autoComplete="email" required maxLength={180} />
       </div>
 
       <div className="form-field">
         <label htmlFor="organisation">Organisation (optional)</label>
-        <input
+        <input disabled={isSubmitting}
           id="organisation"
           name="organisation"
           type="text"
@@ -91,7 +103,7 @@ export default function ContactForm() {
 
       <div className="form-field">
         <label htmlFor="type">What would you like to discuss?</label>
-        <select id="type" name="type" defaultValue="product" required>
+        <select disabled={isSubmitting} id="type" name="type" defaultValue="product" required>
           <option value="product">A Savvy Rilla product</option>
           <option value="partnership">Partnership</option>
           <option value="build">A product or system</option>
@@ -102,7 +114,7 @@ export default function ContactForm() {
 
       <div className="form-field form-field-full">
         <label htmlFor="message">Tell us a little more (required)</label>
-        <textarea
+        <textarea disabled={isSubmitting}
           id="message"
           name="message"
           placeholder="What are you working on, and how can we help?"
@@ -131,6 +143,8 @@ export default function ContactForm() {
       <p
         className="form-status form-field-full"
         data-state={status.state}
+        ref={statusRef}
+        tabIndex={-1}
         role="status"
         aria-live="polite"
       >

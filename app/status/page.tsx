@@ -43,7 +43,7 @@ export default function StatusPage() {
                   <span aria-hidden="true" />
                   {product.availability}
                 </p>
-                <h3>{product.name}</h3>
+                <h2>{product.name}</h2>
               </div>
               <p>
                 <a

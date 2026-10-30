@@ -23,8 +23,13 @@ export default function SiteHeader() {
     const closeOnDesktop = () => {
       if (desktop.matches) setMobileOpen(false);
     };
+    const closeOnHistory = () => setMobileOpen(false);
     desktop.addEventListener("change", closeOnDesktop);
-    return () => desktop.removeEventListener("change", closeOnDesktop);
+    window.addEventListener("popstate", closeOnHistory);
+    return () => {
+      desktop.removeEventListener("change", closeOnDesktop);
+      window.removeEventListener("popstate", closeOnHistory);
+    };
   }, []);
 
   function isCurrent(href: string) {
@@ -39,6 +44,9 @@ export default function SiteHeader() {
     const previousOverflow = document.body.style.overflow;
     const firstLink = menuPanelRef.current?.querySelector<HTMLAnchorElement>("a");
 
+    const background = Array.from(document.querySelectorAll<HTMLElement>("main, footer"));
+    const previouslyInert = background.map(element => element.inert);
+    background.forEach(element => { element.inert = true; });
     document.body.style.overflow = "hidden";
     firstLink?.focus();
 
@@ -77,12 +85,21 @@ export default function SiteHeader() {
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      background.forEach((element, index) => { element.inert = previouslyInert[index]; });
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [mobileOpen]);
 
   return (
-    <header className="site-header" data-menu-open={mobileOpen || undefined}>
+    <header
+      className="site-header"
+      data-menu-open={mobileOpen || undefined}
+      onClickCapture={(event) => {
+        if (event.target instanceof Element && event.target.closest("a")) {
+          setMobileOpen(false);
+        }
+      }}
+    >
       <div className="shell nav-shell">
         <CompanyBrand priority />
 
@@ -108,7 +125,6 @@ export default function SiteHeader() {
           <button
             aria-controls="mobile-navigation"
             aria-expanded={mobileOpen}
-            aria-haspopup="true"
             aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
             className="mobile-nav-toggle"
             onClick={() => setMobileOpen((open) => !open)}
@@ -118,6 +134,17 @@ export default function SiteHeader() {
             <span />
             <span />
           </button>
+          <button
+            aria-label="Dismiss navigation"
+            className="mobile-nav-backdrop"
+            hidden={!mobileOpen}
+            onClick={() => {
+              setMobileOpen(false);
+              menuButtonRef.current?.focus();
+            }}
+            tabIndex={-1}
+            type="button"
+          />
           <nav
             aria-label="Mobile navigation"
             className="mobile-nav-panel"

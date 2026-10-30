@@ -70,7 +70,7 @@ export default function CapabilitiesPage() {
           {capabilities.map((capability) => (
             <article key={capability.number}>
               <span>{capability.number}</span>
-              <h3>{capability.title}</h3>
+              <h2>{capability.title}</h2>
               <p>{capability.text}</p>
             </article>
           ))}

@@ -31,7 +31,7 @@ export default function ProductsPage() {
         <div className="shell">
           <div className="product-grid">
             {products.map((product, index) => (
-              <ProductCard product={product} index={index} key={product.slug} />
+              <ProductCard headingLevel={2} product={product} index={index} key={product.slug} />
             ))}
           </div>
         </div>

@@ -826,7 +826,7 @@ img {
   text-transform: uppercase;
 }
 
-.product-card h3 {
+.product-card :is(h2, h3) {
   margin: 0;
   font-size: clamp(2rem, 3vw, 3rem);
   line-height: 1;
@@ -1436,7 +1436,7 @@ img {
   font-weight: 700;
 }
 
-.detail-list h3 {
+.detail-list :is(h2, h3) {
   margin: 86px 0 16px;
   font-size: 1.25rem;
   font-weight: 500;
@@ -1820,7 +1820,7 @@ img {
   height: 32px;
 }
 
-.access-card h3 {
+.access-card :is(h2, h3) {
   margin-top: 14px;
 }
 
@@ -2706,7 +2706,7 @@ p { text-wrap: pretty; }
 .product-card:focus-within::after { width: 100%; }
 .product-card:focus-within { border-color: var(--product-accent); }
 .detail-list article { padding: 30px; }
-.detail-list h3 { margin-top: 46px; }
+.detail-list :is(h2, h3) { margin-top: 46px; }
 .detail-list p { font-size: 0.94rem; line-height: 1.75; }
 .technology-principles p { font-size: 0.88rem; }
 .capability-grid p { font-size: 0.94rem; }
@@ -2759,7 +2759,7 @@ p { text-wrap: pretty; }
   .product-card-actions { flex-direction: row; justify-content: space-between; flex-wrap: wrap; gap: 8px 18px; }
   .product-card-copy > p:last-child { font-size: 0.94rem; }
   .detail-list article { min-height: 220px; padding: 26px; }
-  .detail-list h3 { margin-top: 36px; }
+  .detail-list :is(h2, h3) { margin-top: 36px; }
   .page-section, .section { padding-block: 68px; }
   .product-detail-hero { padding-top: 128px; }
   .product-detail-hero h1 { font-size: clamp(2.7rem, 12vw, 4.5rem); line-height: 1; }
@@ -2790,3 +2790,16 @@ p { text-wrap: pretty; }
   .product-symbol > .product-logo-wordmark { width: 176px; height: 64px; padding: 8px; border-radius: 12px; }
   .product-facts { margin-top: 42px; }
 }
+
+/* A dismissible backdrop keeps the mobile menu separate from page actions. */
+.mobile-nav-backdrop { display: none; }
+@media (max-width: 1050px) {
+  .mobile-nav-backdrop { display: block; position: fixed; inset: 80px 0 auto; height: calc(100dvh - 80px); z-index: 1; border: 0; background: rgb(0 0 0 / 0.62); cursor: pointer; }
+  .mobile-nav-panel { z-index: 2; }
+}
+@media (max-width: 760px) {
+  .mobile-nav-backdrop { top: 72px; height: calc(100dvh - 72px); }
+}
+.mobile-nav-backdrop[hidden], .mobile-nav-panel[hidden] { display: none; }
+.form-field :disabled { opacity: 0.75; cursor: wait; }
+.form-status:focus { outline: 2px solid var(--acid); outline-offset: 8px; }

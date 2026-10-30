@@ -6,10 +6,13 @@ import type { Product } from "@/lib/products";
 export default function ProductCard({
   product,
   index,
+  headingLevel = 3,
 }: {
   product: Product;
   index: number;
+  headingLevel?: 2 | 3;
 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const style = {
     "--product-accent": product.accent,
     "--product-soft": product.accentSoft,
@@ -40,7 +43,7 @@ export default function ProductCard({
       </div>
       <div className="product-card-copy">
         <p className="product-category">{product.category}</p>
-        <h3>{product.name}</h3>
+        <Heading>{product.name}</Heading>
         <p className="product-tagline">{product.tagline}</p>
         <p>{product.description}</p>
       </div>
